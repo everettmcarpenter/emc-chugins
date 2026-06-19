@@ -1,0 +1,3 @@
+[submodule "include/stk"]
+	path = include/stk
+	url = https://github.com/thestk/stk.git
