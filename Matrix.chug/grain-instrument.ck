@@ -22,17 +22,20 @@
 @import "Rec.ck"
 
 // instantiate a Matrix
-GrainSwarm grains( "audio/composed3+whispering.wav" )[4] => Delay del[4] => Matrix4 obj => dac;
+GrainSwarm grains( "audio/composed3+whispering.wav" )[4] => Delay del[4] => Matrix4 obj => Delay del2[4] => Matrix4 obj2 => dac;
 // feedback
 obj => del; 
+obj2 => del2;
 grains => Gain vol(0.5)[4] => dac;
 
 for( int i; i < del.size(); i++ ) { del[i].set( ((i+1)*12)::ms, (((i+1)*12)+1)::ms ); del[i].gain(1.2); }
+for( int i; i < del2.size(); i++ ) { del2[i].set( ((i+1)*32)::ms, (((i+1)*32)+1)::ms ); del2[i].gain(1.2); }
 
 Hid hi;
 HidMsg msg;
 
 obj.identity();
+obj2.identity();
 
 0 => float phase;
 0.000123 => float step;
@@ -45,8 +48,10 @@ obj.identity();
 if( !hi.openKeyboard( device ) ) me.exit();
 <<< "keyboard '" + hi.name() + "' ready", "" >>>;
 
-spork ~ update();
+spork ~ update( obj );
+spork ~ update( obj2 );
 spork ~ matrixUpdate( obj );
+spork ~ matrixUpdate( obj2 );
 spork ~ Rec.auto();
 
 while( true ) 
@@ -93,8 +98,9 @@ fun void matrixUpdate( Matrix4 ob )
     }
 }
 
-fun void update()
+fun void update( Matrix4 object )
 {
+    Math.random2( 1,3 ) => int mult;
     while( true )
     {
         if( go ) 
@@ -105,8 +111,8 @@ fun void update()
             {
                 for( int j; j < 4; j++ )
                 {
-                    if( j < i ) obj.entry( 0.98 * Math.cos( phase ), i, j );
-                    else obj.entry( 0.0, i, j );
+                    if( j < i ) object.entry( 0.98 * Math.cos( mult * phase ), i, j );
+                    else object.entry( 0.25, i, j );
                 }
             }
         }

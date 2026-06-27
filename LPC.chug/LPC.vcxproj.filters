@@ -2,22 +2,22 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{1f9ae656-e376-4279-822e-c5eba754da79}</UniqueIdentifier>
+      <UniqueIdentifier>{8515dce6-390a-4450-a494-7f15a9fb614e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{fa6725b1-f8fb-49b6-842b-65f4e47e0993}</UniqueIdentifier>
+      <UniqueIdentifier>{03d5dbfc-0ec9-49fa-bc8d-bc9bc81143a8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Matrix.cpp">
+    <ClCompile Include="src\LPC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Matrix.h">
+    <ClInclude Include="LPC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\chugin.h">
+    <ClInclude Include="CircularBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

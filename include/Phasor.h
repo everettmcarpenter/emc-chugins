@@ -17,19 +17,20 @@ public:
     }
 
     // overloaded constructor
-    Phasor::Phasor( t_CKFLOAT fs, t_CKFLOAT freq )
+    Phasor::Phasor( t_CKFLOAT fs, t_CKFLOAT freq, bool mode = false )
     {
         this->fs = fs;
+        this->oneShot = mode;
         setFrequency( freq );
     }
 
-    // for chugins extending UGen
+    // tick
     SAMPLE Phasor::tick()
     {
         SAMPLE out = phase;
-        phase += normFreq;
-        // wrap around
-        if ( phase >= 1.0 ) phase -= 1.0;
+        if( !done ) phase += normFreq; // if we aren't done, move forward
+        // wrap around, if it's one shot, note that we are done
+        if ( phase >= 1.0 ) { phase -= 1.0; if ( oneShot ) done = true; }
         return out;
     }
 
@@ -58,6 +59,11 @@ public:
     // retreive sampling frequency
     t_CKFLOAT Phasor::getSR() { return fs; }
 
+    // shoot!
+    void Phasor::trigger() { done = false; }
+
+    bool Phasor::state() { return done; }
+
     // reset
     void Phasor::reset() { phase = 0.f; }
 
@@ -67,6 +73,8 @@ private:
     t_CKFLOAT freq = 1.f;
     t_CKFLOAT normFreq = 1.f;
     t_CKFLOAT phase = 0.f;
+    bool oneShot = false;
+    bool done = false;
 };
 
 #endif

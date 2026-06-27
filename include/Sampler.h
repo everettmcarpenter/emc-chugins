@@ -35,9 +35,11 @@ public:
 	SAMPLE Sampler::tick()
 	{
 		// interpolate pitch
-		playback->setFrequency( pitch->tick() * oneHert, FALSE );
+		playback->setFrequency( ( pitch->tick() * oneHert ), FALSE );
 		// get index
 		t_CKFLOAT index = playback->tick() * indexLimit * loopLength;
+		// wrap to loop start
+		index += loopStart * indexLimit;
 		// range check ( if the index is smaller than the potential target + file size, then we may add it
 		if( index <= indexLimit - position->getTarget() ) { index += position->tick(); }
 		// return the sample
@@ -64,7 +66,7 @@ public:
 		reader->read( *buffer, 0, true );
 
 		// set our interal oneHert
-		oneHert = ( reader->fileRate() / reader->fileSize() );
+		oneHert = ( reader->fileRate() / ( reader->fileSize() * loopLength ) );
 		// set out index limit
 		indexLimit = ( -1.0f + ( buffer->size() / buffer->channels() ) );
 		// let's go!
@@ -127,7 +129,25 @@ public:
 	{ 
 		if( leng > 0.0 && leng <= 1.0 ) { loopLength = leng; }
 		else loopLength = 1.f;
+		oneHert = ( reader->fileRate() / ( reader->fileSize() * loopLength ) );
 		return loopLength;
+	}
+
+	t_CKFLOAT Sampler::setLoopStart( t_CKFLOAT start )
+	{
+		if( start >= 0.0 && start < 1.0 ) loopStart = start;
+		return loopStart;
+	}
+
+	// set loop length from ms ( meant to syncronize looping with a grain window )
+	void Sampler::setLoopLengthWithWindow( t_CKFLOAT length_ms ) // an attempt to make legible code
+	{
+		// ms to samples
+		t_CKFLOAT windowSamples = ( length_ms * stk::Stk::sampleRate() ) / 1000.0;
+    
+		// fractional
+		t_CKFLOAT fileSamples = buffer->size() / buffer->channels();
+		this->setLoopLength( windowSamples / fileSamples );
 	}
 
 	// experimental time stretch
@@ -142,7 +162,8 @@ public:
 	Smoother* position = nullptr;
 	stk::FileRead* reader = nullptr;
 	stk::StkFrames* buffer = nullptr;
-	t_CKFLOAT loopLength = 1.f; // this is multiplied by the playback phasor [0.0,1.0]
+	t_CKFLOAT loopLength = 0.5; // this is multiplied by the playback phasor [0.0,1.0]
+	t_CKFLOAT loopStart = 0.f;
 	t_CKFLOAT oneHert = 0.f; // this is the frequency needed to playback the current file at it's normal rate
 	t_CKFLOAT indexLimit  = 0.f; // this is the maximum value the index can be when interpolating
 };

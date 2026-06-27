@@ -36,7 +36,7 @@
 //-----------------------------------------------------------------------------
 
 // include chugin header
-#include "../include/chugin.h"
+#include "../../include/chugin.h"
 #include "../include/Matrix.h"
 
 // general includes
@@ -96,6 +96,42 @@ CK_DLL_TICKF( matrix4_tickf );
 
 // this is a special offset reserved for chugin internal data
 t_CKINT matrix4_data_offset = 0;
+
+// declaration of chugin constructor
+CK_DLL_CTOR( matrix8_ctor );
+// declaration of chugin desctructor
+CK_DLL_DTOR( matrix8_dtor );
+
+// example of getter/setter
+CK_DLL_MFUN( matrix8_setEntry );
+CK_DLL_MFUN( matrix8_getEntry );
+CK_DLL_MFUN( matrix8_getSize );
+
+CK_DLL_MFUN( matrix8_identity );
+
+// for chugins extending UGen, this is mono synthesis function for 1 sample
+CK_DLL_TICKF( matrix8_tickf );
+
+// this is a special offset reserved for chugin internal data
+t_CKINT matrix8_data_offset = 0;
+
+// declaration of chugin constructor
+CK_DLL_CTOR( matrix16_ctor );
+// declaration of chugin desctructor
+CK_DLL_DTOR( matrix16_dtor );
+
+// example of getter/setter
+CK_DLL_MFUN( matrix16_setEntry );
+CK_DLL_MFUN( matrix16_getEntry );
+CK_DLL_MFUN( matrix16_getSize );
+
+CK_DLL_MFUN( matrix16_identity );
+
+// for chugins extending UGen, this is mono synthesis function for 1 sample
+CK_DLL_TICKF( matrix16_tickf );
+
+// this is a special offset reserved for chugin internal data
+t_CKINT matrix16_data_offset = 0;
 
 //-----------------------------------------------------------------------------
 // info function: ChucK calls this when loading/probing the chugin
@@ -231,6 +267,106 @@ CK_DLL_QUERY( Matrix )
     QUERY->end_class( QUERY );
     // ------------------------------------------------------------------------
 
+    // ------------------------------------------------------------------------
+    // begin class definition(s); will be compiled, verified,
+    // and added to the chuck host type system for use
+    // ------------------------------------------------------------------------
+    // NOTE to create a non-UGen class, change the second argument
+    // to extend a different ChucK class (e.g., "Object")
+    QUERY->begin_class( QUERY, "Matrix8", "UGen" );
+
+    // register default constructor
+    QUERY->add_ctor( QUERY, matrix8_ctor );
+    // NOTE constructors can be overloaded like any other functions,
+    // each overloaded constructor begins with `QUERY->add_ctor()`
+    // followed by a sequence of `QUERY->add_arg()`
+
+    // register the destructor (probably no need to change)
+    QUERY->add_dtor( QUERY, matrix8_dtor );
+
+    // for UGens only: add tick function
+    // NOTE a non-UGen class should remove or comment out this next line
+    QUERY->add_ugen_funcf( QUERY, matrix8_tickf, NULL, 8, 8 );
+    // NOTE: if this is to be a UGen with more than 1 channel,
+    // e.g., a multichannel UGen -- will need to use add_ugen_funcf()
+    // and declare a tickf function using CK_DLL_TICKF
+
+    // example of adding setter method
+    QUERY->add_mfun( QUERY, matrix8_setEntry, "float", "entry" );
+    // example of adding argument to the above method
+    QUERY->add_arg( QUERY, "float", "value" );
+    QUERY->add_arg( QUERY, "int", "column" );
+    QUERY->add_arg( QUERY, "int", "row" );
+
+    QUERY->add_mfun( QUERY, matrix8_getEntry, "float", "entry" );
+    QUERY->add_arg( QUERY, "int", "column" );
+    QUERY->add_arg( QUERY, "int", "row" );
+
+    QUERY->add_mfun( QUERY, matrix8_getSize, "int", "size" );
+
+    QUERY->add_mfun( QUERY, matrix8_identity, "void", "identity" );
+    QUERY->doc_func( QUERY, "Empty matrix and fill it's diagonals with 1.0" );
+    
+    // this reserves a variable in the ChucK internal class to store 
+    // referene to the c++ class we defined above
+    matrix8_data_offset = QUERY->add_mvar( QUERY, "int", "@m_data", false );
+
+    // ------------------------------------------------------------------------
+    // end the class definition
+    // IMPORTANT: this MUST be called to each class definition!
+    // ------------------------------------------------------------------------
+    QUERY->end_class( QUERY );
+
+    // ------------------------------------------------------------------------
+    // begin class definition(s); will be compiled, verified,
+    // and added to the chuck host type system for use
+    // ------------------------------------------------------------------------
+    // NOTE to create a non-UGen class, change the second argument
+    // to extend a different ChucK class (e.g., "Object")
+    QUERY->begin_class( QUERY, "Matrix16", "UGen" );
+
+    // register default constructor
+    QUERY->add_ctor( QUERY, matrix16_ctor );
+    // NOTE constructors can be overloaded like any other functions,
+    // each overloaded constructor begins with `QUERY->add_ctor()`
+    // followed by a sequence of `QUERY->add_arg()`
+
+    // register the destructor (probably no need to change)
+    QUERY->add_dtor( QUERY, matrix16_dtor );
+
+    // for UGens only: add tick function
+    // NOTE a non-UGen class should remove or comment out this next line
+    QUERY->add_ugen_funcf( QUERY, matrix16_tickf, NULL, 16, 16 );
+    // NOTE: if this is to be a UGen with more than 1 channel,
+    // e.g., a multichannel UGen -- will need to use add_ugen_funcf()
+    // and declare a tickf function using CK_DLL_TICKF
+
+    // example of adding setter method
+    QUERY->add_mfun( QUERY, matrix16_setEntry, "float", "entry" );
+    // example of adding argument to the above method
+    QUERY->add_arg( QUERY, "float", "value" );
+    QUERY->add_arg( QUERY, "int", "column" );
+    QUERY->add_arg( QUERY, "int", "row" );
+
+    QUERY->add_mfun( QUERY, matrix16_getEntry, "float", "entry" );
+    QUERY->add_arg( QUERY, "int", "column" );
+    QUERY->add_arg( QUERY, "int", "row" );
+
+    QUERY->add_mfun( QUERY, matrix16_getSize, "int", "size" );
+
+    QUERY->add_mfun( QUERY, matrix16_identity, "void", "identity" );
+    QUERY->doc_func( QUERY, "Empty matrix and fill it's diagonals with 1.0" );
+    
+    // this reserves a variable in the ChucK internal class to store 
+    // referene to the c++ class we defined above
+    matrix16_data_offset = QUERY->add_mvar( QUERY, "int", "@m_data", false );
+
+    // ------------------------------------------------------------------------
+    // end the class definition
+    // IMPORTANT: this MUST be called to each class definition!
+    // ------------------------------------------------------------------------
+    QUERY->end_class( QUERY );
+
     // wasn't that a breeze?
     return TRUE;
 }
@@ -243,7 +379,7 @@ CK_DLL_CTOR( matrix2_ctor )
     OBJ_MEMBER_INT( SELF, matrix2_data_offset ) = 0;
     
     // instantiate our internal c++ class representation
-    Matrix<2, t_CKFLOAT> * m_obj = new Matrix<2, t_CKFLOAT>( API->vm->srate( VM ) );
+    Matrix<t_CKFLOAT> * m_obj = new Matrix<t_CKFLOAT>( API->vm->srate( VM ), 2 );
     
     // store the pointer in the ChucK object member
     OBJ_MEMBER_INT( SELF, matrix2_data_offset ) = (t_CKINT)m_obj;
@@ -254,7 +390,7 @@ CK_DLL_CTOR( matrix2_ctor )
 CK_DLL_DTOR( matrix2_dtor )
 {
     // get our c++ class pointer
-    Matrix<2, t_CKFLOAT> * m_obj = (Matrix<2, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix2_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix2_data_offset );
     // clean up (this macro tests for NULL, deletes, and zeros out the variable)
     CK_SAFE_DELETE( m_obj );
     // set the data field to 0
@@ -266,7 +402,7 @@ CK_DLL_DTOR( matrix2_dtor )
 CK_DLL_TICKF( matrix2_tickf )
 {
     // get our c++ class pointer
-   Matrix<2, t_CKFLOAT> * m_obj = (Matrix<2, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix2_data_offset );
+   Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix2_data_offset );
  
     // invoke our tick function; store in the magical out variable
     if( m_obj ) m_obj->tick( in, out, nframes );
@@ -280,7 +416,7 @@ CK_DLL_TICKF( matrix2_tickf )
 CK_DLL_MFUN( matrix2_setEntry )
 {
     // get our c++ class pointer
-    Matrix<2, t_CKFLOAT> * m_obj = (Matrix<2, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix2_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix2_data_offset );
 
     // get next argument
     // NOTE argument type must match what is specified above in CK_DLL_QUERY
@@ -297,7 +433,7 @@ CK_DLL_MFUN( matrix2_setEntry )
 CK_DLL_MFUN( matrix2_getEntry )
 {
     // get our c++ class pointer
-    Matrix<2, t_CKFLOAT> * m_obj = (Matrix<2, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix2_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix2_data_offset );
 
     // get next argument
     // NOTE argument type must match what is specified above in CK_DLL_QUERY
@@ -312,14 +448,14 @@ CK_DLL_MFUN( matrix2_getEntry )
 CK_DLL_MFUN( matrix2_getSize )
 {
     // get our c++ class pointer
-    Matrix<2, t_CKFLOAT> * m_obj = (Matrix<2, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix2_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix2_data_offset );
     if( m_obj ) RETURN->v_int = m_obj->size();
 }
 
 CK_DLL_MFUN( matrix2_identity )
 {
      // get our c++ class pointer
-    Matrix<2, t_CKFLOAT> * m_obj = (Matrix<2, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix2_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix2_data_offset );
     // call
     if( m_obj ) m_obj->identity();
 }
@@ -331,7 +467,7 @@ CK_DLL_CTOR( matrix3_ctor )
     OBJ_MEMBER_INT( SELF, matrix3_data_offset ) = 0;
     
     // instantiate our internal c++ class representation
-    Matrix<3, t_CKFLOAT> * m_obj = new Matrix<3, t_CKFLOAT>( API->vm->srate( VM ) );
+    Matrix<t_CKFLOAT> * m_obj = new Matrix<t_CKFLOAT>( API->vm->srate( VM ), 3 );
     
     // store the pointer in the ChucK object member
     OBJ_MEMBER_INT( SELF, matrix3_data_offset ) = (t_CKINT)m_obj;
@@ -342,7 +478,7 @@ CK_DLL_CTOR( matrix3_ctor )
 CK_DLL_DTOR( matrix3_dtor )
 {
     // get our c++ class pointer
-    Matrix<3, t_CKFLOAT> * m_obj = (Matrix<3, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix3_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix3_data_offset );
     // clean up (this macro tests for NULL, deletes, and zeros out the variable)
     CK_SAFE_DELETE( m_obj );
     // set the data field to 0
@@ -354,7 +490,7 @@ CK_DLL_DTOR( matrix3_dtor )
 CK_DLL_TICKF( matrix3_tickf )
 {
     // get our c++ class pointer
-   Matrix<3, t_CKFLOAT> * m_obj = (Matrix<3, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix3_data_offset );
+   Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix3_data_offset );
  
     // invoke our tick function; store in the magical out variable
     if( m_obj ) m_obj->tick( in, out, nframes );
@@ -368,7 +504,7 @@ CK_DLL_TICKF( matrix3_tickf )
 CK_DLL_MFUN( matrix3_setEntry )
 {
     // get our c++ class pointer
-    Matrix<3, t_CKFLOAT> * m_obj = (Matrix<3, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix3_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix3_data_offset );
 
     // get next argument
     // NOTE argument type must match what is specified above in CK_DLL_QUERY
@@ -385,7 +521,7 @@ CK_DLL_MFUN( matrix3_setEntry )
 CK_DLL_MFUN( matrix3_getEntry )
 {
     // get our c++ class pointer
-    Matrix<3, t_CKFLOAT> * m_obj = (Matrix<3, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix3_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix3_data_offset );
 
     // get next argument
     // NOTE argument type must match what is specified above in CK_DLL_QUERY
@@ -400,7 +536,7 @@ CK_DLL_MFUN( matrix3_getEntry )
 CK_DLL_MFUN( matrix3_getSize )
 {
     // get our c++ class pointer
-    Matrix<3, t_CKFLOAT> * m_obj = (Matrix<3, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix3_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix3_data_offset );
     if( m_obj ) RETURN->v_int = m_obj->size();
 }
 
@@ -408,7 +544,7 @@ CK_DLL_MFUN( matrix3_getSize )
 CK_DLL_MFUN( matrix3_identity )
 {
      // get our c++ class pointer
-    Matrix<3, t_CKFLOAT> * m_obj = (Matrix<3, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix3_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix3_data_offset );
     // call
     if( m_obj ) m_obj->identity();
 }
@@ -420,7 +556,7 @@ CK_DLL_CTOR( matrix4_ctor )
     OBJ_MEMBER_INT( SELF, matrix4_data_offset ) = 0;
     
     // instantiate our internal c++ class representation
-    Matrix<4, t_CKFLOAT> * m_obj = new Matrix<4, t_CKFLOAT>( API->vm->srate( VM ) );
+    Matrix<t_CKFLOAT> * m_obj = new Matrix<t_CKFLOAT>( API->vm->srate( VM ), 4 );
     
     // store the pointer in the ChucK object member
     OBJ_MEMBER_INT( SELF, matrix4_data_offset ) = (t_CKINT)m_obj;
@@ -431,7 +567,7 @@ CK_DLL_CTOR( matrix4_ctor )
 CK_DLL_DTOR( matrix4_dtor )
 {
     // get our c++ class pointer
-    Matrix<4, t_CKFLOAT> * m_obj = (Matrix<4, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix4_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix4_data_offset );
     // clean up (this macro tests for NULL, deletes, and zeros out the variable)
     CK_SAFE_DELETE( m_obj );
     // set the data field to 0
@@ -443,7 +579,7 @@ CK_DLL_DTOR( matrix4_dtor )
 CK_DLL_TICKF( matrix4_tickf )
 {
     // get our c++ class pointer
-   Matrix<4, t_CKFLOAT> * m_obj = (Matrix<4, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix4_data_offset );
+   Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix4_data_offset );
  
     // invoke our tick function; store in the magical out variable
     if( m_obj ) m_obj->tick( in, out, nframes );
@@ -456,7 +592,7 @@ CK_DLL_TICKF( matrix4_tickf )
 CK_DLL_MFUN( matrix4_setEntry )
 {
     // get our c++ class pointer
-    Matrix<4, t_CKFLOAT> * m_obj = (Matrix<4, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix4_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix4_data_offset );
 
     // get next argument
     // NOTE argument type must match what is specified above in CK_DLL_QUERY
@@ -473,7 +609,7 @@ CK_DLL_MFUN( matrix4_setEntry )
 CK_DLL_MFUN( matrix4_getEntry )
 {
     // get our c++ class pointer
-    Matrix<4, t_CKFLOAT> * m_obj = (Matrix<4, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix4_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix4_data_offset );
 
     // get next argument
     // NOTE argument type must match what is specified above in CK_DLL_QUERY
@@ -488,7 +624,7 @@ CK_DLL_MFUN( matrix4_getEntry )
 CK_DLL_MFUN( matrix4_getSize )
 {
     // get our c++ class pointer
-    Matrix<4, t_CKFLOAT> * m_obj = (Matrix<4, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix4_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix4_data_offset );
     if( m_obj ) RETURN->v_int = m_obj->size();
 }
 
@@ -496,7 +632,183 @@ CK_DLL_MFUN( matrix4_getSize )
 CK_DLL_MFUN( matrix4_identity )
 {
      // get our c++ class pointer
-    Matrix<4, t_CKFLOAT> * m_obj = (Matrix<4, t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix4_data_offset );
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix4_data_offset );
+    // call
+    if( m_obj ) m_obj->identity();
+}
+// ------------------------------------------------------------------------
+// implementation for the default constructor
+CK_DLL_CTOR( matrix8_ctor )
+{
+    // get the offset where we'll store our internal c++ class pointer
+    OBJ_MEMBER_INT( SELF, matrix8_data_offset ) = 0;
+    
+    // instantiate our internal c++ class representation
+    Matrix<t_CKFLOAT> * m_obj = new Matrix<t_CKFLOAT>( API->vm->srate( VM ), 8 );
+    
+    // store the pointer in the ChucK object member
+    OBJ_MEMBER_INT( SELF, matrix8_data_offset ) = (t_CKINT)m_obj;
+}
+
+
+// implementation for the destructor
+CK_DLL_DTOR( matrix8_dtor )
+{
+    // get our c++ class pointer
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix8_data_offset );
+    // clean up (this macro tests for NULL, deletes, and zeros out the variable)
+    CK_SAFE_DELETE( m_obj );
+    // set the data field to 0
+    OBJ_MEMBER_INT( SELF, matrix8_data_offset ) = 0;
+}
+
+
+// implementation for tick function (relevant only for UGens)
+CK_DLL_TICKF( matrix8_tickf )
+{
+    // get our c++ class pointer
+   Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix8_data_offset );
+ 
+    // invoke our tick function; store in the magical out variable
+    if( m_obj ) m_obj->tick( in, out, nframes );
+
+    // yes
+    return TRUE;
+}
+
+// example implementation for setter
+CK_DLL_MFUN( matrix8_setEntry )
+{
+    // get our c++ class pointer
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix8_data_offset );
+
+    // get next argument
+    // NOTE argument type must match what is specified above in CK_DLL_QUERY
+    // NOTE this advances the ARGS pointer, so save in variable for re-use
+    t_CKFLOAT val = GET_NEXT_FLOAT( ARGS );
+    t_CKUINT col = GET_NEXT_UINT( ARGS );
+    t_CKUINT row = GET_NEXT_UINT( ARGS );
+    
+    // call setParam() and set the return value
+    RETURN->v_float = m_obj->set( col, row, val );
+}
+
+// example implementation for setter
+CK_DLL_MFUN( matrix8_getEntry )
+{
+    // get our c++ class pointer
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix8_data_offset );
+
+    // get next argument
+    // NOTE argument type must match what is specified above in CK_DLL_QUERY
+    // NOTE this advances the ARGS pointer, so save in variable for re-use
+    t_CKUINT col = GET_NEXT_UINT( ARGS );
+    t_CKUINT row = GET_NEXT_UINT( ARGS );
+    
+    // call setParam() and set the return value
+    RETURN->v_float = m_obj->get( col, row );
+}
+
+CK_DLL_MFUN( matrix8_getSize )
+{
+    // get our c++ class pointer
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix8_data_offset );
+    if( m_obj ) RETURN->v_int = m_obj->size();
+}
+
+
+CK_DLL_MFUN( matrix8_identity )
+{
+     // get our c++ class pointer
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix8_data_offset );
+    // call
+    if( m_obj ) m_obj->identity();
+}
+// ------------------------------------------------------------------------
+// implementation for the default constructor
+CK_DLL_CTOR( matrix16_ctor )
+{
+    // get the offset where we'll store our internal c++ class pointer
+    OBJ_MEMBER_INT( SELF, matrix16_data_offset ) = 0;
+    
+    // instantiate our internal c++ class representation
+    Matrix<t_CKFLOAT> * m_obj = new Matrix<t_CKFLOAT>( API->vm->srate( VM ), 16 );
+    
+    // store the pointer in the ChucK object member
+    OBJ_MEMBER_INT( SELF, matrix16_data_offset ) = (t_CKINT)m_obj;
+}
+
+
+// implementation for the destructor
+CK_DLL_DTOR( matrix16_dtor )
+{
+    // get our c++ class pointer
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix16_data_offset );
+    // clean up (this macro tests for NULL, deletes, and zeros out the variable)
+    CK_SAFE_DELETE( m_obj );
+    // set the data field to 0
+    OBJ_MEMBER_INT( SELF, matrix16_data_offset ) = 0;
+}
+
+
+// implementation for tick function (relevant only for UGens)
+CK_DLL_TICKF( matrix16_tickf )
+{
+    // get our c++ class pointer
+   Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix16_data_offset );
+ 
+    // invoke our tick function; store in the magical out variable
+    if( m_obj ) m_obj->tick( in, out, nframes );
+
+    // yes
+    return TRUE;
+}
+
+// example implementation for setter
+CK_DLL_MFUN( matrix16_setEntry )
+{
+    // get our c++ class pointer
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix16_data_offset );
+
+    // get next argument
+    // NOTE argument type must match what is specified above in CK_DLL_QUERY
+    // NOTE this advances the ARGS pointer, so save in variable for re-use
+    t_CKFLOAT val = GET_NEXT_FLOAT( ARGS );
+    t_CKUINT col = GET_NEXT_UINT( ARGS );
+    t_CKUINT row = GET_NEXT_UINT( ARGS );
+    
+    // call setParam() and set the return value
+    RETURN->v_float = m_obj->set( col, row, val );
+}
+
+// example implementation for setter
+CK_DLL_MFUN( matrix16_getEntry )
+{
+    // get our c++ class pointer
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix16_data_offset );
+
+    // get next argument
+    // NOTE argument type must match what is specified above in CK_DLL_QUERY
+    // NOTE this advances the ARGS pointer, so save in variable for re-use
+    t_CKUINT col = GET_NEXT_UINT( ARGS );
+    t_CKUINT row = GET_NEXT_UINT( ARGS );
+    
+    // call setParam() and set the return value
+    RETURN->v_float = m_obj->get( col, row );
+}
+
+CK_DLL_MFUN( matrix16_getSize )
+{
+    // get our c++ class pointer
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix16_data_offset );
+    if( m_obj ) RETURN->v_int = m_obj->size();
+}
+
+
+CK_DLL_MFUN( matrix16_identity )
+{
+     // get our c++ class pointer
+    Matrix<t_CKFLOAT> * m_obj = (Matrix<t_CKFLOAT>*)OBJ_MEMBER_INT( SELF, matrix16_data_offset );
     // call
     if( m_obj ) m_obj->identity();
 }

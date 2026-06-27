@@ -17,24 +17,26 @@
 
 #define MAXIMUM_BUFFER_SIZE 600000000 // maximum number of frames an StkFrames object can have, equates to 0.6 Gb using 8 byte doubles
 
-#include "../../include/Grain.h"
-#include "../../Sampler.chug/include/Sampler.h"
-#include "../../include/stk/include/FileRead.h"
-#include "../../include/stk/include/Noise.h"
-#include "../../include/stk/include/Stk.h"
+#include "Grain.h"
+#include "Sampler.h"
+#include "stk/include/FileRead.h"
+#include "stk/include/Noise.h"
+#include "stk/include/Stk.h"
 
 class FileGrain
 {
 public:
 	// constructor
-	FileGrain::FileGrain( t_CKINT fs )
+	FileGrain::FileGrain( t_CKINT fs, t_CKFLOAT init_size = 100.f )
 	{
 		// set global sample rate
 		stk::Stk::setSampleRate( fs );
 		// create fresh member-classes
-		myGrain = new Grain( fs );
-		rand = new stk::Noise( 6589 );
+		myGrain = new Granulator( fs );
+		rand = new stk::Noise( time( NULL ) );
 		samp = new Sampler( fs );
+		samp->setPitch( 1.0 ); // init pitch
+		myGrain->setWindowSize( init_size );
 	}
 
 	FileGrain::~FileGrain()
@@ -48,11 +50,21 @@ public:
 	// tick ( eventually this will just take the next sample in the file reader and granulate it )
 	SAMPLE FileGrain::tick()
     {
-        // set kinda random pit 
-        if( !samp->pitch->isMoving() ) samp->playback->setFrequency( ( random_pitch * rand->tick() ) + ( myPitch * samp->oneHert ), FALSE );
+		SAMPLE out = myGrain->tick( samp->tick() );
+		// move pitch
+		samp->setPitch( addedPitch + myPitch, 0.1 );
+
+        // set random pit 
+        if( this->myGrain->state() ) 
+		{
+			addedPitch = ( random_pitch * rand->tick() );
+			// sync sampler with window size
+			samp->setLoopLengtWithWindow( myGrain->getWindowSize() );
+		}
+
 
         // granulate! ( finally )
-        return myGrain->tick( samp->tick() );
+        return out;
     }
 
 	// overloaded tick 
@@ -73,8 +85,6 @@ public:
 	{
 		// save
 		myPitch = pit;
-		// set sampler
-		samp->setPitch( pit ); 
 		// return for fun
 		return myPitch;
 	}
@@ -83,13 +93,13 @@ public:
 	// setters and getters for window rate ( grain size )
 	void FileGrain::setGrainSize( t_CKFLOAT rate )
 	{
-		if( rate > 0.f ) myGrain->setWindowSize( rate ); // call grain function ( which calls grain param function, which calls phasor )
+		if( rate > 0.f ) myGrain->setWindowSize( rate ); // in ms
 	}
 	t_CKFLOAT FileGrain::getGrainSize() { return myGrain->getWindowSize(); }
 
 	// random size
-	void FileGrain::setRandomGrainSize( t_CKFLOAT rand ) { myGrain->setRandomWindowSize( rand ); }
-	t_CKFLOAT FileGrain::getRandomGrainSize() { return myGrain->getRandomWindowSize(); }
+	void FileGrain::setRandomGrainSize( t_CKFLOAT rand ) { myGrain->setRandomSize( rand ); }
+	t_CKFLOAT FileGrain::getRandomGrainSize() { return myGrain->getRandomSize(); }
 
 	// set random pitch
 	void FileGrain::setRandomPitch( t_CKFLOAT random ) { random_pitch = random; }
@@ -102,13 +112,14 @@ public:
 	t_CKFLOAT FileGrain::getRandomPosition() { return random_position; }
 
 	// create grain
-	Grain* myGrain = nullptr;
+	Granulator* myGrain = nullptr;
 	// file player manipulator
 	Sampler* samp = nullptr;
 	// randomness
 	stk::Noise* rand = nullptr; 
 	// internal position and pitch ( these insure that the center point of pitch or position do not change when random variations occur )
-	t_CKFLOAT myPitch = 0.f;
+	t_CKFLOAT myPitch = 1.f;
+	t_CKFLOAT addedPitch = 0.f;
 	t_CKFLOAT myPosition = 0.f;
 	// pitch interpolator
 	t_CKFLOAT random_pitch = 0.f;

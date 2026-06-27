@@ -19,33 +19,34 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3EA02ED5-4A4E-ADAE-19C8-315BA3080C13}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)/Microsoft.Cpp.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -129,11 +130,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\include\stk\src\FileRead.cpp" />
+    <ClCompile Include="..\include\stk\src\Noise.cpp" />
+    <ClCompile Include="..\include\stk\src\Stk.cpp" />
     <ClCompile Include="src\Granulator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\chugin.h" />
-    <ClInclude Include="include\Granulator.h" />
+    <ClInclude Include="..\include\chugin.h" />
+    <ClInclude Include="..\include\FileGrain.h" />
+    <ClInclude Include="..\include\Grain.h" />
+    <ClInclude Include="..\include\GrainEvent.h" />
+    <ClInclude Include="..\include\Sampler.h" />
+    <ClInclude Include="..\include\stk\include\FileRead.h" />
+    <ClInclude Include="..\include\stk\include\Noise.h" />
+    <ClInclude Include="..\include\stk\include\Stk.h" />
+    <ClInclude Include="include\Swarm.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Targets" />
 </Project>

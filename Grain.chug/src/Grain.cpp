@@ -37,7 +37,7 @@
 
 // include chugin header
 #include "../../include/chugin.h"
-#include "../include/FileGrain.h"
+#include "../../include/FileGrain.h"
 
 // general includes
 #include <iostream>
@@ -45,6 +45,7 @@
 
 // declaration of chugin constructor
 CK_DLL_CTOR( grain_ctor );
+CK_DLL_CTOR( grain_2ctor );
 // declaration of chugin desctructor
 CK_DLL_DTOR( grain_dtor );
 
@@ -115,6 +116,8 @@ CK_DLL_QUERY( Grain )
     // NOTE constructors can be overloaded like any other functions,
     // each overloaded constructor begins with `QUERY->add_ctor()`
     // followed by a sequence of `QUERY->add_arg()`
+    QUERY->add_ctor( QUERY, grain_2ctor );
+    QUERY->add_arg( QUERY, "string", "file" );
 
     // register the destructor (probably no need to change)
     QUERY->add_dtor( QUERY, grain_dtor );
@@ -201,6 +204,25 @@ CK_DLL_CTOR( grain_ctor )
 
     // instantiate our internal c++ class representation
     FileGrain* g_obj = new FileGrain( API->vm->srate( VM ) );
+
+    // store the pointer in the ChucK object member
+    OBJ_MEMBER_INT( SELF, grain_data_offset ) = ( t_CKINT )g_obj;
+}
+
+
+// implementation for the default constructor
+CK_DLL_CTOR( grain_2ctor )
+{
+    // get the offset where we'll store our internal c++ class pointer
+    OBJ_MEMBER_INT( SELF, grain_data_offset ) = 0;
+
+    // instantiate our internal c++ class representation
+    FileGrain* g_obj = new FileGrain( API->vm->srate( VM ) );
+
+    // get file
+    Chuck_String* path = GET_NEXT_STRING( ARGS );
+
+    if( g_obj ) g_obj->openFile( API->object->str( path ) );
 
     // store the pointer in the ChucK object member
     OBJ_MEMBER_INT( SELF, grain_data_offset ) = ( t_CKINT )g_obj;

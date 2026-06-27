@@ -6,15 +6,15 @@
 //      but it is possible, of course, to create non-UGen classes in a chugin!
 // To modify this generated file for a non-UGen class...
 //      1. in QUERY->begin_class(), change "UGen" to a different ChucK class
-//         (e.g., `QUERY->begin_class(QUERY, "Granulator", "Object");`)
+//         (e.g., `QUERY->begin_class(QUERY, "Grain", "Object");`)
 //      2. remove or commment out the line containing QUERY->add_ugen_func()
 //      3. that's it; the rest is no different for UGens/non-UGens
 //-----------------------------------------------------------------------------
-// NOTE once you have built this into a chugin (Granulator.chug), here are a few
+// NOTE once you have built this into a chugin (Grain.chug), here are a few
 //      helpful tools for testing / probing / verifying your new chugin!
 //
-// chuginate also generated a Granulator-test.ck boilerplate ChucK program
-//      to help test your chugin (see Granulator-test.ck for more instructions)
+// chuginate also generated a Grain-test.ck boilerplate ChucK program
+//      to help test your chugin (see Grain-test.ck for more instructions)
 //
 // run `chuck --chugin-probe` to probe what chugins would be loaded, and
 //      from where in the chugin search paths
@@ -36,7 +36,8 @@
 //-----------------------------------------------------------------------------
 
 // include chugin header
-#include "chugin.h"
+#include "../../include/chugin.h"
+#include "../include/Swarm.h"
 
 // general includes
 #include <iostream>
@@ -44,15 +45,31 @@
 
 // declaration of chugin constructor
 CK_DLL_CTOR( granulator_ctor );
+CK_DLL_CTOR( granulator_2ctor );
 // declaration of chugin desctructor
 CK_DLL_DTOR( granulator_dtor );
 
-// example of getter/setter
-CK_DLL_MFUN( granulator_setParam );
-CK_DLL_MFUN( granulator_getParam );
-
 // for chugins extending UGen, this is mono synthesis function for 1 sample
 CK_DLL_TICK( granulator_tick );
+
+CK_DLL_MFUN( granulator_setGrainSize );
+CK_DLL_MFUN( granulator_getGrainSize );
+CK_DLL_MFUN( granulator_setRandomGrainSize );
+CK_DLL_MFUN( granulator_getRandomGrainSize );
+
+CK_DLL_MFUN( granulator_setPitch );
+CK_DLL_MFUN( granulator_getPitch );
+CK_DLL_MFUN( granulator_setRandomPitch );
+CK_DLL_MFUN( granulator_getRandomPitch );
+
+CK_DLL_MFUN( granulator_setPosition );
+CK_DLL_MFUN( granulator_getPosition );
+CK_DLL_MFUN( granulator_setRandomPosition );
+CK_DLL_MFUN( granulator_getRandomPosition );
+
+CK_DLL_MFUN( granulator_openFile );
+CK_DLL_MFUN( granulator_closeFile );
+CK_DLL_MFUN( granulator_fileSize );
 
 // this is a special offset reserved for chugin internal data
 t_CKINT granulator_data_offset = 0;
@@ -65,15 +82,15 @@ t_CKINT granulator_data_offset = 0;
 CK_DLL_INFO( Granulator )
 {
     // the version string of this chugin, e.g., "v1.2.1"
-    QUERY->setinfo( QUERY, CHUGIN_INFO_CHUGIN_VERSION, "" );
+    QUERY->setinfo( QUERY, CHUGIN_INFO_CHUGIN_VERSION, "v1.0.0" );
     // the author(s) of this chugin, e.g., "Alice Baker & Carl Donut"
-    QUERY->setinfo( QUERY, CHUGIN_INFO_AUTHORS, "" );
+    QUERY->setinfo( QUERY, CHUGIN_INFO_AUTHORS, "Everett M. Carpenter" );
     // text description of this chugin; what is it? what does it do? who is it for?
-    QUERY->setinfo( QUERY, CHUGIN_INFO_DESCRIPTION, "" );
+    QUERY->setinfo( QUERY, CHUGIN_INFO_DESCRIPTION, "A single granulator with typical parameters." );
     // (optional) URL of the homepage for this chugin
     QUERY->setinfo( QUERY, CHUGIN_INFO_URL, "" );
     // (optional) contact email
-    QUERY->setinfo( QUERY, CHUGIN_INFO_EMAIL, "" );
+    QUERY->setinfo( QUERY, CHUGIN_INFO_EMAIL, "carpee2 [at] rpi [dot] edu" );
 }
 
 
@@ -99,25 +116,72 @@ CK_DLL_QUERY( Granulator )
     // NOTE constructors can be overloaded like any other functions,
     // each overloaded constructor begins with `QUERY->add_ctor()`
     // followed by a sequence of `QUERY->add_arg()`
+    QUERY->add_ctor( QUERY, granulator_2ctor );
+    QUERY->add_arg( QUERY, "string", "file" );
+    QUERY->add_arg( QUERY, "int", "num" );
 
     // register the destructor (probably no need to change)
     QUERY->add_dtor( QUERY, granulator_dtor );
 
     // for UGens only: add tick function
     // NOTE a non-UGen class should remove or comment out this next line
-    QUERY->add_ugen_func( QUERY, granulator_tick, NULL, 1, 1 );
+    QUERY->add_ugen_func( QUERY, granulator_tick, NULL, 0, 1 );
     // NOTE: if this is to be a UGen with more than 1 channel,
     // e.g., a multichannel UGen -- will need to use add_ugen_funcf()
     // and declare a tickf function using CK_DLL_TICKF
 
-    // example of adding setter method
-    QUERY->add_mfun( QUERY, granulator_setParam, "float", "param" );
-    // example of adding argument to the above method
-    QUERY->add_arg( QUERY, "float", "arg" );
+    QUERY->add_mfun( QUERY, granulator_setGrainSize, "void", "size" );
+    QUERY->add_arg( QUERY, "float", "size" );
+    QUERY->doc_func( QUERY, "Set granulator size in ms." );
 
-    // example of adding getter method
-    QUERY->add_mfun( QUERY, granulator_getParam, "float", "param" );
-    
+    QUERY->add_mfun( QUERY, granulator_getGrainSize, "float", "size" );
+    QUERY->doc_func( QUERY, "Get granulator size in ms." );
+
+    QUERY->add_mfun( QUERY, granulator_setRandomGrainSize, "void", "randomSize" );
+    QUERY->add_arg( QUERY, "float", "randomness" );
+    QUERY->doc_func( QUERY, "Set randomness of granulator size. (Additive, this is a random number between 0 and 'randomSize' which is added to the base granulator size)" );
+
+    QUERY->add_mfun( QUERY, granulator_getRandomGrainSize, "float", "randomSize" );
+    QUERY->doc_func( QUERY, "Get randomness of granulator size." );
+
+    QUERY->add_mfun( QUERY, granulator_setPitch, "void", "pitch" );
+    QUERY->add_arg( QUERY, "float", "pitch" );
+    QUERY->doc_func( QUERY, "Set pitch/rate of internal file." );
+
+    QUERY->add_mfun( QUERY, granulator_getPitch, "float", "pitch" );
+    QUERY->doc_func( QUERY, "Get the pitch/rate of internal file." );
+
+    QUERY->add_mfun( QUERY, granulator_setRandomPitch, "void", "randomPitch" );
+    QUERY->add_arg( QUERY, "float", "randomness" );
+    QUERY->doc_func( QUERY, "Set randomness of pitch." );
+
+    QUERY->add_mfun( QUERY, granulator_getRandomPitch, "float", "randomPitch" );
+    QUERY->doc_func( QUERY, "Get randomness of pitch." );
+
+    QUERY->add_mfun( QUERY, granulator_setPosition, "void", "position" );
+    QUERY->add_arg( QUERY, "float", "position" );
+    QUERY->doc_func( QUERY, "Set position of granulator in file." );
+
+    QUERY->add_mfun( QUERY, granulator_getPosition, "float", "position" );
+    QUERY->doc_func( QUERY, "Get position of granulator." );
+
+    QUERY->add_mfun( QUERY, granulator_setRandomPosition, "void", "randomPosition" );
+    QUERY->add_arg( QUERY, "float", "randomness" );
+    QUERY->doc_func( QUERY, "Set randomness of position." );
+
+    QUERY->add_mfun( QUERY, granulator_getRandomPosition, "float", "randomPosition" );
+    QUERY->doc_func( QUERY, "Get randomness of position." );
+
+    QUERY->add_mfun( QUERY, granulator_openFile, "void", "openFile" );
+    QUERY->add_arg( QUERY, "string", "file" );
+    QUERY->doc_func( QUERY, "Open file at the given path." );
+
+    QUERY->add_mfun( QUERY, granulator_closeFile, "void", "closeFile" );
+    QUERY->doc_func( QUERY, "Close the active file." );
+
+    QUERY->add_mfun( QUERY, granulator_fileSize, "float", "fileSize" );
+    QUERY->doc_func( QUERY, "Retrieve file size in samples." );
+
     // this reserves a variable in the ChucK internal class to store 
     // referene to the c++ class we defined above
     granulator_data_offset = QUERY->add_mvar( QUERY, "int", "@g_data", false );
@@ -138,12 +202,34 @@ CK_DLL_CTOR( granulator_ctor )
 {
     // get the offset where we'll store our internal c++ class pointer
     OBJ_MEMBER_INT( SELF, granulator_data_offset ) = 0;
-    
+
     // instantiate our internal c++ class representation
-    Granulator * g_obj = new Granulator( API->vm->srate(VM) );
-    
+    GrainSwarm* g_obj = new GrainSwarm( API->vm->srate( VM ), 4 );
+
     // store the pointer in the ChucK object member
-    OBJ_MEMBER_INT( SELF, granulator_data_offset ) = (t_CKINT)g_obj;
+    OBJ_MEMBER_INT( SELF, granulator_data_offset ) = ( t_CKINT )g_obj;
+}
+
+
+// implementation for the default constructor
+CK_DLL_CTOR( granulator_2ctor )
+{
+    // get the offset where we'll store our internal c++ class pointer
+    OBJ_MEMBER_INT( SELF, granulator_data_offset ) = 0;
+
+    // get file
+    Chuck_String* path = GET_NEXT_STRING( ARGS );
+
+    t_CKUINT n = GET_NEXT_UINT( ARGS );
+    if( n <= 0 ) n = 1;
+
+    // instantiate our internal c++ class representation
+    GrainSwarm* g_obj = new GrainSwarm( API->vm->srate( VM ), n );
+
+    if( g_obj ) g_obj->openFile( API->object->str( path ) );
+
+    // store the pointer in the ChucK object member
+    OBJ_MEMBER_INT( SELF, granulator_data_offset ) = ( t_CKINT )g_obj;
 }
 
 
@@ -151,7 +237,7 @@ CK_DLL_CTOR( granulator_ctor )
 CK_DLL_DTOR( granulator_dtor )
 {
     // get our c++ class pointer
-    Granulator * g_obj = (Granulator *)OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
     // clean up (this macro tests for NULL, deletes, and zeros out the variable)
     CK_SAFE_DELETE( g_obj );
     // set the data field to 0
@@ -163,38 +249,156 @@ CK_DLL_DTOR( granulator_dtor )
 CK_DLL_TICK( granulator_tick )
 {
     // get our c++ class pointer
-    Granulator * g_obj = (Granulator *)OBJ_MEMBER_INT(SELF, granulator_data_offset);
- 
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+
     // invoke our tick function; store in the magical out variable
-    if( g_obj ) *out = g_obj->tick( in );
+    if ( g_obj ) *out = g_obj->tick();
 
     // yes
     return TRUE;
 }
 
-
-// example implementation for setter
-CK_DLL_MFUN( granulator_setParam )
+// set rate
+CK_DLL_MFUN( granulator_setGrainSize )
 {
-    // get our c++ class pointer
-    Granulator * g_obj = (Granulator *)OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    // get arg
+    t_CKFLOAT nrate = GET_NEXT_FLOAT( ARGS );
+    // get our granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    // call function
+    if( g_obj ) g_obj->setGrainSize( nrate );
+}
 
-    // get next argument
-    // NOTE argument type must match what is specified above in CK_DLL_QUERY
-    // NOTE this advances the ARGS pointer, so save in variable for re-use
-    t_CKFLOAT arg1 = GET_NEXT_FLOAT( ARGS );
-    
-    // call setParam() and set the return value
-    RETURN->v_float = g_obj->setParam( arg1 );
+// get rate
+CK_DLL_MFUN( granulator_getGrainSize )
+{
+    // get granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+
+    if( g_obj ) RETURN->v_float = g_obj->getGrainSize();
+    else RETURN->v_float = -1.0;
+}
+
+// set random
+CK_DLL_MFUN( granulator_setRandomGrainSize )
+{
+    // get arg
+    t_CKFLOAT randomness = GET_NEXT_FLOAT( ARGS );
+    // get granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+
+    if( g_obj ) g_obj->setRandomGrainSize( randomness );
+}
+
+CK_DLL_MFUN( granulator_getRandomGrainSize )
+{
+    // get granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+
+    if( g_obj ) RETURN->v_float = g_obj->getRandomGrainSize();
+    else RETURN->v_float = -1.0;
 }
 
 
-// example implementation for getter
-CK_DLL_MFUN(granulator_getParam)
+CK_DLL_MFUN( granulator_setPitch )
 {
-    // get our c++ class pointer
-    Granulator * g_obj = (Granulator *)OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    // get granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    // get arg
+    t_CKFLOAT pitch = GET_NEXT_FLOAT( ARGS );
+    // set
+    if( g_obj ) g_obj->setPitch( pitch );
+}
 
-    // call getParam() and set the return value
-    RETURN->v_float = g_obj->getParam();
+CK_DLL_MFUN( granulator_getPitch )
+{
+    // get granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    // retrieve
+    if( g_obj ) RETURN->v_float = g_obj->getPitch();
+}
+
+// set random
+CK_DLL_MFUN( granulator_setRandomPitch )
+{
+    // get arg
+    t_CKFLOAT randomness = GET_NEXT_FLOAT( ARGS );
+    // get granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+
+    if( g_obj ) g_obj->setRandomPitch( randomness );
+}
+
+CK_DLL_MFUN( granulator_getRandomPitch )
+{
+    // get granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+
+    if( g_obj ) RETURN->v_float = g_obj->getRandomPitch();
+    else RETURN->v_float = -1.0;
+}
+
+CK_DLL_MFUN( granulator_setPosition )
+{
+    // get granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    // get arg
+    t_CKFLOAT pitch = GET_NEXT_FLOAT( ARGS );
+    // set
+    if( g_obj ) g_obj->samp->setPosition( pitch );
+}
+
+CK_DLL_MFUN( granulator_getPosition )
+{
+    // get granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    // retrieve
+    if( g_obj ) RETURN->v_float = g_obj->samp->getPosition() / g_obj->samp->getFileSize();
+}
+
+// set random
+CK_DLL_MFUN( granulator_setRandomPosition )
+{
+    // get arg
+    t_CKFLOAT randomness = GET_NEXT_FLOAT( ARGS );
+    // get granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+
+    if( g_obj ) g_obj->setRandomPosition( randomness );
+}
+
+CK_DLL_MFUN( granulator_getRandomPosition )
+{
+    // get granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+
+    if( g_obj ) RETURN->v_float = g_obj->getRandomPosition();
+    else RETURN->v_float = -1.0;
+}
+
+CK_DLL_MFUN( granulator_openFile )
+{
+    // get granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    // get file
+    Chuck_String* path = GET_NEXT_STRING( ARGS );
+
+    if( g_obj ) g_obj->openFile( API->object->str( path ) );
+}
+
+CK_DLL_MFUN( granulator_closeFile )
+{
+    // get granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    
+    if( g_obj ) g_obj->samp->closeFile();
+}
+
+CK_DLL_MFUN( granulator_fileSize )
+{
+    // get granulator
+    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+
+    if( g_obj ) RETURN->v_int = g_obj->samp->getFileSize();
+    else RETURN->v_int = -1;
 }

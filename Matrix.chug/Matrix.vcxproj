@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\chugin.h" />
+    <ClInclude Include="..\include\chugin.h" />
     <ClInclude Include="include\Matrix.h" />
   </ItemGroup>
   <ItemGroup>

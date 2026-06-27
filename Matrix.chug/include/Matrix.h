@@ -4,11 +4,11 @@
 const t_CKFLOAT ZERO_THRESHOLD = 1e-3;
 const t_CKFLOAT SMOOTHING_MS = 5.0; // 5ms smoothing window
 
-template <unsigned int n_size, typename T>
+template <typename T>
 class Matrix
 {
 public:
-    Matrix::Matrix( unsigned fs ) : _size( n_size )
+    Matrix::Matrix( unsigned int fs, unsigned int n_size ) : _size( n_size ), scale( 2.0 / n_size )
     {
         // create pointers to pointers
         _data = new T*[_size];
@@ -28,7 +28,7 @@ public:
         {
             _smoothing[i] = new bool[_size]();
         }
-        
+
         // zero out
         zero();
         _coeff = 0.0; // will be set in prepare()
@@ -56,12 +56,12 @@ public:
     Matrix& operator=( const Matrix& ) = delete;
 
     // call this once with the sample rate before processing
-    void init( t_CKFLOAT sampleRate )
+    void init( t_CKFLOAT fs )
     {
         // calc smoothing coefficient for exponential moving average
         // tau = smoothing time constant
-        t_CKFLOAT tau = SMOOTHING_MS / 1000.0;
-        _coeff = 1.0 - exp(-1.0 / (tau * sampleRate));
+        t_CKFLOAT tau = SMOOTHING_MS / 1000.f;
+        _coeff = 1.0 - exp( -1.0 / ( tau * fs ) );
     }
 
     int Matrix::zero() 
@@ -217,6 +217,6 @@ private:
     T** _current = nullptr;   // interpolated values during smoothing
     bool** _smoothing = nullptr; // which coefficients are smoothing
     t_CKFLOAT _coeff = 0.0;   // smoothing coefficient
-    t_CKFLOAT scale = 1.0 / n_size;
-    unsigned int _size = n_size;
+    t_CKFLOAT scale = 0.0;
+    unsigned int _size = 0;
 };
