@@ -17,133 +17,197 @@
 
 #define MAXIMUM_BUFFER_SIZE 600000000 // maximum number of frames an StkFrames object can have, equates to 0.6 Gb using 8 byte doubles
 
-#include "../../include/Grain.h"
-#include "../../include/Sampler.h"
 #include "../../include/stk/include/FileRead.h"
 #include "../../include/stk/include/Noise.h"
 #include "../../include/stk/include/Stk.h"
+#include "../../include/Quark.h"
 
-class GrainSwarm
+class SoundMatter
 {
 public:
-	// constructor
-	GrainSwarm::GrainSwarm( t_CKINT fs, t_CKUINT num = 1, t_CKFLOAT init_size = 100.f ) : num_grains( num ), scalar( 1.0 / num )
+	SoundMatter::SoundMatter( unsigned int fs, unsigned int size = 4 )
 	{
-		// set global sample rate
-		stk::Stk::setSampleRate( fs );
-		// create fresh member-classes
-		myGrains = new Granulator*[ num_grains ];
-		for( int i = 0; i < num_grains; i++ ) { myGrains[i] = new Granulator( fs ); myGrains[i]->setWindowSize( init_size ); }
-		// the rest
-		rand = new stk::Noise( time( NULL ) );
-		samp = new Sampler( fs );
-		samp->setPitch( 1.0 ); // init pitch
+		// sample rate
+		_fs = fs;
+		stk::Stk::setSampleRate( _fs );
+		// num
+		num_grains = size;
+		// scale down
+		scale = 1.0 / num_grains;
+		// buffer
+		buffer = new stk::StkFrames( 1, 1 );
+		// read
+		file_read = new stk::FileRead();
+		// random
+		random = new stk::Noise( time( NULL ) );
+		// create matter
+		quantum = new Quark*[num_grains];
+		for( int i = 0; i < num_grains; i++ ) quantum[i] = new Quark( fs, *buffer );
+		// init
+		this->setSize( this->base_size );
+		this->setPitch( 1.f );
+		this->setPosition( 0.f );
 	}
 
-	GrainSwarm::~GrainSwarm()
+	SoundMatter::~SoundMatter()
 	{
-		// delete
-		delete myGrains; myGrains = nullptr;
-		delete rand; rand = nullptr;
-		delete samp; samp = nullptr;
+		// destroy matter
+		for( int i = 0; i < num_grains; i++ ) { delete quantum[i]; quantum[i] = nullptr; }
+		delete[] quantum; quantum = nullptr;
+		// destroy again
+		delete file_read; file_read = nullptr;
+		// once more
+		delete buffer; buffer = nullptr;
 	}
 
-	// tick ( eventually this will just take the next sample in the file reader and granulate it )
-	SAMPLE GrainSwarm::tick()
-    {
-		SAMPLE out = 0.f; 
+	double SoundMatter::tick()
+	{
+		// output
+		double out = 0.0;
+		// if we're good to go
+		if( go )
+		{
+			for( int i = 0; i < num_grains; i++ ) 
+			{
+				out += quantum[i]->tick();
+				if( quantum[i]->state() ) // randomize
+				{
+					// wrap around to prevent negative sizes
+					float n_size = base_size + ( random->tick() * random_size );
+					n_size = std::max( 1.f, n_size );
+					quantum[i]->setSize( n_size ); // set 
+					// pitch is easy(ish)
+					float n_pitch = abs( base_pitch + ( random->tick() * random_pitch ) ); // offset
+					n_pitch = std::max( 0.f, n_pitch ); // clamp
+					quantum[i]->setPitch( n_pitch );
+					// we gotta wrap around again
+					float random_offset_frames = ( random_position * 0.001f ) * _fs; // convert random_position to samples
+					random_offset_frames /= (float)this->size();
+					float n_position = base_position + ( random->tick() * random_offset_frames ); // apply random offset
+					n_position = std::max( 0.f, std::min( n_position, 1.f ) ); // clamp
+					quantum[i]->setPosition( n_position ); 
+				}
+			}
+			out *= scale;
+		}
+		// return
+		return out;
+	}
 
-		// accumulate
+	void SoundMatter::setSize( float n_size_ms )
+	{
+		base_size = n_size_ms;
 		for( int i = 0; i < num_grains; i++ ) 
 		{
-			out += myGrains[i]->tick( samp->tick() );
-
-			// set random pit 
-			if( this->myGrains[i]->state() ) 
-			{
-				addedPitch = ( random_pitch * rand->tick() );
-				// move pitch
-				samp->setPitch( addedPitch + myPitch, 0.1 );
-			}
+			// we gotta wrap around 
+			float n_size = base_size + ( random->tick() * random_size );
+			n_size = std::max( 1.f, n_size );
+			quantum[i]->setSize( n_size );
 		}
+	}
+	
+	float SoundMatter::getSize() { return base_size; }
 
-		// lets not blow up the dac
-		out *= scalar;
-
-        // granulate! ( finally )
-        return out;
-    }
-
-	// open file and update
-	void GrainSwarm::openFile( const char* path )
+	void SoundMatter::setPitch( float n_pitch )
 	{
-		// underlying sampler
-		samp->openFile( path );
+		base_pitch = n_pitch;
+		for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
-	// pitch
-	t_CKFLOAT GrainSwarm::setPitch( t_CKFLOAT pit )
-	{
-		// save
-		myPitch = pit;
-		// return for fun
-		return myPitch;
-	}
-	t_CKFLOAT GrainSwarm::getPitch() { return myPitch; }
+	float SoundMatter::getPitch() { return base_pitch; }
 
-	// setters and getters for window rate ( grain size )
-	void GrainSwarm::setGrainSize( t_CKFLOAT rate )
+	void SoundMatter::setPosition( float n_position ) 
 	{
-		if( rate > 0.f ) 
+		base_position = n_position;
+		float random_offset_frames = ( random_position * 0.001f ) * _fs;
+		for( int i = 0; i < num_grains; i++ )
 		{
-			for ( int i = 0; i < num_grains; i++ )
-			{
-				myGrains[i]->setWindowSize( rate ); // in ms
-				// sync sampler with window size ( this will be a little asychronous when we have a non-zero random size value )
-				samp->setLoopLengthWithWindow( myGrains[0]->getWindowSize() + ( 2.0 * myGrains[0]->random_size ) );
-			}
+			float n_pos = base_position + ( ( random->tick() * random_offset_frames ) / this->size() );
+			n_pos = std::max( 0.f, std::min( n_pos, 1.f ) ); // keep in [0,1]
+			quantum[i]->setPosition( n_pos );
 		}
 	}
-	t_CKFLOAT GrainSwarm::getGrainSize() { return myGrains[0]->getWindowSize(); }
 
-	// random size
-	void GrainSwarm::setRandomGrainSize( t_CKFLOAT rand ) 
-	{ 
-		for ( int i = 0; i < num_grains; i++ )
+	void SoundMatter::setPosition( unsigned int n_position )
+	{
+		base_position = (float)n_position / (float)this->size(); // convert
+		float random_offset_frames = ( random_position * 0.001f ) * _fs;
+		for( int i = 0; i < num_grains; i++ )
 		{
-			myGrains[i]->setRandomSize( rand ); 
+			float n_pos = base_position + ( ( random->tick() * random_offset_frames ) / this->size() );
+			n_pos = std::max( 0.f, std::min( n_pos, 1.f ) ); // keep in [0,1]
+			quantum[i]->setPosition( n_pos );
 		}
 	}
-	t_CKFLOAT GrainSwarm::getRandomGrainSize() { return myGrains[0]->getRandomSize(); }
 
-	// set random pitch
-	void GrainSwarm::setRandomPitch( t_CKFLOAT random ) { random_pitch = random; }
-	// get random pitch
-	t_CKFLOAT GrainSwarm::getRandomPitch() { return random_pitch; }
+	float SoundMatter::getPosition() { return base_position; }
 
-	// set random position
-	void GrainSwarm::setRandomPosition( t_CKFLOAT random ) { random_position = random; }
-	// get random position 
-	t_CKFLOAT GrainSwarm::getRandomPosition() { return random_position; }
+	void SoundMatter::setRandomSize( float random_si ) { random_size = random_si; }
+	float SoundMatter::getRandomSize() { return random_size; }
 
-	// create grain
-	Granulator** myGrains = nullptr;
-	// file player manipulator
-	Sampler* samp = nullptr;
-	// randomness
-	stk::Noise* rand = nullptr; 
-	// internal position and pitch ( these insure that the center point of pitch or position do not change when random variations occur )
-	t_CKFLOAT myPitch = 1.f;
-	t_CKFLOAT addedPitch = 0.f;
-	t_CKFLOAT myPosition = 0.f;
-	// pitch interpolator
-	t_CKFLOAT random_pitch = 0.f;
-	// position interpolator
-	t_CKFLOAT random_position = 0.f;
-	// num grains
-	t_CKUINT num_grains = 0;
-	// scale 
-	t_CKFLOAT scalar = 0.f;
+	void SoundMatter::setRandomPitch( float random_pit ) { random_pitch = random_pit; }
+	float SoundMatter::getRandomPitch() { return random_pitch; }
+
+	void SoundMatter::setRandomPosition( float random_pos_ms ) { random_position = ( random_pos_ms / _fs ) * 1000.f; } // legacy input is samples, might change this
+	float SoundMatter::getRandomPosition() { return random_position; }
+
+	void SoundMatter::openFile( const char* path )
+	{
+		// don't do anything
+		go = false;
+
+		// if one is open, close the file and delete the buffer
+		if( file_read->isOpen() ) file_read->close();
+		
+		// clear 
+		delete buffer;
+
+		// convert C string to C++ string
+		std::string cppString = path;
+
+		// open!
+		file_read->open( cppString );
+
+		// resize!
+		buffer = new stk::StkFrames( 0.f, file_read->fileSize(), file_read->channels() );
+		// sample rate
+		buffer->setDataRate( file_read->fileRate() );
+		// read!
+		file_read->read( *buffer, 0, true );
+		// give to quarks
+		for( int i = 0; i < num_grains; i++ ) quantum[i]->setBuffer( *buffer );
+		// good to go
+		go = true;
+	}
+
+	void SoundMatter::closeFile()
+	{
+		// stop doing anything
+		go = false;
+		// close the file
+		file_read->close();
+		// clear buffer
+		delete buffer;
+		buffer = nullptr;
+	}
+
+	unsigned int SoundMatter::size() { return buffer->size() / buffer->channels(); }
+	
+private:
+	Quark** quantum = nullptr; // little grains
+	stk::Noise* random = nullptr; // randomization
+	stk::FileRead* file_read = nullptr; // this opens up a file
+	stk::StkFrames* buffer = nullptr; // everyone reads from here
+	unsigned int num_grains = 0; // number of grains
+	unsigned int _fs = 0; // sample rate
+	float scale = 0.f; // scale down the grains
+	float random_position = 0.f; // in milliseconds
+	float random_pitch = 0.f; // in multiple of the source file
+	float random_size = 0.f; // in ms
+	float base_size = 200.f; // in ms
+	float base_pitch = 0.f; // in multiple of the source file 
+	float base_position = 0.f; // [0.0,1.0]
+	bool go = false;
 };
 
 #endif

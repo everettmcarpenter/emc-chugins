@@ -63,13 +63,15 @@ CK_DLL_MFUN( granulator_setRandomPitch );
 CK_DLL_MFUN( granulator_getRandomPitch );
 
 CK_DLL_MFUN( granulator_setPosition );
+CK_DLL_MFUN( granulator_set2Position );
 CK_DLL_MFUN( granulator_getPosition );
 CK_DLL_MFUN( granulator_setRandomPosition );
 CK_DLL_MFUN( granulator_getRandomPosition );
 
 CK_DLL_MFUN( granulator_openFile );
 CK_DLL_MFUN( granulator_closeFile );
-CK_DLL_MFUN( granulator_fileSize );
+
+CK_DLL_MFUN( granulator_samples );
 
 // this is a special offset reserved for chugin internal data
 t_CKINT granulator_data_offset = 0;
@@ -86,7 +88,7 @@ CK_DLL_INFO( Granulator )
     // the author(s) of this chugin, e.g., "Alice Baker & Carl Donut"
     QUERY->setinfo( QUERY, CHUGIN_INFO_AUTHORS, "Everett M. Carpenter" );
     // text description of this chugin; what is it? what does it do? who is it for?
-    QUERY->setinfo( QUERY, CHUGIN_INFO_DESCRIPTION, "A single granulator with typical parameters." );
+    QUERY->setinfo( QUERY, CHUGIN_INFO_DESCRIPTION, "A swarm granulator with typical parameters." );
     // (optional) URL of the homepage for this chugin
     QUERY->setinfo( QUERY, CHUGIN_INFO_URL, "" );
     // (optional) contact email
@@ -162,6 +164,10 @@ CK_DLL_QUERY( Granulator )
     QUERY->add_arg( QUERY, "float", "position" );
     QUERY->doc_func( QUERY, "Set position of granulator in file." );
 
+    QUERY->add_mfun( QUERY, granulator_set2Position, "void", "position" );
+    QUERY->add_arg( QUERY, "int", "position" );
+    QUERY->doc_func( QUERY, "Set position of granulator in file." );
+
     QUERY->add_mfun( QUERY, granulator_getPosition, "float", "position" );
     QUERY->doc_func( QUERY, "Get position of granulator." );
 
@@ -179,8 +185,8 @@ CK_DLL_QUERY( Granulator )
     QUERY->add_mfun( QUERY, granulator_closeFile, "void", "closeFile" );
     QUERY->doc_func( QUERY, "Close the active file." );
 
-    QUERY->add_mfun( QUERY, granulator_fileSize, "float", "fileSize" );
-    QUERY->doc_func( QUERY, "Retrieve file size in samples." );
+    QUERY->add_mfun( QUERY, granulator_samples, "int", "samples" );
+    QUERY->doc_func( QUERY, "Return how many samples are in the active file." );
 
     // this reserves a variable in the ChucK internal class to store 
     // referene to the c++ class we defined above
@@ -204,7 +210,7 @@ CK_DLL_CTOR( granulator_ctor )
     OBJ_MEMBER_INT( SELF, granulator_data_offset ) = 0;
 
     // instantiate our internal c++ class representation
-    GrainSwarm* g_obj = new GrainSwarm( API->vm->srate( VM ), 4 );
+    SoundMatter* g_obj = new SoundMatter( API->vm->srate( VM ) );
 
     // store the pointer in the ChucK object member
     OBJ_MEMBER_INT( SELF, granulator_data_offset ) = ( t_CKINT )g_obj;
@@ -220,11 +226,11 @@ CK_DLL_CTOR( granulator_2ctor )
     // get file
     Chuck_String* path = GET_NEXT_STRING( ARGS );
 
-    t_CKUINT n = GET_NEXT_UINT( ARGS );
+    t_CKINT n = GET_NEXT_INT( ARGS );
     if( n <= 0 ) n = 1;
 
     // instantiate our internal c++ class representation
-    GrainSwarm* g_obj = new GrainSwarm( API->vm->srate( VM ), n );
+    SoundMatter* g_obj = new SoundMatter( API->vm->srate( VM ), n );
 
     if( g_obj ) g_obj->openFile( API->object->str( path ) );
 
@@ -237,7 +243,7 @@ CK_DLL_CTOR( granulator_2ctor )
 CK_DLL_DTOR( granulator_dtor )
 {
     // get our c++ class pointer
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
     // clean up (this macro tests for NULL, deletes, and zeros out the variable)
     CK_SAFE_DELETE( g_obj );
     // set the data field to 0
@@ -249,7 +255,7 @@ CK_DLL_DTOR( granulator_dtor )
 CK_DLL_TICK( granulator_tick )
 {
     // get our c++ class pointer
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
 
     // invoke our tick function; store in the magical out variable
     if ( g_obj ) *out = g_obj->tick();
@@ -264,18 +270,18 @@ CK_DLL_MFUN( granulator_setGrainSize )
     // get arg
     t_CKFLOAT nrate = GET_NEXT_FLOAT( ARGS );
     // get our granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
     // call function
-    if( g_obj ) g_obj->setGrainSize( nrate );
+    if( g_obj ) g_obj->setSize( nrate );
 }
 
 // get rate
 CK_DLL_MFUN( granulator_getGrainSize )
 {
     // get granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
 
-    if( g_obj ) RETURN->v_float = g_obj->getGrainSize();
+    if( g_obj ) RETURN->v_float = g_obj->getSize();
     else RETURN->v_float = -1.0;
 }
 
@@ -285,17 +291,17 @@ CK_DLL_MFUN( granulator_setRandomGrainSize )
     // get arg
     t_CKFLOAT randomness = GET_NEXT_FLOAT( ARGS );
     // get granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
 
-    if( g_obj ) g_obj->setRandomGrainSize( randomness );
+    if( g_obj ) g_obj->setRandomSize( randomness );
 }
 
 CK_DLL_MFUN( granulator_getRandomGrainSize )
 {
     // get granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
 
-    if( g_obj ) RETURN->v_float = g_obj->getRandomGrainSize();
+    if( g_obj ) RETURN->v_float = g_obj->getRandomSize();
     else RETURN->v_float = -1.0;
 }
 
@@ -303,7 +309,7 @@ CK_DLL_MFUN( granulator_getRandomGrainSize )
 CK_DLL_MFUN( granulator_setPitch )
 {
     // get granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
     // get arg
     t_CKFLOAT pitch = GET_NEXT_FLOAT( ARGS );
     // set
@@ -313,7 +319,7 @@ CK_DLL_MFUN( granulator_setPitch )
 CK_DLL_MFUN( granulator_getPitch )
 {
     // get granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
     // retrieve
     if( g_obj ) RETURN->v_float = g_obj->getPitch();
 }
@@ -324,7 +330,7 @@ CK_DLL_MFUN( granulator_setRandomPitch )
     // get arg
     t_CKFLOAT randomness = GET_NEXT_FLOAT( ARGS );
     // get granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
 
     if( g_obj ) g_obj->setRandomPitch( randomness );
 }
@@ -332,7 +338,7 @@ CK_DLL_MFUN( granulator_setRandomPitch )
 CK_DLL_MFUN( granulator_getRandomPitch )
 {
     // get granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
 
     if( g_obj ) RETURN->v_float = g_obj->getRandomPitch();
     else RETURN->v_float = -1.0;
@@ -341,19 +347,30 @@ CK_DLL_MFUN( granulator_getRandomPitch )
 CK_DLL_MFUN( granulator_setPosition )
 {
     // get granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
     // get arg
-    t_CKFLOAT pitch = GET_NEXT_FLOAT( ARGS );
+    t_CKFLOAT position = GET_NEXT_FLOAT( ARGS );
     // set
-    if( g_obj ) g_obj->samp->setPosition( pitch );
+    if( g_obj ) g_obj->setPosition( (float)position );
+}
+
+CK_DLL_MFUN( granulator_set2Position )
+{
+    // get granulator
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    // get arg
+    t_CKINT position = GET_NEXT_INT( ARGS );
+    if( position < 0 ) position = 0;
+    // set
+    if( g_obj ) g_obj->setPosition( (unsigned int)position );
 }
 
 CK_DLL_MFUN( granulator_getPosition )
 {
     // get granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
     // retrieve
-    if( g_obj ) RETURN->v_float = g_obj->samp->getPosition() / g_obj->samp->getFileSize();
+    if( g_obj ) RETURN->v_float = g_obj->getPosition();
 }
 
 // set random
@@ -362,7 +379,7 @@ CK_DLL_MFUN( granulator_setRandomPosition )
     // get arg
     t_CKFLOAT randomness = GET_NEXT_FLOAT( ARGS );
     // get granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
 
     if( g_obj ) g_obj->setRandomPosition( randomness );
 }
@@ -370,16 +387,15 @@ CK_DLL_MFUN( granulator_setRandomPosition )
 CK_DLL_MFUN( granulator_getRandomPosition )
 {
     // get granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
 
     if( g_obj ) RETURN->v_float = g_obj->getRandomPosition();
-    else RETURN->v_float = -1.0;
 }
 
 CK_DLL_MFUN( granulator_openFile )
 {
     // get granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
     // get file
     Chuck_String* path = GET_NEXT_STRING( ARGS );
 
@@ -389,16 +405,15 @@ CK_DLL_MFUN( granulator_openFile )
 CK_DLL_MFUN( granulator_closeFile )
 {
     // get granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
     
-    if( g_obj ) g_obj->samp->closeFile();
+    if( g_obj ) g_obj->closeFile();
 }
 
-CK_DLL_MFUN( granulator_fileSize )
+CK_DLL_MFUN( granulator_samples )
 {
     // get granulator
-    GrainSwarm* g_obj = ( GrainSwarm* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
-
-    if( g_obj ) RETURN->v_int = g_obj->samp->getFileSize();
-    else RETURN->v_int = -1;
+    SoundMatter* g_obj = ( SoundMatter* )OBJ_MEMBER_INT( SELF, granulator_data_offset );
+    
+    if( g_obj ) RETURN->v_int = g_obj->size();
 }

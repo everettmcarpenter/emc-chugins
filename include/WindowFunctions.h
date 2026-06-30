@@ -19,6 +19,16 @@ void hann( double* buffer, unsigned size )
 	}
 }
 
+// fill a buffer of some size with a hamming window
+void hamming( double* buffer, unsigned size )
+{
+	for( int i = 0; i < size; i++ )
+	{
+		buffer[i] = 0.53836 - ( 0.46164 * cos( ( DOS_PI * i ) / size ) );
+	}
+}
+
+
 // fill a buffer of some size with a blackman window
 void blackman( double* buffer, unsigned size )
 {

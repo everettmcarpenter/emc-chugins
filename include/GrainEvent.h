@@ -4,6 +4,8 @@
 // an event grain, produces one window of a grain
 
 #include "../../include/Phasor.h"
+#include "../../include/stk/include/Stk.h"
+#include "../../include/stk/include/FileRead.h"
 #include "WindowFunctions.h"
 
 struct GrainEvent
@@ -21,12 +23,20 @@ struct GrainEvent
 		window = new double[ size_samp ];
 		// audio buffer
 		buffer = new stk::StkFrames( 1, 1 );
+		// buffer playback
+		bufferPlayer = new Phasor( fs, 1.0, true );
+		// pitch slew
+		pit = new Smoother( fs );
 		// make new window
 		this->setWindow( size_samp, type );
 	}
 
 	// destructor
-	GrainEvent::~GrainEvent() { delete reader; reader = nullptr; delete window; window = nullptr; };
+	GrainEvent::~GrainEvent() { delete reader; reader = nullptr; 
+								delete window; window = nullptr; 
+								delete buffer; buffer = nullptr;
+								delete pit; pit = nullptr;
+								delete bufferPlayer; bufferPlayer = nullptr; };
 
 	// tick func
 	double GrainEvent::tick() 
@@ -51,18 +61,21 @@ struct GrainEvent
 	int GrainEvent::state() { return this->reader->state(); }
 
 	// make a new grain
-	void GrainEvent::newGrain( float length_ms, int position, Sampler* source, int type = -1 )
+	void GrainEvent::newGrain( float length_ms, int position, stk::FileRead* source, int type = -1 )
 	{
 		// resize buffer
-		this->buffer->resize( msToNormalizedSamp( length_ms ) );
+		this->buffer->resize( msToNormalizedSamp( length_ms ) + 1 );
 		// read
-		source->read( buffer, position, true );
+		source->read( *buffer, position, true );
+		// resize window
 		if ( length_ms != normalizedSampToMs( size_samp ) )
 		{
 			// set internal size
 			this->size_samp = msToNormalizedSamp( length_ms );
 			// set freq
 			reader->setFrequency( 1000.0 / length_ms, TRUE );
+			// buffer 
+			bufferPlayer->setFrequency( source->fileRate() / source->fileSize() );
 			// get rid of old window
 			delete[] window;
 			// new buffer
@@ -70,9 +83,9 @@ struct GrainEvent
 			// make new window
 			this->setWindow( size_samp, type );
 			// go!
-			reader->trigger();
+			reader->trigger(); bufferPlayer->trigger();
 		}
-		else reader->trigger();
+		else { reader->trigger(); bufferPlayer->trigger(); }
 	}
 
 	// create a window 
@@ -101,7 +114,9 @@ struct GrainEvent
 	unsigned int GrainEvent::msToNormalizedSamp( float ms ) { return static_cast<unsigned int>( 0.5 + ( ms * 0.001 ) * this->_fs ); }
 	float GrainEvent::normalizedSampToMs( unsigned int samp ) { return ( samp * 1000.0f ) / this->_fs; }
 
+	Phasor* bufferPlayer = nullptr;
 	Phasor* reader = nullptr; // reads through window
+	Smoother* pit = nullptr;
 	stk::StkFrames* buffer = nullptr;
 	double* window = nullptr; // the actual window
 	unsigned int size_samp = 1;
