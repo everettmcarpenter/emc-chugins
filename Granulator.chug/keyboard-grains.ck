@@ -4,7 +4,7 @@
 Hid hi;
 HidMsg msg;
 GranularSupport helper(1);
-Granulator grains( "composed3+whispering.wav", 32 ) => dac;
+Granulator grains( "../include/251391__kwahmah_02__man-speaking-in-arabic-am.wav", 128 ) => dac;
 // identify yourself
 string address;
 int port;

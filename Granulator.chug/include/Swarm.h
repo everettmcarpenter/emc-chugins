@@ -40,12 +40,17 @@ public:
 		file_read = new stk::FileRead();
 		// random
 		random = new stk::Noise( time( NULL ) );
+		// positional_slew 
+		position_slew = new Smoother( _fs );
+		// pitch_slew
+		pitch_slew = new Smoother( _fs );
 		// create matter
 		quantum = new Quark*[num_grains];
+		// configure matter
 		for( int i = 0; i < num_grains; i++ ) quantum[i] = new Quark( fs, *buffer );
 		// init
 		this->setSize( this->base_size );
-		this->setPitch( 1.f );
+		this->setPitchInstant( 1.f );
 		this->setPosition( 0.f );
 	}
 
@@ -56,6 +61,12 @@ public:
 		delete[] quantum; quantum = nullptr;
 		// destroy again
 		delete file_read; file_read = nullptr;
+		// destroy again
+		delete random; random = nullptr;
+		// destroy again
+		delete position_slew; position_slew = nullptr;
+		// destroy again
+		delete pitch_slew; pitch_slew = nullptr;
 		// once more
 		delete buffer; buffer = nullptr;
 	}
@@ -77,18 +88,25 @@ public:
 					n_size = std::max( 1.f, n_size );
 					quantum[i]->setSize( n_size ); // set 
 					// pitch is easy(ish)
-					float n_pitch = abs( base_pitch + ( random->tick() * random_pitch ) ); // offset
+					float n_pitch = abs( pitch_slew->getCurrent() + ( random->tick() * random_pitch ) ); // offset
 					n_pitch = std::max( 0.f, n_pitch ); // clamp
 					quantum[i]->setPitch( n_pitch );
 					// we gotta wrap around again
 					float random_offset_frames = ( random_position * 0.001f ) * _fs; // convert random_position to samples
 					random_offset_frames /= (float)this->size();
-					float n_position = base_position + ( random->tick() * random_offset_frames ); // apply random offset
+					float n_position = position_slew->getCurrent() + ( random->tick() * random_offset_frames ); // apply random offset
 					n_position = std::max( 0.f, std::min( n_position, 1.f ) ); // clamp
 					quantum[i]->setPosition( n_position ); 
 				}
 			}
+			// don't use tick functions in loops! that defeats the point of a time normalized tick function everett!
+			// anyways, advance
+			pitch_slew->tick();
+			position_slew->tick();
+			// scale because if we don't prevent blowing our ears out, ChucK definitely won't!
 			out *= scale;
+			// soft clip
+			out = tanh( out );
 		}
 		// return
 		return out;
@@ -110,37 +128,29 @@ public:
 
 	void SoundMatter::setPitch( float n_pitch )
 	{
-		base_pitch = n_pitch;
-		for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
+		pitch_slew->setTarget( n_pitch, 100.f );
+		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
-	float SoundMatter::getPitch() { return base_pitch; }
+	void SoundMatter::setPitchInstant( float n_pitch )
+	{
+		pitch_slew->instant( n_pitch );
+		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
+	}
+
+	float SoundMatter::getPitch() { return pitch_slew->getTarget(); }
 
 	void SoundMatter::setPosition( float n_position ) 
 	{
-		base_position = n_position;
-		float random_offset_frames = ( random_position * 0.001f ) * _fs;
-		for( int i = 0; i < num_grains; i++ )
-		{
-			float n_pos = base_position + ( ( random->tick() * random_offset_frames ) / this->size() );
-			n_pos = std::max( 0.f, std::min( n_pos, 1.f ) ); // keep in [0,1]
-			quantum[i]->setPosition( n_pos );
-		}
+		position_slew->setTarget( n_position, 40.f );
 	}
 
 	void SoundMatter::setPosition( unsigned int n_position )
 	{
-		base_position = (float)n_position / (float)this->size(); // convert
-		float random_offset_frames = ( random_position * 0.001f ) * _fs;
-		for( int i = 0; i < num_grains; i++ )
-		{
-			float n_pos = base_position + ( ( random->tick() * random_offset_frames ) / this->size() );
-			n_pos = std::max( 0.f, std::min( n_pos, 1.f ) ); // keep in [0,1]
-			quantum[i]->setPosition( n_pos );
-		}
+		position_slew->setTarget( (float)n_position / (float)this->size(), 40.f); // convert
 	}
 
-	float SoundMatter::getPosition() { return base_position; }
+	float SoundMatter::getPosition() { return position_slew->getTarget(); }
 
 	void SoundMatter::setRandomSize( float random_si ) { random_size = random_si; }
 	float SoundMatter::getRandomSize() { return random_size; }
@@ -148,7 +158,7 @@ public:
 	void SoundMatter::setRandomPitch( float random_pit ) { random_pitch = random_pit; }
 	float SoundMatter::getRandomPitch() { return random_pitch; }
 
-	void SoundMatter::setRandomPosition( float random_pos_ms ) { random_position = ( random_pos_ms / _fs ) * 1000.f; } // legacy input is samples, might change this
+	void SoundMatter::setRandomPosition( float random_pos_ms ) { random_position = ( random_pos_ms / _fs ) * 1000.f; }
 	float SoundMatter::getRandomPosition() { return random_position; }
 
 	void SoundMatter::openFile( const char* path )
@@ -186,9 +196,10 @@ public:
 		go = false;
 		// close the file
 		file_read->close();
+		// unlink the quarks
+		for( int i = 0; i < num_grains; i++ ) quantum[i]->clearBuffer();
 		// clear buffer
-		delete buffer;
-		buffer = nullptr;
+		delete buffer; buffer = nullptr;
 	}
 
 	unsigned int SoundMatter::size() { return buffer->size() / buffer->channels(); }
@@ -198,6 +209,8 @@ private:
 	stk::Noise* random = nullptr; // randomization
 	stk::FileRead* file_read = nullptr; // this opens up a file
 	stk::StkFrames* buffer = nullptr; // everyone reads from here
+	Smoother* position_slew = nullptr; // this enables us to slew our position from a high level [0.0,1.0]
+	Smoother* pitch_slew = nullptr; // slew pitch from high level
 	unsigned int num_grains = 0; // number of grains
 	unsigned int _fs = 0; // sample rate
 	float scale = 0.f; // scale down the grains
@@ -206,7 +219,6 @@ private:
 	float random_size = 0.f; // in ms
 	float base_size = 200.f; // in ms
 	float base_pitch = 0.f; // in multiple of the source file 
-	float base_position = 0.f; // [0.0,1.0]
 	bool go = false;
 };
 

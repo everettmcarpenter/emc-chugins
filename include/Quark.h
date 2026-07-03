@@ -46,9 +46,9 @@ public:
 			if( this->state() == GRAIN_IN_PROGRESS )
 			{
 				// how big is our loop/grain/audio segment
-				float segment_size_frames = ( current_segment_size_ms * 0.001f ) * _fs;
+				float segment_size_frames = ( current_segment_size_ms * 0.001f ) * _buffer->dataRate();
 				// where do i look
-				float frame_index = position_slew->tick() + ( playback->tick() * segment_size_frames );
+				float frame_index = position_slew->getCurrent() + ( playback->tick() * segment_size_frames );
 				// wrap within the file
 				frame_index = fmod( frame_index, (float)file_size_frames );
 				if( frame_index < 0.f ) frame_index += file_size_frames;
@@ -82,7 +82,6 @@ public:
 	{
 		go = false; // stop doing every thing
 		_buffer = &source; // store the location of our audio
-		file_rate = _buffer->size() / _buffer->channels();
 		file_size_frames = ( _buffer->size() / _buffer->channels() );
 		go = true;
 	}
@@ -97,9 +96,11 @@ public:
 	// set position
 	void Quark::setPosition( float new_position )
 	{
+		// save out initially given position
+		position = new_position;
 		// clamp and scale
-		segment_offset = std::max( 0.f, std::min( file_size_frames * new_position, (float)( file_size_frames - 1 ) ) );
-		position_slew->setTarget( segment_offset );
+		float segment_offset = std::max( 0.f, std::min( file_size_frames * position, (float)( file_size_frames - 1 ) ) );
+		position_slew->setTarget( segment_offset, 5.f );
 	}
 
 	// get position
@@ -144,14 +145,12 @@ private:
 	Smoother* position_slew = nullptr;
 	Windower* window = nullptr;
 	stk::StkFrames* _buffer = nullptr;
-	unsigned int _fs = 0;
-	float segment_offset = 0.f;
-	float segment_size_ms = 1.f;
-	float segment_size_frames = 1.f;
-	float current_segment_size_ms = 100.f;
-	float pitch = 1.f;
-	float file_rate = 0.f;
-	unsigned int file_size_frames = 0;
+	unsigned int _fs = 0; // our internal sample rate
+	float position = 0.f; // base position
+	float segment_size_ms = 1.f; // size of the audio we need to read
+	float current_segment_size_ms = 100.f; // this is "memory" variable used in the tick function
+	float pitch = 1.f; // base pitch
+	unsigned int file_size_frames = 0; // file size in frames ( samples / channels )
 	bool go = true;
 };
 

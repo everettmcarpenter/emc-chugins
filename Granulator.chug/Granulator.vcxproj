@@ -139,6 +139,7 @@
     <ClInclude Include="..\include\chugin.h" />
     <ClInclude Include="..\include\Phasor.h" />
     <ClInclude Include="..\include\Quark.h" />
+    <ClInclude Include="..\include\Smoother.h" />
     <ClInclude Include="..\include\stk\include\FileRead.h" />
     <ClInclude Include="..\include\stk\include\Noise.h" />
     <ClInclude Include="..\include\stk\include\Stk.h" />
