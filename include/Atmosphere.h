@@ -45,7 +45,7 @@ public:
 		// create matter
 		quantum = new Quark*[num_grains];
 		// configure matter
-		for( int i = 0; i < num_grains; i++ ) quantum[i] = new Quark( fs, *buffer );
+		for( int i = 0; i < num_grains; i++ ) { quantum[i] = new Quark( fs, *buffer ); quantum[i]->on(); }
 		// init
 		this->setSize( this->base_size );
 		this->setPitchInstant( 1.f );
@@ -74,7 +74,6 @@ public:
 		// if we're good to go
 		if( go )
 		{
-			printf(" yup %i \n", num_grains );
 			memset( out, 0, sizeof( SAMPLE ) * num_channels * frames ); // clear
 			// start up the machine
 			for( int f = 0; f < frames; f++ )
@@ -85,8 +84,16 @@ public:
 					unsigned int channel = quantum[q]->getChannel();
 					// get audio and hope the channel index is within bounds
 					out[f * num_channels + channel] += quantum[q]->tick();
+
+					/*
+					*	Idea: each frame check if all grains are off, if they are, shoot them all off, otherwise, wait until they are all completed. 
+					*	If this works well, consider how each grain can be delayed/changed to create variation across the channels
+					*/
+
 					// create new grain parameters if resting
 					if( quantum[q]->windowState() ) newGrain( *quantum[q] );
+					// if our grain is loop and finished, shoot off a new one
+					if( quantum[q]->windowState() && quantum[q]->loopState() ) quantum[q]->trigger();
 				}
 				
 				// scale the outgoing buffer ( is this more effecient than scaling every time we add the quantum tick to the output? i don't know )

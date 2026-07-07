@@ -68,7 +68,7 @@ public:
     t_CKFLOAT Phasor::getSR() { return fs; }
 
     // shoot!
-    void Phasor::trigger() { done = false; }
+    void Phasor::trigger() { done = false; phase = 0.f; }
 
     // is it on
     bool Phasor::state() { return done; }

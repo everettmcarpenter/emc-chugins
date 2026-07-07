@@ -45,7 +45,7 @@ public:
 		// create matter
 		quantum = new Quark*[num_grains];
 		// configure matter
-		for( int i = 0; i < num_grains; i++ ) quantum[i] = new Quark( fs, *buffer );
+		for( int i = 0; i < num_grains; i++ ) { quantum[i] = new Quark( fs, *buffer ); quantum[i]->on(); }
 		// init
 		this->setSize( this->base_size );
 		this->setPitchInstant( 1.f );
@@ -76,10 +76,15 @@ public:
 		// if we're good to go
 		if( go )
 		{
+			// cycle through
 			for( int i = 0; i < num_grains; i++ ) 
 			{
+				// the amalgamation of sound
 				out += quantum[i]->tick();
+				// create new grain parameters if resting
 				if( quantum[i]->windowState() ) newGrain( *quantum[i] );
+				// if our grain is loop and finished, shoot off a new one
+				if( quantum[i]->windowState() && quantum[i]->loopState() ) quantum[i]->trigger();
 			}
 			// don't use tick functions in loops! that defeats the point of a time normalized tick function everett!
 			// anyways, advance
@@ -88,7 +93,7 @@ public:
 			// scale because if we don't prevent blowing our ears out, ChucK definitely won't!
 			out *= scale;
 			// soft clip
-			// out = tanh( out );
+			out = tanh( out );
 		}
 		// return
 		return out;
@@ -111,7 +116,6 @@ public:
 		float n_position = position_slew->getCurrent() + (  0.5 * ( random->tick() + 1.0 ) * random_offset_frames ); // apply random offset
 		n_position = std::max( 0.f, std::min( n_position, 40.f ) ); // clamp
 		particle.setPositionInstant( n_position );
-
 		// debug
 		// printf( "Size %f, pitch %f, position %f \n", n_size, n_pitch, n_position );
 	}

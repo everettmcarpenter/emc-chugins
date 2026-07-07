@@ -55,40 +55,57 @@ public:
 				// lookup and window
 				out = window->tick( _buffer->interpolate( frame_index, channel ) );
 			}
+			// if we aren't graining
 			else if( this->windowState() == GRAIN_DONE )
 			{
-				// new size
-				current_segment_size_ms = segment_size_ms;
-				window->setSize( current_segment_size_ms );
-				// a change in window size means a change in phasor playback speed to maintain the current pitch
-				pitch_slew->instant( pitch );
-				// slew 
-				float phasor_freq = pitch_slew->tick() / ( current_segment_size_ms * 0.001f );
-				playback->setFrequency( phasor_freq, TRUE );
-				position_slew->tick(); // move
-
 				// debug
 				// printf( "Position %f, Pitch %f, Window size (ms) %f \n", position_slew->getCurrent(), pitch_slew->getCurrent(), window->getSizeMs() );
 
 				// start a new grain
-				this->trigger();
+				if( loop ) this->trigger();
 			}
 		}
 		// return
 		return out;
 	}
 
+	// loop on
+	void Quark::loopOn() { loop = true; }
+
+	// loop off
+	void Quark::loopOff() { loop = false; }
+
+	// loop state
+	bool Quark::loopState() { return loop; }
+
     // freeze and reset
     void Quark::off() { go = false; window->reset(); }
 
     // on
-    void Quark::on() { go = true; }
+    void Quark::on() { go= true; this->trigger(); }
 
     // quark state
     bool Quark::state() { return go; }
 
     // shoot
-	void Quark::trigger() { go = true; window->trigger(); }
+	void Quark::trigger() 
+	{ 
+		go = true; 
+
+		// new size
+		current_segment_size_ms = segment_size_ms;
+		window->setSize( current_segment_size_ms );
+
+		// a change in window size means a change in phasor playback speed to maintain the current pitch
+		pitch_slew->instant( pitch );
+
+		// slew
+		float phasor_freq = pitch_slew->tick() / ( current_segment_size_ms * 0.001f );
+		playback->setFrequency( phasor_freq, TRUE );
+		position_slew->tick(); // move
+
+		window->trigger(); // start windowing
+	}
 
     // are we playing
 	bool Quark::windowState() { return window->state(); }
@@ -200,7 +217,8 @@ private:
 	float current_segment_size_ms = 100.f; // this is "memory" variable used in the tick function
 	float pitch = 1.f; // base pitch
 	unsigned int file_size_frames = 0; // file size in frames ( samples / channels )
-	bool go = true;
+	bool go = false;
+	bool loop = true;
 };
 
 #endif /* QUARK_H */
