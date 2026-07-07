@@ -30,7 +30,15 @@ public:
         SAMPLE out = phase;
         if( !done ) phase += normFreq; // if we aren't done, move forward
         // wrap around, if it's one shot, note that we are done
-        if ( phase >= 1.0 ) { phase -= 1.0; if ( oneShot ) done = true; }
+        if ( phase >= 1.0 ) 
+        { 
+            phase -= 1.0; 
+            if ( oneShot ) 
+            { 
+                done = true; 
+                phase = 0.f;
+            }
+        }
         return out;
     }
 
@@ -62,6 +70,7 @@ public:
     // shoot!
     void Phasor::trigger() { done = false; }
 
+    // is it on
     bool Phasor::state() { return done; }
 
     // reset

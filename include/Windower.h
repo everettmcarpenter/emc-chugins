@@ -100,6 +100,11 @@ public:
 		rectangle( _window, table_size );
 	}
 
+    void Windower::reset()
+    {
+        phasor->reset();
+    }
+
 	unsigned int Windower::msToNormalizedSamp( float ms ) { return static_cast<unsigned int>( 0.5 + ( ms * 0.001 ) * this->_fs ); }
 	float Windower::normalizedSampToMs( unsigned int samp ) { return ( samp * 1000.0f ) / this->_fs; }
 

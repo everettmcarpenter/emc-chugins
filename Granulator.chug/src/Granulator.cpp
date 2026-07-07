@@ -37,7 +37,7 @@
 
 // include chugin header
 #include "../../include/chugin.h"
-#include "../include/Swarm.h"
+#include "../../include/Swarm.h"
 
 // general includes
 #include <iostream>

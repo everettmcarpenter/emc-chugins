@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{c78d7d72-64af-4292-a7d8-90354eed85c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{19c858c4-2e00-4e75-b552-ed25f282233e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\stk">
+      <UniqueIdentifier>{5a3e50cf-56ab-45e1-9bc0-30d92ba71f30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\stk">
+      <UniqueIdentifier>{f448c68c-ae42-40c7-ae03-6ecb3e45b5eb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\chugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Phasor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Quark.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Smoother.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Swarm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Windower.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\WindowFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\stk\include\FileRead.h">
+      <Filter>Header Files\stk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\stk\include\Noise.h">
+      <Filter>Header Files\stk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\stk\include\Stk.h">
+      <Filter>Header Files\stk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Atmosphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Atmosphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\stk\src\FileRead.cpp">
+      <Filter>Source Files\stk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\stk\src\Noise.cpp">
+      <Filter>Source Files\stk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\stk\src\Stk.cpp">
+      <Filter>Source Files\stk</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -26,14 +26,14 @@ public:
 	}
 
 	// overloaded constructor
-	Quark::Quark( unsigned int fs, stk::StkFrames& source )
+	Quark::Quark( unsigned int fs, stk::StkFrames& source, unsigned int n_channel = 0 )
 	{
 		_fs = fs;
 		playback = new Phasor( _fs );
 		window = new Windower( _fs );
 		pitch_slew = new Smoother( _fs );
 		position_slew = new Smoother( _fs );
-		this->setBuffer( source );
+		this->setBuffer( source, n_channel );
 	}
 
 	double Quark::tick()
@@ -43,7 +43,7 @@ public:
 		if( go )
 		{
 			// if we're graining
-			if( this->state() == GRAIN_IN_PROGRESS )
+			if( this->windowState() == GRAIN_IN_PROGRESS )
 			{
 				// how big is our loop/grain/audio segment
 				float segment_size_frames = ( current_segment_size_ms * 0.001f ) * _buffer->dataRate();
@@ -53,9 +53,9 @@ public:
 				frame_index = fmod( frame_index, (float)file_size_frames );
 				if( frame_index < 0.f ) frame_index += file_size_frames;
 				// lookup and window
-				out = window->tick( _buffer->interpolate( frame_index ) );
+				out = window->tick( _buffer->interpolate( frame_index, channel ) );
 			}
-			else if( this->state() == GRAIN_DONE )
+			else if( this->windowState() == GRAIN_DONE )
 			{
 				// new size
 				current_segment_size_ms = segment_size_ms;
@@ -66,6 +66,10 @@ public:
 				float phasor_freq = pitch_slew->tick() / ( current_segment_size_ms * 0.001f );
 				playback->setFrequency( phasor_freq, TRUE );
 				position_slew->tick(); // move
+
+				// debug
+				// printf( "Position %f, Pitch %f, Window size (ms) %f \n", position_slew->getCurrent(), pitch_slew->getCurrent(), window->getSizeMs() );
+
 				// start a new grain
 				this->trigger();
 			}
@@ -74,23 +78,37 @@ public:
 		return out;
 	}
 
-	void Quark::trigger() { window->trigger(); }
-	bool Quark::state() { return window->state(); }
+    // freeze and reset
+    void Quark::off() { go = false; window->reset(); }
+
+    // on
+    void Quark::on() { go = true; }
+
+    // quark state
+    bool Quark::state() { return go; }
+
+    // shoot
+	void Quark::trigger() { go = true; window->trigger(); }
+
+    // are we playing
+	bool Quark::windowState() { return window->state(); }
 
 	// link audio buffer
-	void Quark::setBuffer( stk::StkFrames& source )
+	void Quark::setBuffer( stk::StkFrames& source, unsigned int n_channel = 0 )
 	{
 		go = false; // stop doing every thing
 		_buffer = &source; // store the location of our audio
+		this->channel = n_channel;
 		file_size_frames = ( _buffer->size() / _buffer->channels() );
 		go = true;
 	}
 
-	// clear buffer
+	// clear buffer & set channel = 0
 	void Quark::clearBuffer()
 	{
 		go = false;
 		_buffer = nullptr;
+		channel = 0;
 	}
 
 	// set position
@@ -100,7 +118,17 @@ public:
 		position = new_position;
 		// clamp and scale
 		float segment_offset = std::max( 0.f, std::min( file_size_frames * position, (float)( file_size_frames - 1 ) ) );
-		position_slew->setTarget( segment_offset, 5.f );
+		position_slew->setTarget( segment_offset, 1.f );
+	}
+
+	// set position
+	void Quark::setPositionInstant( float new_position )
+	{
+		// save out initially given position
+		position = new_position;
+		// clamp and scale
+		float segment_offset = std::max( 0.f, std::min( file_size_frames * position, (float)( file_size_frames - 1 ) ) );
+		position_slew->instant( segment_offset );
 	}
 
 	// get position
@@ -113,6 +141,13 @@ public:
 	void Quark::setPitch( float new_pitch )
 	{
 		pitch = new_pitch;
+	}
+
+	// set pitch instantly
+	void Quark::setPitchInstant( float new_pitch )
+	{
+		pitch = new_pitch;
+		pitch_slew->instant( pitch );
 	}
 
 	// get pitch
@@ -133,11 +168,24 @@ public:
 		return window->getSizeMs();
 	}
 
-	unsigned int Quark::size()
+	unsigned int Quark::bufferSize()
 	{
 		if( _buffer ) return _buffer->size() / _buffer->channels();
 		else return 0;
 	}
+
+    // set channel ( default to 0 )
+    void Quark::setChannel( unsigned int n_channel )
+    {
+        channel = n_channel;
+        if( channel > ( _buffer->channels() - 1 ) ) channel = _buffer->channels();
+    }
+
+    // get which channel we're reading
+    unsigned int Quark::getChannel()
+    {
+        return this->channel;
+    }
 
 private:
 	Phasor* playback = nullptr;
@@ -146,6 +194,7 @@ private:
 	Windower* window = nullptr;
 	stk::StkFrames* _buffer = nullptr;
 	unsigned int _fs = 0; // our internal sample rate
+    unsigned int channel = 0; // which channel of the buffer to read
 	float position = 0.f; // base position
 	float segment_size_ms = 1.f; // size of the audio we need to read
 	float current_segment_size_ms = 100.f; // this is "memory" variable used in the tick function
