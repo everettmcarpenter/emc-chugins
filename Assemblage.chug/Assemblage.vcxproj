@@ -24,6 +24,7 @@
     <ClCompile Include="src\Assemblage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\Assemblage.h" />
     <ClInclude Include="..\include\chugin.h" />
     <ClInclude Include="..\include\Grain.h" />
     <ClInclude Include="..\include\Phasor.h" />

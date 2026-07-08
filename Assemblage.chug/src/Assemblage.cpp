@@ -37,6 +37,7 @@
 
 // include chugin header
 #include "../../include/chugin.h"
+#include "../../include/Assemblage.h"
 
 // general includes
 #include <iostream>
@@ -56,43 +57,6 @@ CK_DLL_TICK( assemblage_tick );
 
 // this is a special offset reserved for chugin internal data
 t_CKINT assemblage_data_offset = 0;
-
-
-//-----------------------------------------------------------------------------
-// class definition for internal chugin data
-// (NOTE this isn't strictly necessary, but is one example of a recommended approach)
-//-----------------------------------------------------------------------------
-class Assemblage
-{
-public:
-    // constructor
-    Assemblage( t_CKFLOAT fs )
-    {
-        m_param = 0;
-    }
-
-    // for chugins extending UGen
-    SAMPLE tick( SAMPLE in )
-    {
-        // default: this passes whatever input is patched into chugin
-        return in;
-    }
-
-    // set parameter example
-    t_CKFLOAT setParam( t_CKFLOAT p )
-    {
-        m_param = p;
-        return p;
-    }
-
-    // get parameter example
-    t_CKFLOAT getParam() { return m_param; }
-    
-private:
-    // instance data
-    t_CKFLOAT m_param;
-};
-
 
 //-----------------------------------------------------------------------------
 // info function: ChucK calls this when loading/probing the chugin

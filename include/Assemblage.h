@@ -2,6 +2,7 @@
 	#define ASSEMBLAGE_H
 
 #include "Swarm.h"
+#include "chugin.h"
 
 class Assemblage
 {
@@ -18,77 +19,112 @@ public:
 		{
 			collage[i] = new SoundMatter( fs, 4 ); 
 		}
-		// init members
-		this->init();
+		// precalc
+		scalar = 1.f / num_pieces;
 	}
 
-	void Assemblage::setPitch( float* n_pitches, unsigned int size )
+	Assemblage::~Assemblage()
 	{
-		// new size
-		num_pitches = size;
-		// get rid of the last pitches
-		delete pitches; pitches = nullptr;
-		// new storage
-		pitches = new float[num_pitches];
-		// swap
-		for( int i = 0; i < num_pitches; i++ ) pitches[i] = n_pitches[i];
+		// destroy matter
+		for( int i = 0; i < num_pieces; i++ ) { delete collage[i]; collage[i] = nullptr; }
+		delete[] collage; collage = nullptr;
+	}
+
+	double Assemblage::tick()
+	{
+		double out = 0.0; // return this
+		for( int i = 0; i < num_pieces; i++ )
+		{
+			out += collage[i]->tick(); // mix
+		}
+		out *= scalar; // quiet
+		return out;
+	}
+
+	// this assumes we are outputting however many pieces we have in the assemblage, be careful! 
+	void Assemblage::tick( SAMPLE* in, SAMPLE* out, unsigned int frames )
+	{
+		memset( out, 0, sizeof(SAMPLE) * num_pieces * frames); // clear
+
+		for( int f = 0; f < frames; f++ )
+		{
+			for( int c = 0; c < num_pieces; c++ )
+			{
+				out[f * num_pieces + c] = collage[c]->tick();
+			}
+		}
+	}
+
+	// this is safer but compresses the components to a certain number of channels 
+	void Assemblage::tick( SAMPLE* in, SAMPLE* out, unsigned int frames, unsigned int channels )
+	{
+		memset( out, 0, sizeof(SAMPLE) * num_pieces * frames); // clear
+
+		for( int f = 0; f < frames; f++ )
+		{
+			for( int c = 0; c < num_pieces; c++ )
+			{
+				out[f * channels + ( c % channels )] = collage[c]->tick();
+			}
+		}
+	}
+
+	// set all pitches given a collection of sizes
+	void Assemblage::setPitch( Chuck_ArrayFloat& pitches, CK_DL_API& API )
+	{
+		unsigned int size = API->object->array_float_size( &pitches );
 		// assign
-		for( int i = 0; i < num_pieces; i++ ) collage[i]->setPitch( pitches[i % num_pitches] );
+		for( int i = 0; i < size; i++ ) collage[i]->setPitch( API->object->array_float_get_idx( &pitches, i % size ) );
+		// how do we save this? maybe we just retrieve the targets of the sound matter(s) and fit them into a chuck array?
 	}
 
-	void Assemblage::setSize( float* n_sizes, unsigned int size )
+	// set all sizes given a collection of sizes
+	void Assemblage::setSize( Chuck_ArrayFloat& sizes, CK_DL_API& API )
 	{
-		// new size
-		num_sizes = size;
-		// get rid
-		delete sizes; sizes = nullptr;
-		// new
-		sizes = new float[num_sizes];
-		// swap
-		for( int i = 0; i < num_sizes; i++ ) sizes[i] = n_sizes[i];
+		unsigned int size = API->object->array_float_size( &sizes);
 		// assign
-		for( int i = 0; i < num_pieces; i++ ) collage[i]->setSize( sizes[i % num_sizes] );
+		for( int i = 0; i < size; i++ ) collage[i]->setSize( API->object->array_float_get_idx( &sizes, i % size ) );
+		// how do we save this?
 	}
 
-	void Assemblage::setPosition( float* n_positions, unsigned int size )
+	// set all positions given a collection of position
+	void Assemblage::setPosition( Chuck_ArrayFloat& positions, CK_DL_API& API )
 	{
-		// new size
-		num_positions = size;
-		// get rid
-		delete positions; positions = nullptr;
-		// new
-		positions = new float[num_positions];
-		// swap
-		for( int i = 0; i < num_positions; i++ ) positions[i] = n_positions[i];
+		unsigned int size = API->object->array_float_size( &positions );
 		// assign
-		for( int i = 0; i < num_pieces; i++ ) collage[i]->setPosition( positions[i % num_positions] );
+		for (int i = 0; i < size; i++) collage[i]->setPosition( (float)API->object->array_float_get_idx( &positions, i % size ) );
+		// how do we save this?
 	}
 
-	void Assemblage::init()
+	// set all pitches to a single value
+	void Assemblage::setPitch( float pitch )
 	{
-		// pitches
-		num_pitches = 1;
-		pitches = new float;
-		pitches = 1.f;
-		// sizes
-		num_sizes = 1;
-		sizes = new float;
-		sizes = 100.f;
-		// positions
-		num_positions = 1;
-		positions = new float;
-		positions = 0.f;
+		// assign
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->setPitch( pitch );
+		// how do we save this? maybe we just retrieve the targets of the sound matter(s) and fit them into a chuck array?
 	}
+
+	// set all sizes to a single value
+	void Assemblage::setSize( float size )
+	{
+		// assign
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->setSize( size );
+		// how do we save this?
+	}
+
+	// set all positions to a single value
+	void Assemblage::setPosition( float position )
+	{
+		// assign
+		for (int i = 0; i < num_pieces; i++) collage[i]->setPosition( position );
+		// how do we save this?
+	}
+
 private:
-	float* pitches = nullptr; // stored pitches
-	unsigned int num_pitches = 0; // how many pitches do we have stored
-	float* sizes = nullptr; // stored sizes
-	unsigned int num_sizes = 0; // how many grain sizes do we have stored
-	float* positions = nullptr; // store positions
-	unsigned num_positions = 0; // how many positions do we have stored
 	stk::StkFrames* _buffer = nullptr; // shared audio buffer
 	SoundMatter** collage = nullptr; // our pieces of sound
 	unsigned int num_pieces = 0; // how many pieces of sound?
+	float scalar = 0.f; // turn down the volume
 };
 
 #endif /* ASSEMBLAGE_H */

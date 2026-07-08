@@ -62,5 +62,8 @@
     <ClInclude Include="..\include\stk\include\Stk.h">
       <Filter>Header Files\stk</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\Assemblage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
