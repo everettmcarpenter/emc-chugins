@@ -42,18 +42,36 @@
 // general includes
 #include <iostream>
 
-
 // declaration of chugin constructor
 CK_DLL_CTOR( assemblage_ctor );
+CK_DLL_CTOR( assemblage_2ctor );
 // declaration of chugin desctructor
 CK_DLL_DTOR( assemblage_dtor );
 
-// example of getter/setter
-CK_DLL_MFUN( assemblage_setParam );
-CK_DLL_MFUN( assemblage_getParam );
-
 // for chugins extending UGen, this is mono synthesis function for 1 sample
 CK_DLL_TICK( assemblage_tick );
+
+CK_DLL_MFUN( assemblage_setGrainSize );
+CK_DLL_MFUN( assemblage_getGrainSize );
+CK_DLL_MFUN( assemblage_setRandomGrainSize );
+CK_DLL_MFUN( assemblage_getRandomGrainSize );
+
+CK_DLL_MFUN( assemblage_setPitch );
+CK_DLL_MFUN( assemblage_getPitch );
+CK_DLL_MFUN( assemblage_setRandomPitch );
+CK_DLL_MFUN( assemblage_getRandomPitch );
+
+CK_DLL_MFUN( assemblage_setPosition );
+CK_DLL_MFUN( assemblage_set2Position );
+CK_DLL_MFUN( assemblage_getPosition );
+CK_DLL_MFUN( assemblage_setRandomPosition );
+CK_DLL_MFUN( assemblage_getRandomPosition );
+
+CK_DLL_MFUN( assemblage_count );
+CK_DLL_MFUN( assemblage_openFile );
+CK_DLL_MFUN( assemblage_closeFile );
+
+CK_DLL_MFUN( assemblage_samples );
 
 // this is a special offset reserved for chugin internal data
 t_CKINT assemblage_data_offset = 0;
@@ -100,28 +118,110 @@ CK_DLL_QUERY( Assemblage )
     // NOTE constructors can be overloaded like any other functions,
     // each overloaded constructor begins with `QUERY->add_ctor()`
     // followed by a sequence of `QUERY->add_arg()`
+    QUERY->add_ctor( QUERY, assemblage_2ctor );
+    QUERY->add_arg( QUERY, "string", "file" );
+    QUERY->add_arg( QUERY, "int", "num" );
 
     // register the destructor (probably no need to change)
     QUERY->add_dtor( QUERY, assemblage_dtor );
 
     // for UGens only: add tick function
     // NOTE a non-UGen class should remove or comment out this next line
-    QUERY->add_ugen_func( QUERY, assemblage_tick, NULL, 1, 1 );
+    QUERY->add_ugen_func( QUERY, assemblage_tick, NULL, 0, 1 );
     // NOTE: if this is to be a UGen with more than 1 channel,
     // e.g., a multichannel UGen -- will need to use add_ugen_funcf()
     // and declare a tickf function using CK_DLL_TICKF
 
-    // example of adding setter method
-    QUERY->add_mfun( QUERY, assemblage_setParam, "float", "param" );
-    // example of adding argument to the above method
-    QUERY->add_arg( QUERY, "float", "arg" );
+    QUERY->add_mfun( QUERY, assemblage_setGrainSize, "void", "size" );
+    QUERY->add_arg( QUERY, "float", "size" );
+    QUERY->doc_func( QUERY, "Set assemblage size in ms." );
 
-    // example of adding getter method
-    QUERY->add_mfun( QUERY, assemblage_getParam, "float", "param" );
-    
+    QUERY->add_mfun(QUERY, assemblage_setGrainSize, "void", "size");
+    QUERY->add_arg(QUERY, "float[]", "size");
+    QUERY->doc_func(QUERY, "Set assemblage size in ms.");
+
+    QUERY->add_mfun( QUERY, assemblage_getGrainSize, "float[]", "size" );
+    QUERY->doc_func( QUERY, "Get assemblage size in ms." );
+
+    QUERY->add_mfun( QUERY, assemblage_setRandomGrainSize, "void", "randomSize" );
+    QUERY->add_arg( QUERY, "float", "randomness" );
+    QUERY->doc_func( QUERY, "Set randomness of assemblage size. (Additive, this is a random number between 0 and 'randomSize' which is added to the base assemblage size)" );
+
+    QUERY->add_mfun( QUERY, assemblage_setRandomGrainSize, "void", "randomSize" );
+    QUERY->add_arg( QUERY, "float[]", "randomness" );
+    QUERY->doc_func( QUERY, "Set randomness of assemblage size. (Additive, this is a random number between 0 and 'randomSize' which is added to the base assemblage size)" );
+
+    QUERY->add_mfun( QUERY, assemblage_getRandomGrainSize, "float[]", "randomSize" );
+    QUERY->doc_func( QUERY, "Get randomness of assemblage size." );
+
+    QUERY->add_mfun( QUERY, assemblage_setPitch, "void", "pitch" );
+    QUERY->add_arg( QUERY, "float", "pitch" );
+    QUERY->doc_func( QUERY, "Set pitch/rate of internal file." );
+
+    QUERY->add_mfun( QUERY, assemblage_setPitch, "void", "pitch" );
+    QUERY->add_arg( QUERY, "float[]", "pitch" );
+    QUERY->doc_func( QUERY, "Set pitch/rate of internal file." );
+
+    QUERY->add_mfun( QUERY, assemblage_getPitch, "float[]", "pitch" );
+    QUERY->doc_func( QUERY, "Get the pitch/rate of internal file." );
+
+    QUERY->add_mfun( QUERY, assemblage_setRandomPitch, "void", "randomPitch" );
+    QUERY->add_arg( QUERY, "float", "randomness" );
+    QUERY->doc_func( QUERY, "Set randomness of pitch." );
+
+    QUERY->add_mfun( QUERY, assemblage_setRandomPitch, "void", "randomPitch" );
+    QUERY->add_arg( QUERY, "float[]", "randomness" );
+    QUERY->doc_func( QUERY, "Set randomness of pitch." );
+
+    QUERY->add_mfun( QUERY, assemblage_getRandomPitch, "float[]", "randomPitch" );
+    QUERY->doc_func( QUERY, "Get randomness of pitch." );
+
+    QUERY->add_mfun( QUERY, assemblage_setPosition, "void", "position" );
+    QUERY->add_arg( QUERY, "float", "position" );
+    QUERY->doc_func( QUERY, "Set position of assemblage in file." );
+
+    QUERY->add_mfun( QUERY, assemblage_setPosition, "void", "position" );
+    QUERY->add_arg( QUERY, "float[]", "position" );
+    QUERY->doc_func( QUERY, "Set position of assemblage in file." );
+
+    QUERY->add_mfun( QUERY, assemblage_set2Position, "void", "position" );
+    QUERY->add_arg( QUERY, "int", "position" );
+    QUERY->doc_func( QUERY, "Set position of assemblage in file." );
+
+    QUERY->add_mfun( QUERY, assemblage_set2Position, "void", "position" );
+    QUERY->add_arg( QUERY, "int[]", "position" );
+    QUERY->doc_func( QUERY, "Set position of assemblage in file." );
+
+    QUERY->add_mfun( QUERY, assemblage_getPosition, "float[]", "position" );
+    QUERY->doc_func( QUERY, "Get position of assemblage." );
+
+    QUERY->add_mfun( QUERY, assemblage_setRandomPosition, "void", "randomPosition" );
+    QUERY->add_arg( QUERY, "float", "randomness" );
+    QUERY->doc_func( QUERY, "Set randomness of position." );
+
+    QUERY->add_mfun( QUERY, assemblage_setRandomPosition, "void", "randomPosition" );
+    QUERY->add_arg( QUERY, "float[]", "randomness" );
+    QUERY->doc_func( QUERY, "Set randomness of position." );
+
+    QUERY->add_mfun( QUERY, assemblage_getRandomPosition, "float[]", "randomPosition" );
+    QUERY->doc_func( QUERY, "Get randomness of position." );
+
+    QUERY->add_mfun( QUERY, assemblage_count, "int", "count" );
+    QUERY->doc_func( QUERY, "How many pieces." );
+
+    QUERY->add_mfun( QUERY, assemblage_openFile, "void", "openFile" );
+    QUERY->add_arg( QUERY, "string", "file" );
+    QUERY->doc_func( QUERY, "Open file at the given path." );
+
+    QUERY->add_mfun( QUERY, assemblage_closeFile, "void", "closeFile" );
+    QUERY->doc_func( QUERY, "Close the active file." );
+
+    QUERY->add_mfun( QUERY, assemblage_samples, "int", "samples" );
+    QUERY->doc_func( QUERY, "Return how many samples are in the active file." );
+
     // this reserves a variable in the ChucK internal class to store 
     // referene to the c++ class we defined above
-    assemblage_data_offset = QUERY->add_mvar( QUERY, "int", "@a_data", false );
+    assemblage_data_offset = QUERY->add_mvar( QUERY, "int", "@g_data", false );
 
     // ------------------------------------------------------------------------
     // end the class definition
@@ -167,35 +267,8 @@ CK_DLL_TICK( assemblage_tick )
     Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
  
     // invoke our tick function; store in the magical out variable
-    if( a_obj ) *out = a_obj->tick( in );
+    if( a_obj ) *out = a_obj->tick();
 
     // yes
     return TRUE;
-}
-
-
-// example implementation for setter
-CK_DLL_MFUN( assemblage_setParam )
-{
-    // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT( SELF, assemblage_data_offset );
-
-    // get next argument
-    // NOTE argument type must match what is specified above in CK_DLL_QUERY
-    // NOTE this advances the ARGS pointer, so save in variable for re-use
-    t_CKFLOAT arg1 = GET_NEXT_FLOAT( ARGS );
-    
-    // call setParam() and set the return value
-    RETURN->v_float = a_obj->setParam( arg1 );
-}
-
-
-// example implementation for getter
-CK_DLL_MFUN(assemblage_getParam)
-{
-    // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT( SELF, assemblage_data_offset );
-
-    // call getParam() and set the return value
-    RETURN->v_float = a_obj->getParam();
 }

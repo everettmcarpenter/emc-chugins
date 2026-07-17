@@ -48,7 +48,7 @@ public class GranularSupport // carbon copy of keyboard mapping from Everett
         else if( key == 40 )
         {
             if( gran.randomSize() <= 0.01 ) 0.01 => gran.randomSize;
-            Math.min( 2000.0, (gran.randomSize() * 1.3 )) => gran.randomSize;
+            Math.min( 5000.0, (gran.randomSize() * 1.3 )) => gran.randomSize;
             if( print ) <<< "+ randomness grain length: ", gran.randomSize() >>>;
         }
         // reduce rand position via [
@@ -219,12 +219,12 @@ public class GranularSupport // carbon copy of keyboard mapping from Everett
         }
         else if( key == 228 )
         {
-            gran.size( Math.clampf( gran.size() + ((gran.size() / 6.0) + 0.01), 1.0, 850.0 ) );
+            gran.size( Math.clampf( gran.size() + ((gran.size() / 6.0) + 0.01), 1.0, 5000.0 ) );
             if( print ) <<< "+ grain size: ", gran.size() >>>;
         }
         else if( key == 230 )
         {
-            gran.size( Math.clampf( gran.size() - ((gran.size() / 6.0) + 0.01), 1.0, 850.0 ) );
+            gran.size( Math.clampf( gran.size() - ((gran.size() / 6.0) + 0.01), 1.0, 5000.0 ) );
             if( print ) <<< "- grain size: ", gran.size() >>>;
         }
     }

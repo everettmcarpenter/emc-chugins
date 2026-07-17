@@ -8,10 +8,10 @@ class Assemblage
 {
 public:
 	// default constructor
-	Assemblage::Assemblage( unsigned int fs )
+	Assemblage::Assemblage( unsigned int fs, unsigned int n_pieces = 4 )
 	{
 		// default number of pieces
-		num_pieces = 4;
+		num_pieces = n_pieces;
 		// initialize
 		collage = new SoundMatter*[num_pieces];
 		// default to 4 grains per sound object, can do more
@@ -55,20 +55,6 @@ public:
 		}
 	}
 
-	// this is safer but compresses the components to a certain number of channels 
-	void Assemblage::tick( SAMPLE* in, SAMPLE* out, unsigned int frames, unsigned int channels )
-	{
-		memset( out, 0, sizeof(SAMPLE) * num_pieces * frames); // clear
-
-		for( int f = 0; f < frames; f++ )
-		{
-			for( int c = 0; c < num_pieces; c++ )
-			{
-				out[f * channels + ( c % channels )] = collage[c]->tick();
-			}
-		}
-	}
-
 	// set all pitches given a collection of sizes
 	void Assemblage::setPitch( Chuck_ArrayFloat& pitches, CK_DL_API& API )
 	{
@@ -92,7 +78,7 @@ public:
 	{
 		unsigned int size = API->object->array_float_size( &positions );
 		// assign
-		for (int i = 0; i < size; i++) collage[i]->setPosition( (float)API->object->array_float_get_idx( &positions, i % size ) );
+		for( int i = 0; i < size; i++ ) collage[i]->setPosition( (float)API->object->array_float_get_idx( &positions, i % size ) );
 		// how do we save this?
 	}
 

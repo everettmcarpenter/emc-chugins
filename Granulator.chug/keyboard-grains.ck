@@ -4,7 +4,7 @@
 Hid hi;
 HidMsg msg;
 GranularSupport helper(1);
-Granulator grains( "../include/compressed-07-06-2026.wav", 16 ) => dac;
+Granulator grains( "../include/compress_practice.wav", 32 )[2] => dac;
 // identify yourself
 string address;
 int port;
@@ -32,7 +32,13 @@ while( true )
                 cherr <= " . " <= IO.newline();
                 me.exit();
             }
-            else helper.key( msg.key, grains );
+            else 
+            {
+                for( int i; i < grains.size(); i++ )
+                {
+                    helper.key( msg.key, grains[i] );
+                }
+            }
         }
     }
     10::ms => now;

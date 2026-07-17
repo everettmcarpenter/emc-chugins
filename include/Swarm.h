@@ -113,7 +113,7 @@ public:
 		// we gotta wrap around again
 		float random_offset_frames = ( random_position * 0.001f ) * _fs; // convert random_position to samples
 		random_offset_frames /= (float)this->size();
-		float n_position = position_slew->getCurrent() + (  0.5 * ( random->tick() + 1.0 ) * random_offset_frames ); // apply random offset
+		float n_position = position_slew->getCurrent() + ( 0.5 * ( random->tick() + 1.0 ) * random_offset_frames ); // apply random offset
 		n_position = std::max( 0.f, std::min( n_position, 40.f ) ); // clamp
 		particle.setPositionInstant( n_position );
 		// debug
@@ -166,7 +166,7 @@ public:
 	void SoundMatter::setRandomPitch( float random_pit ) { random_pitch = random_pit; }
 	float SoundMatter::getRandomPitch() { return random_pitch; }
 
-	void SoundMatter::setRandomPosition( float random_pos_ms ) { random_position = ( random_pos_ms / _fs ) * 1000.f; }
+	void SoundMatter::setRandomPosition( float random_pos_ms ) { random_position = random_pos_ms; }
 	float SoundMatter::getRandomPosition() { return random_position; }
 
 	virtual void SoundMatter::openFile( const char* path )
