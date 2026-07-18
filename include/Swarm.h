@@ -28,14 +28,11 @@ public:
 		// sample rate
 		_fs = fs;
 		stk::Stk::setSampleRate( _fs );
+		this->createBuffer();
 		// num
 		num_grains = size;
 		// scale down
 		scale = 1.0 / num_grains;
-		// buffer
-		buffer = new stk::StkFrames( 1, 1 );
-		// read
-		file_read = new stk::FileRead();
 		// random
 		random = new stk::Noise( time( NULL ) );
 		// positional_slew 
@@ -58,15 +55,13 @@ public:
 		for( int i = 0; i < num_grains; i++ ) { delete quantum[i]; quantum[i] = nullptr; }
 		delete[] quantum; quantum = nullptr;
 		// destroy again
-		delete file_read; file_read = nullptr;
-		// destroy again
 		delete random; random = nullptr;
 		// destroy again
 		delete position_slew; position_slew = nullptr;
 		// destroy again
 		delete pitch_slew; pitch_slew = nullptr;
-		// once more
-		delete buffer; buffer = nullptr;
+		// delete buf
+		this->deleteBuffer();
 	}
 
 	double SoundMatter::tick()
@@ -82,7 +77,7 @@ public:
 				// the amalgamation of sound
 				out += quantum[i]->tick();
 				// create new grain parameters if resting
-				if( quantum[i]->windowState() ) newGrain( *quantum[i] );
+				if( quantum[i]->windowState() ) newGrain( quantum[i] );
 				// if our grain is loop and finished, shoot off a new one
 				if( quantum[i]->windowState() && quantum[i]->loopState() ) quantum[i]->trigger();
 			}
@@ -100,24 +95,38 @@ public:
 	}
 
 	// create a new 
-	void SoundMatter::newGrain( Quark& particle )
+	void SoundMatter::newGrain( Quark* particle )
 	{
 		// wrap around to prevent negative sizes
 		float n_size = base_size + (  0.5 * ( random->tick() + 1.0 ) * random_size );
 		n_size = std::max( 1.f, n_size );
-		particle.setSize( n_size ); // set 
+		particle->setSize( n_size ); // set 
 		// pitch is easy(ish)
 		float n_pitch = pitch_slew->getCurrent() + ( 0.5 * ( random->tick() + 1.0 ) * random_pitch ); // offset
 		n_pitch = std::max( 0.f, n_pitch ); // clamp
-		particle.setPitchInstant( n_pitch );
+		particle->setPitchInstant( n_pitch );
 		// we gotta wrap around again
 		float random_offset_frames = ( random_position * 0.001f ) * _fs; // convert random_position to samples
 		random_offset_frames /= (float)this->size();
 		float n_position = position_slew->getCurrent() + ( 0.5 * ( random->tick() + 1.0 ) * random_offset_frames ); // apply random offset
 		n_position = std::max( 0.f, std::min( n_position, 40.f ) ); // clamp
-		particle.setPositionInstant( n_position );
+		particle->setPositionInstant( n_position );
 		// debug
 		// printf( "Size %f, pitch %f, position %f \n", n_size, n_pitch, n_position );
+	}
+
+	void SoundMatter::start() 
+	{ 
+		// turn everything on
+		go = false;
+		for( int i = 0; i < num_grains; i++ ) quantum[i]->on();
+	}
+
+	void SoundMatter::stop() 
+	{ 
+		// turn everything off
+		go = false;
+		for( int i = 0; i < num_grains; i++ ) quantum[i]->off();
 	}
 
 	void SoundMatter::setSize( float n_size_ms )
@@ -150,7 +159,7 @@ public:
 
 	void SoundMatter::setPosition( float n_position ) 
 	{
-		position_slew->setTarget( n_position, 120.f );
+		position_slew->setTarget( n_position, 240.f );
 	}
 
 	void SoundMatter::setPosition( unsigned int n_position )
@@ -171,45 +180,85 @@ public:
 
 	virtual void SoundMatter::openFile( const char* path )
 	{
-		// don't do anything
-		go = false;
+		if( internalBuffer )
+		{
+			// don't do anything
+			go = false;
 
-		// if one is open, close the file and delete the buffer
-		if( file_read->isOpen() ) file_read->close();
+			// if one is open, close the file and delete the buffer
+			if( file_read->isOpen() ) file_read->close();
 		
-		// clear 
-		delete buffer;
+			// clear 
+			delete buffer;
 
-		// convert C string to C++ string
-		std::string cppString = path;
+			// convert C string to C++ string
+			std::string cppString = path;
 
-		// open!
-		file_read->open( cppString );
+			// open!
+			file_read->open( cppString );
 
-		// resize!
-		buffer = new stk::StkFrames( 0.f, file_read->fileSize(), file_read->channels() );
-		// sample rate
-		buffer->setDataRate( file_read->fileRate() );
-		// read!
-		file_read->read( *buffer, 0, true );
-		// give to quarks and assign them to channels
-		for( int i = 0; i < num_grains; i++ ) { quantum[i]->setBuffer( *buffer, i % buffer->channels() ); }
-		// good to go
-		go = true;
+			// resize!
+			buffer = new stk::StkFrames( 0.f, file_read->fileSize(), file_read->channels() );
+			// sample rate
+			buffer->setDataRate( file_read->fileRate() );
+			// read!
+			file_read->read( *buffer, 0, true );
+			// give to quarks and assign them to channels
+			for( int i = 0; i < num_grains; i++ ) { quantum[i]->setBuffer( *buffer, i % buffer->channels() ); }
+			// good to go
+			go = true;
+		}
 	}
 
 	virtual void SoundMatter::closeFile()
 	{
-		// stop doing anything
-		go = false;
-		// close the file
-		file_read->close();
-		// unlink the quarks
-		for( int i = 0; i < num_grains; i++ ) quantum[i]->clearBuffer();
-		// clear buffer
-		delete buffer; buffer = nullptr;
+		// we don't wanna delete what buffer is pointing to if it's not ours
+		if( internalBuffer )
+		{
+			// stop doing anything
+			go = false;
+			// close the file
+			file_read->close();
+			// unlink the quarks
+			for( int i = 0; i < num_grains; i++ ) quantum[i]->clearBuffer();
+			// clear buffer
+			delete buffer; buffer = nullptr;
+		}
 	}
 
+	// create internal audio buffer
+	void SoundMatter::createBuffer()
+	{
+		// buffer
+		buffer = new stk::StkFrames( 1, 1 );
+		// read
+		file_read = new stk::FileRead();
+		// is there an internal buffer?
+		internalBuffer = true;
+	}
+
+	// delete internal audio buffer
+	void SoundMatter::deleteBuffer()
+	{
+		// destroy again
+		delete file_read; file_read = nullptr;
+		// once more
+		delete buffer; buffer = nullptr;
+		// is there an internal buffer?
+		internalBuffer = false;
+	}
+
+	// provided an outside buffer, utilize this instead of an interally allocated one
+	void SoundMatter::linkOutsideBuffer( stk::StkFrames& n_buffer )
+	{
+		// if we're using our own, we need to dispose of it first
+		if( internalBuffer ) this->deleteBuffer();
+		// point to this!
+		buffer = &n_buffer;
+		internalBuffer = false; // we're using an outside buffer
+	}
+
+	// how big is the buffer
 	unsigned int SoundMatter::size() { return buffer->size() / buffer->channels(); }
 	
 protected:
@@ -227,6 +276,7 @@ protected:
 	float random_size = 0.f; // in ms
 	float base_size = 200.f; // in ms
 	bool go = false;
+	bool internalBuffer = true;
 };
 
 #endif

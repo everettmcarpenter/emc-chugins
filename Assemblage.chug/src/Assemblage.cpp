@@ -45,6 +45,8 @@
 // declaration of chugin constructor
 CK_DLL_CTOR( assemblage_ctor );
 CK_DLL_CTOR( assemblage_2ctor );
+CK_DLL_CTOR( assemblage_3ctor );
+CK_DLL_CTOR( assemblage_4ctor );
 // declaration of chugin desctructor
 CK_DLL_DTOR( assemblage_dtor );
 
@@ -52,19 +54,24 @@ CK_DLL_DTOR( assemblage_dtor );
 CK_DLL_TICK( assemblage_tick );
 
 CK_DLL_MFUN( assemblage_setGrainSize );
+CK_DLL_MFUN( assemblage_set2GrainSize );
 CK_DLL_MFUN( assemblage_getGrainSize );
 CK_DLL_MFUN( assemblage_setRandomGrainSize );
+CK_DLL_MFUN( assemblage_set2RandomGrainSize );
 CK_DLL_MFUN( assemblage_getRandomGrainSize );
 
 CK_DLL_MFUN( assemblage_setPitch );
+CK_DLL_MFUN( assemblage_set2Pitch );
 CK_DLL_MFUN( assemblage_getPitch );
 CK_DLL_MFUN( assemblage_setRandomPitch );
+CK_DLL_MFUN( assemblage_set2RandomPitch );
 CK_DLL_MFUN( assemblage_getRandomPitch );
 
 CK_DLL_MFUN( assemblage_setPosition );
 CK_DLL_MFUN( assemblage_set2Position );
 CK_DLL_MFUN( assemblage_getPosition );
 CK_DLL_MFUN( assemblage_setRandomPosition );
+CK_DLL_MFUN( assemblage_set2RandomPosition );
 CK_DLL_MFUN( assemblage_getRandomPosition );
 
 CK_DLL_MFUN( assemblage_count );
@@ -122,6 +129,12 @@ CK_DLL_QUERY( Assemblage )
     QUERY->add_arg( QUERY, "string", "file" );
     QUERY->add_arg( QUERY, "int", "num" );
 
+    QUERY->add_ctor( QUERY, assemblage_3ctor );
+    QUERY->add_arg( QUERY, "string", "file" );
+
+    QUERY->add_ctor( QUERY, assemblage_4ctor );
+    QUERY->add_arg( QUERY, "int", "number" );
+
     // register the destructor (probably no need to change)
     QUERY->add_dtor( QUERY, assemblage_dtor );
 
@@ -136,7 +149,7 @@ CK_DLL_QUERY( Assemblage )
     QUERY->add_arg( QUERY, "float", "size" );
     QUERY->doc_func( QUERY, "Set assemblage size in ms." );
 
-    QUERY->add_mfun(QUERY, assemblage_setGrainSize, "void", "size");
+    QUERY->add_mfun(QUERY, assemblage_set2GrainSize, "void", "size");
     QUERY->add_arg(QUERY, "float[]", "size");
     QUERY->doc_func(QUERY, "Set assemblage size in ms.");
 
@@ -147,7 +160,7 @@ CK_DLL_QUERY( Assemblage )
     QUERY->add_arg( QUERY, "float", "randomness" );
     QUERY->doc_func( QUERY, "Set randomness of assemblage size. (Additive, this is a random number between 0 and 'randomSize' which is added to the base assemblage size)" );
 
-    QUERY->add_mfun( QUERY, assemblage_setRandomGrainSize, "void", "randomSize" );
+    QUERY->add_mfun( QUERY, assemblage_set2RandomGrainSize, "void", "randomSize" );
     QUERY->add_arg( QUERY, "float[]", "randomness" );
     QUERY->doc_func( QUERY, "Set randomness of assemblage size. (Additive, this is a random number between 0 and 'randomSize' which is added to the base assemblage size)" );
 
@@ -158,7 +171,7 @@ CK_DLL_QUERY( Assemblage )
     QUERY->add_arg( QUERY, "float", "pitch" );
     QUERY->doc_func( QUERY, "Set pitch/rate of internal file." );
 
-    QUERY->add_mfun( QUERY, assemblage_setPitch, "void", "pitch" );
+    QUERY->add_mfun( QUERY, assemblage_set2Pitch, "void", "pitch" );
     QUERY->add_arg( QUERY, "float[]", "pitch" );
     QUERY->doc_func( QUERY, "Set pitch/rate of internal file." );
 
@@ -169,7 +182,7 @@ CK_DLL_QUERY( Assemblage )
     QUERY->add_arg( QUERY, "float", "randomness" );
     QUERY->doc_func( QUERY, "Set randomness of pitch." );
 
-    QUERY->add_mfun( QUERY, assemblage_setRandomPitch, "void", "randomPitch" );
+    QUERY->add_mfun( QUERY, assemblage_set2RandomPitch, "void", "randomPitch" );
     QUERY->add_arg( QUERY, "float[]", "randomness" );
     QUERY->doc_func( QUERY, "Set randomness of pitch." );
 
@@ -180,7 +193,7 @@ CK_DLL_QUERY( Assemblage )
     QUERY->add_arg( QUERY, "float", "position" );
     QUERY->doc_func( QUERY, "Set position of assemblage in file." );
 
-    QUERY->add_mfun( QUERY, assemblage_setPosition, "void", "position" );
+    QUERY->add_mfun( QUERY, assemblage_set2Position, "void", "position" );
     QUERY->add_arg( QUERY, "float[]", "position" );
     QUERY->doc_func( QUERY, "Set position of assemblage in file." );
 
@@ -199,7 +212,7 @@ CK_DLL_QUERY( Assemblage )
     QUERY->add_arg( QUERY, "float", "randomness" );
     QUERY->doc_func( QUERY, "Set randomness of position." );
 
-    QUERY->add_mfun( QUERY, assemblage_setRandomPosition, "void", "randomPosition" );
+    QUERY->add_mfun( QUERY, assemblage_set2RandomPosition, "void", "randomPosition" );
     QUERY->add_arg( QUERY, "float[]", "randomness" );
     QUERY->doc_func( QUERY, "Set randomness of position." );
 
@@ -247,6 +260,56 @@ CK_DLL_CTOR( assemblage_ctor )
     OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = (t_CKINT)a_obj;
 }
 
+// implementation for the default constructor
+CK_DLL_CTOR( assemblage_2ctor )
+{
+    // get the offset where we'll store our internal c++ class pointer
+    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = 0;
+    
+    Chuck_String* path =  GET_NEXT_STRING( ARGS );
+    t_CKINT num_grains = GET_NEXT_INT( ARGS );
+    if( num_grains <= 0 ) num_grains = 4;
+
+    // instantiate our internal c++ class representation
+    Assemblage * a_obj = new Assemblage( API->vm->srate(VM), num_grains );
+    a_obj->openFile( API->object->str( path ) );
+    
+    // store the pointer in the ChucK object member
+    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = (t_CKINT)a_obj;
+}
+
+// implementation for the default constructor
+CK_DLL_CTOR( assemblage_3ctor )
+{
+    // get the offset where we'll store our internal c++ class pointer
+    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = 0;
+    
+    Chuck_String* path =  GET_NEXT_STRING( ARGS );
+
+    // instantiate our internal c++ class representation
+    Assemblage * a_obj = new Assemblage( API->vm->srate(VM) );
+    a_obj->openFile( API->object->str( path ) );
+    
+    // store the pointer in the ChucK object member
+    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = (t_CKINT)a_obj;
+}
+
+// implementation for the default constructor
+CK_DLL_CTOR( assemblage_4ctor )
+{
+    // get the offset where we'll store our internal c++ class pointer
+    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = 0;
+   
+    t_CKINT num_grains = GET_NEXT_INT( ARGS );
+    if( num_grains <= 0 ) num_grains = 4;
+
+    // instantiate our internal c++ class representation
+    Assemblage * a_obj = new Assemblage( API->vm->srate(VM), num_grains );
+    
+    // store the pointer in the ChucK object member
+    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = (t_CKINT)a_obj;
+}
+
 
 // implementation for the destructor
 CK_DLL_DTOR( assemblage_dtor )
@@ -259,7 +322,6 @@ CK_DLL_DTOR( assemblage_dtor )
     OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = 0;
 }
 
-
 // implementation for tick function (relevant only for UGens)
 CK_DLL_TICK( assemblage_tick )
 {
@@ -271,4 +333,63 @@ CK_DLL_TICK( assemblage_tick )
 
     // yes
     return TRUE;
+}
+
+CK_DLL_MFUN( assemblage_setGrainSize )
+{
+    // get our c++ class pointer
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+
+    t_CKFLOAT size = GET_NEXT_FLOAT( ARGS );
+    
+    if( a_obj ) a_obj->setSize( size );
+}
+
+CK_DLL_MFUN( assemblage_setPitch )
+{
+    // get our c++ class pointer
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+
+    t_CKFLOAT pitch = GET_NEXT_FLOAT( ARGS );
+    
+    if( a_obj ) a_obj->setPitch( pitch );
+}
+
+CK_DLL_MFUN( assemblage_setPosition )
+{
+    // get our c++ class pointer
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+
+    t_CKFLOAT pos = GET_NEXT_FLOAT( ARGS );
+    
+    if( a_obj ) a_obj->setSize( pos );
+}
+
+CK_DLL_MFUN( assemblage_setRandomGrainSize ) // need to implement this on the Assemblage side
+{
+    // get our c++ class pointer
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+
+    t_CKFLOAT randomSize = GET_NEXT_FLOAT( ARGS );
+    
+    if( a_obj ) a_obj->setRandomSize( randomSize );
+}
+
+CK_DLL_MFUN( assemblage_setRandomPitch ) // need to implement this on the Assemblage side
+{
+    // get our c++ class pointer
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+
+    t_CKFLOAT randomPitch = GET_NEXT_FLOAT( ARGS );
+    
+    if( a_obj ) a_obj->setRandomPitch( randomPitch );
+}
+
+CK_DLL_MFUN( assemblage_samples )
+{
+    // get our c++ class pointer
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    
+    if( a_obj ) RETURN->v_int = a_obj->samples();
+    else RETURN->v_int = -1;
 }

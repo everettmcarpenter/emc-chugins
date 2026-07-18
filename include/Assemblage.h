@@ -21,6 +21,7 @@ public:
 		}
 		// precalc
 		scalar = 1.f / num_pieces;
+		this->createBuffer();
 	}
 
 	Assemblage::~Assemblage()
@@ -28,6 +29,7 @@ public:
 		// destroy matter
 		for( int i = 0; i < num_pieces; i++ ) { delete collage[i]; collage[i] = nullptr; }
 		delete[] collage; collage = nullptr;
+		this->deleteBuffer();
 	}
 
 	double Assemblage::tick()
@@ -102,12 +104,82 @@ public:
 	void Assemblage::setPosition( float position )
 	{
 		// assign
-		for (int i = 0; i < num_pieces; i++) collage[i]->setPosition( position );
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->setPosition( position );
 		// how do we save this?
 	}
 
+	// start all function calls
+	void Assemblage::start()
+	{
+		// cycle
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->start();
+	}
+
+	// stop all function calls
+	void Assemblage::stop()
+	{
+		// cycle
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->stop();
+	}
+
+	// open up a file and have all our granulators point to it
+	void Assemblage::openFile( const char* path )
+	{
+		// don't do anything
+		this->stop(); 
+
+		// if one is open, close the file and delete the buffer
+		if( file_read->isOpen() ) file_read->close();
+		
+		// clear 
+		delete buffer;
+
+		// convert C string to C++ string
+		std::string cppString = path;
+
+		// open!
+		file_read->open( cppString );
+
+		// resize!
+		buffer = new stk::StkFrames( 0.f, file_read->fileSize(), file_read->channels() );
+		// sample rate
+		buffer->setDataRate( file_read->fileRate() );
+		// read!
+		file_read->read( *buffer, 0, true );
+		// give to quarks and assign them to channels
+		for( int i = 0; i < num_pieces; i++ ) { collage[i]->linkOutsideBuffer( *buffer ); }
+		
+		// good to go
+		this->start();
+	}
+
+	// create internal audio buffer
+	void Assemblage::createBuffer()
+	{
+		// buffer
+		buffer = new stk::StkFrames( 1, 1 );
+		// read
+		file_read = new stk::FileRead();
+	}
+
+	// delete internal audio buffer
+	void Assemblage::deleteBuffer()
+	{
+		// destroy again
+		delete file_read; file_read = nullptr;
+		// once more
+		delete buffer; buffer = nullptr;
+	}
+
+	// buffer size
+	unsigned int Assemblage::samples()
+	{
+		return buffer->size() / buffer->channels();
+	}
+
 private:
-	stk::StkFrames* _buffer = nullptr; // shared audio buffer
+	stk::FileRead* file_read = nullptr; // this opens up a file
+	stk::StkFrames* buffer = nullptr; // everyone reads from here
 	SoundMatter** collage = nullptr; // our pieces of sound
 	unsigned int num_pieces = 0; // how many pieces of sound?
 	float scalar = 0.f; // turn down the volume
