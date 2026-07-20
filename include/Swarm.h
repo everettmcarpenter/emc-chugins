@@ -1,7 +1,7 @@
 //==========================================================
 //
 // Swarm.h : Summer 2026 : everett m. carpenter
-// Granulator is a class which utilizes Grains as a means
+// SoundMatter is a class which utilizes Grains as a means
 // of granulating a file or input. It uses a tick function 
 // with an input, where the input value is ideally a sample 
 // value from an audio file or input.
@@ -23,6 +23,15 @@
 class SoundMatter
 {
 public:
+
+	//=======================================================================
+	//
+	//	names: constructor
+	//	desc: allocates and configures everything
+	//	args: sample rate and optional int for how many individual grains
+	// 
+	//=======================================================================
+
 	SoundMatter::SoundMatter( unsigned int fs, unsigned int size = 4 )
 	{
 		// sample rate
@@ -49,6 +58,15 @@ public:
 		this->setPosition( 0.f );
 	}
 
+	//=======================================================================
+	//
+	//	names: destructor
+	//	desc: deallocates and deletes everything
+	//	args: none
+	// 
+	//=======================================================================
+
+
 	SoundMatter::~SoundMatter()
 	{
 		// destroy matter
@@ -63,6 +81,14 @@ public:
 		// delete buf
 		this->deleteBuffer();
 	}
+
+	//=======================================================================
+	//
+	//	name(s): tick
+	//	desc: returns a single sample value (no buffering)
+	//	args: none
+	// 
+	//=======================================================================
 
 	double SoundMatter::tick()
 	{
@@ -94,31 +120,59 @@ public:
 		return out;
 	}
 
+	//=======================================================================
+	//
+	//	name(s): newGrain
+	//	desc: when a grain has finished, this function creates a new one.
+	//		  applying a new (oftentimes randomized) pitch, window size,
+	//		  and position. 
+	//	args: pointer to the finished grain
+	// 
+	//=======================================================================
+
 	// create a new 
 	void SoundMatter::newGrain( Quark* particle )
 	{
-		// wrap around to prevent negative sizes
+		// calculate our new size using a randomized factor
 		float n_size = base_size + (  0.5 * ( random->tick() + 1.0 ) * random_size );
+		// clamp value 
 		n_size = std::max( 1.f, n_size );
-		particle->setSize( n_size ); // set 
-		// pitch is easy(ish)
-		float n_pitch = pitch_slew->getCurrent() + ( 0.5 * ( random->tick() + 1.0 ) * random_pitch ); // offset
-		n_pitch = std::max( 0.f, n_pitch ); // clamp
+		// provide new value to quark
+		particle->setSize( n_size );
+
+		// pitch is easy(ish), same as above
+		float n_pitch = pitch_slew->getCurrent() + ( 0.5 * ( random->tick() + 1.0 ) * random_pitch );
+		// clamp
+		n_pitch = std::max( 0.f, n_pitch );
+		// have the particle instantly jump there, if it slews, then quarks will just endlessy drift through pitch space
 		particle->setPitchInstant( n_pitch );
-		// we gotta wrap around again
+
+		// this one is the worst
 		float random_offset_frames = ( random_position * 0.001f ) * _fs; // convert random_position to samples
+		// divide by the buffer size 
 		random_offset_frames /= (float)this->size();
-		float n_position = position_slew->getCurrent() + ( 0.5 * ( random->tick() + 1.0 ) * random_offset_frames ); // apply random offset
-		n_position = std::max( 0.f, std::min( n_position, 40.f ) ); // clamp
+		// create randomized position
+		float n_position = position_slew->getCurrent() + ( 0.5 * ( random->tick() + 1.0 ) * random_offset_frames );
+		// clamp, of course
+		n_position = std::max( 0.f, std::min( n_position, 1.f ) );
+		// also instantly jump so that we aren't drifting forever
 		particle->setPositionInstant( n_position );
 		// debug
 		// printf( "Size %f, pitch %f, position %f \n", n_size, n_pitch, n_position );
 	}
 
+	//=======================================================================
+	//
+	//	name(s): start & stop
+	//	desc: silence / don't silence quarks
+	//	args: none
+	// 
+	//=======================================================================
+
 	void SoundMatter::start() 
 	{ 
 		// turn everything on
-		go = false;
+		go = true;
 		for( int i = 0; i < num_grains; i++ ) quantum[i]->on();
 	}
 
@@ -128,6 +182,14 @@ public:
 		go = false;
 		for( int i = 0; i < num_grains; i++ ) quantum[i]->off();
 	}
+
+	//=======================================================================
+	//
+	//	name(s): set*, get* (and variations)
+	//	desc: set the size, pitch and position of underlying quarks
+	//	args: size pitch or position
+	// 
+	//=======================================================================
 
 	void SoundMatter::setSize( float n_size_ms )
 	{
@@ -169,6 +231,14 @@ public:
 
 	float SoundMatter::getPosition() { return position_slew->getTarget(); }
 
+	//=======================================================================
+	//
+	//	name(s): setRandom*, getRandom*
+	//	desc: set the randomness of size, pitch and position of quarks
+	//	args: size pitch or position
+	// 
+	//=======================================================================
+
 	void SoundMatter::setRandomSize( float random_si ) { random_size = random_si; }
 	float SoundMatter::getRandomSize() { return random_size; }
 
@@ -178,7 +248,16 @@ public:
 	void SoundMatter::setRandomPosition( float random_pos_ms ) { random_position = random_pos_ms; }
 	float SoundMatter::getRandomPosition() { return random_position; }
 
-	virtual void SoundMatter::openFile( const char* path )
+	//=======================================================================
+	//
+	//	name(s): openFile
+	//	desc: if we have an internal buffer (controlled by this class instance),
+	//		  open up a file and place it in the buffer
+	//	args: c string to file path
+	// 
+	//=======================================================================
+
+	void SoundMatter::openFile( const char* path )
 	{
 		if( internalBuffer )
 		{
@@ -210,7 +289,15 @@ public:
 		}
 	}
 
-	virtual void SoundMatter::closeFile()
+	//=======================================================================
+	//
+	//	name(s): closeFile
+	//	desc: if we have our own buffer, close the file and delete the buffer
+	//	args: size pitch or position
+	// 
+	//=======================================================================
+
+	void SoundMatter::closeFile()
 	{
 		// we don't wanna delete what buffer is pointing to if it's not ours
 		if( internalBuffer )
@@ -224,8 +311,55 @@ public:
 			// clear buffer
 			delete buffer; buffer = nullptr;
 		}
+		else 
+		{
+			// have the quarks stop listening
+			for( int i = 0; i < num_grains; i++ ) quantum[i]->clearBuffer();
+			// if someone called this and we aren't using our own buffer, it's probably best to assume the outside buffer we're using is goiung to be deleted
+			buffer = nullptr;
+		}
 	}
 
+	//=======================================================================
+	//
+	//	name(s): linkOutsideBuffer
+	//	desc: set our buffer to point to someone else's
+	//	args: pointer to buffer
+	// 
+	//=======================================================================
+
+	// provided an outside buffer, utilize this instead of an interally allocated one
+	void SoundMatter::linkOutsideBuffer( stk::StkFrames* n_buffer )
+	{
+		// if we're using our own, we need to dispose of it first
+		if( internalBuffer ) this->deleteBuffer();
+		// point to this!
+		buffer = n_buffer;
+		// give to quarks and assign them to channels
+		for( int i = 0; i < num_grains; i++ ) { quantum[i]->setBuffer( *buffer, i % buffer->channels() ); }
+		internalBuffer = false; // we're using an outside buffer
+	}
+
+	//=======================================================================
+	//
+	//	name(s): size
+	//	desc: return the size of the buffer we're using
+	//	args: none
+	// 
+	//=======================================================================
+
+	// how big is the buffer
+	unsigned int SoundMatter::size() { return buffer->size() / buffer->channels(); }
+
+	//=======================================================================
+	//
+	//	name(s): create & delete buffer 
+	//	desc: internal functions for managing instance's buffer
+	//	args: none
+	// 
+	//=======================================================================
+
+private:
 	// create internal audio buffer
 	void SoundMatter::createBuffer()
 	{
@@ -240,26 +374,20 @@ public:
 	// delete internal audio buffer
 	void SoundMatter::deleteBuffer()
 	{
-		// destroy again
-		delete file_read; file_read = nullptr;
-		// once more
-		delete buffer; buffer = nullptr;
-		// is there an internal buffer?
+		if( internalBuffer )
+		{
+			// destroy again
+			delete file_read; file_read = nullptr;
+			// once more
+			delete buffer; buffer = nullptr;
+		}
+		else
+		{
+			buffer = nullptr;
+		}
+		// is/was there an internal buffer?
 		internalBuffer = false;
 	}
-
-	// provided an outside buffer, utilize this instead of an interally allocated one
-	void SoundMatter::linkOutsideBuffer( stk::StkFrames& n_buffer )
-	{
-		// if we're using our own, we need to dispose of it first
-		if( internalBuffer ) this->deleteBuffer();
-		// point to this!
-		buffer = &n_buffer;
-		internalBuffer = false; // we're using an outside buffer
-	}
-
-	// how big is the buffer
-	unsigned int SoundMatter::size() { return buffer->size() / buffer->channels(); }
 	
 protected:
 	Quark** quantum = nullptr; // little grains

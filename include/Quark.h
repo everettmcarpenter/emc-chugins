@@ -36,6 +36,15 @@ public:
 		this->setBuffer( source, n_channel );
 	}
 
+	Quark::~Quark()
+	{
+		delete playback; playback = nullptr;
+		delete position_slew; position_slew = nullptr;
+		delete pitch_slew; pitch_slew = nullptr;
+		delete window; window = nullptr;
+		this->clearBuffer();
+	}
+
 	double Quark::tick()
 	{
 		// output

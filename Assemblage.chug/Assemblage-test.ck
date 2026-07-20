@@ -19,10 +19,6 @@
 //--------------------------------------------------------------------
 
 // instantiate a Assemblage
-Assemblage obj;
+Assemblage obj( "../include/808cymbal.wav" ) => blackhole;
 
-// call obj.param() with argument of 5; same as obj.param(5)
-5 => obj.param;
-
-// print
-<<< obj.param() >>>;
+3::second => now;
