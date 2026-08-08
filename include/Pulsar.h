@@ -1,16 +1,14 @@
 #ifndef PULSAR_H
 #define PULSAR_H
 
-#include "../../include/Grain.h"
+#include "Grain.h"
 
 class Pulsar : public Grain
 {
 public:
-	// inherit grain constructor
-	using Grain::Grain;
 
 	// tick
-	SAMPLE Pulsar::tick()
+	SAMPLE tick()
 	{
 		// are you cosine or sine
 		SAMPLE out = isCos ? this->paramBank->tick() * cos( phase ) : sin( phase );
@@ -24,7 +22,7 @@ public:
 	}
 
 	// set frequency
-	void Pulsar::setFrequency( t_CKFLOAT fr ) 
+	void setFrequency( t_CKFLOAT fr ) 
 	{ 
 		if( fr > 0.f )
 		{
@@ -38,17 +36,17 @@ public:
 		}
 	}
 	// get frequency
-	t_CKFLOAT Pulsar::getFrequency() { return this->freq; }
+	t_CKFLOAT getFrequency() { return this->freq; }
 
 	// setters and getters for window rate ( grain size )
-	void Pulsar::setRate(t_CKFLOAT rate)
+	void setRate(t_CKFLOAT rate)
 	{
 		if (rate > 0.f) this->setWindowSize( rate ); // call grain function ( which calls grain param function, which calls phasor )
 	}
-	t_CKFLOAT Pulsar::getRate() { return this->getWindowSize(); }
+	t_CKFLOAT getRate() { return this->getWindowSize(); }
 	// set randomness of grains
-	void Pulsar::setRandomRate(t_CKFLOAT rand) { this->setRandomWindowSize( rand ); }
-	t_CKFLOAT Pulsar::getRandomRate() { return this->getRandomWindowSize(); }
+	void setRandomRate(t_CKFLOAT rand) { this->setRandomWindowSize( rand ); }
+	t_CKFLOAT getRandomRate() { return this->getRandomWindowSize(); }
 
 	// pitch
 	t_CKFLOAT freq = 1.f;

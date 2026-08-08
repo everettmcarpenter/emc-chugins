@@ -7,7 +7,7 @@ C_MODULES=
 CXX_MODULES=Quark.cpp
 
 # where to find chugin.h
-CK_SRC_PATH?=chuck/include
+CK_SRC_PATH?=../include
 
 # where to install chugin
 CHUGIN_PATH?=/usr/local/lib/chuck

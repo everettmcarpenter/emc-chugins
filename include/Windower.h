@@ -12,7 +12,7 @@
 class Windower
 {
 public:
-	Windower::Windower( unsigned int fs, unsigned int init_size = 200.0 )
+	Windower( unsigned int fs, unsigned int init_size = 200.0 )
 	{
 		// set initial size, allocate members
 		_fs = fs;
@@ -23,14 +23,14 @@ public:
 		makeBlackman();
 	}
 
-	Windower::~Windower()
+	~Windower()
 	{
 		delete phasor; phasor = nullptr;
 		delete _window; _window = nullptr;
 	}
 
 	// window
-	double Windower::tick()
+	double tick()
 	{
 		// get index ( phasor [0.0,1.0] * ( size_ms converted to samples ) )
 		double index = phasor->tick() * ( table_size - 1 );
@@ -45,7 +45,7 @@ public:
 	}
 
 	// window an input
-	double Windower::tick( double input )
+	double tick( double input )
 	{
 		// get index ( phasor [0.0,1.0] * ( size_ms converted to samples ) )
 		double index = phasor->tick() * ( table_size - 1 );
@@ -59,54 +59,54 @@ public:
 		return out * input;
 	}
 
-	void Windower::trigger()
+	void trigger()
 	{
 		phasor->trigger();
 	}
 
-	bool Windower::state()
+	bool state()
 	{
 		return phasor->state();
 	}
 
 	// set window size
-	void Windower::setSize( float n_size_ms )
+	void setSize( float n_size_ms )
 	{
 		size_ms = n_size_ms;
 		size_samp = msToNormalizedSamp( size_ms );
 		phasor->setFrequency( 1000.f / size_ms );
 	}
-	float Windower::getSizeMs() { return size_ms; }
-	unsigned int Windower::getSizeSamp() { return size_samp; }
+	float getSizeMs() { return size_ms; }
+	unsigned int getSizeSamp() { return size_samp; }
 
 	// set to blackman window
-	void Windower::makeBlackman()
+	void makeBlackman()
 	{
 		blackman( _window, table_size );
 	}
 
-	void Windower::makeHann()
+	void makeHann()
 	{
 		hann( _window, table_size );
 	}
 
-	void Windower::makeHamming()
+	void makeHamming()
 	{
 		hamming( _window, table_size );
 	}
 
-	void Windower::makeRectangle()
+	void makeRectangle()
 	{
 		rectangle( _window, table_size );
 	}
 
-    void Windower::reset()
+    void reset()
     {
         phasor->reset();
     }
 
-	unsigned int Windower::msToNormalizedSamp( float ms ) { return static_cast<unsigned int>( 0.5 + ( ms * 0.001 ) * this->_fs ); }
-	float Windower::normalizedSampToMs( unsigned int samp ) { return ( samp * 1000.0f ) / this->_fs; }
+	unsigned int msToNormalizedSamp( float ms ) { return static_cast<unsigned int>( 0.5 + ( ms * 0.001 ) * this->_fs ); }
+	float normalizedSampToMs( unsigned int samp ) { return ( samp * 1000.0f ) / this->_fs; }
 
 private:
 	Phasor* phasor = nullptr;

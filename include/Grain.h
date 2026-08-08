@@ -28,7 +28,7 @@ class Granulator
 {
 public:
 	// constructor 
-	Granulator::Granulator( t_CKUINT fs )
+	Granulator( t_CKUINT fs )
 	{
 		// create our helpers
 		this->grain_size = 2048;
@@ -37,13 +37,13 @@ public:
 	}
 
 	// destructor
-	Granulator::~Granulator()
+	~Granulator()
 	{
 		delete win; win = nullptr;
 	}
 
 	// tick function
-	virtual SAMPLE Granulator::tick( SAMPLE in )
+	virtual SAMPLE tick( SAMPLE in )
 	{
 		// if it's still going, keep going!
 		if ( win->state() == GRAIN_IN_PROGRESS )
@@ -58,13 +58,13 @@ public:
 		}
 	}
 
-	void Granulator::setWindowSize( float n_size ) { this->grain_size = n_size; } // in ms
-	float Granulator::getWindowSize() { return this->win->getSizeMs(); } // the current window's size in milliseconds
+	void setWindowSize( float n_size ) { this->grain_size = n_size; } // in ms
+	float getWindowSize() { return this->win->getSizeMs(); } // the current window's size in milliseconds
 
-	void Granulator::setRandomSize( float n_rand_size ) { this->random_size = n_rand_size; }
-	float Granulator::getRandomSize() { return this->random_size; } 
+	void setRandomSize( float n_rand_size ) { this->random_size = n_rand_size; }
+	float getRandomSize() { return this->random_size; } 
 
-	bool Granulator::state() { return this->win->state(); }; // true? grain done, false? grain go
+	bool state() { return this->win->state(); }; // true? grain done, false? grain go
 
 	// get sample rate
 	unsigned int fs() { return win->_fs; }

@@ -1,5 +1,6 @@
 // general matrix class with a signal processing twang
 #include "../../include/Smoother.h"
+#include "math.h"
 
 const t_CKFLOAT ZERO_THRESHOLD = 1e-3;
 const t_CKFLOAT SMOOTHING_MS = 5.0; // 5ms smoothing window
@@ -8,7 +9,7 @@ template <typename T>
 class Matrix
 {
 public:
-    Matrix::Matrix( unsigned int fs, unsigned int n_size ) : _size( n_size ), scale( 2.0 / n_size )
+    Matrix( unsigned int fs, unsigned int n_size ) : _size( n_size ), scale( 2.0 / n_size )
     {
         // create pointers to pointers
         _data = new T*[_size];
@@ -35,7 +36,7 @@ public:
         init( fs );
     }
 
-    Matrix::~Matrix()
+    ~Matrix()
     {
         // delete pointers 
         for ( int i = 0; i < _size; i++ ) 
@@ -61,10 +62,10 @@ public:
         // calc smoothing coefficient for exponential moving average
         // tau = smoothing time constant
         t_CKFLOAT tau = SMOOTHING_MS / 1000.f;
-        _coeff = 1.0 - exp( -1.0 / ( tau * fs ) );
+        _coeff = 1.0 - std::exp( -1.0 / ( tau * fs ) );
     }
 
-    int Matrix::zero() 
+    int zero() 
     {
         for( int i = 0; i < _size; i++ )
         {
@@ -80,7 +81,7 @@ public:
     }
 
     // fill all with one value
-    int Matrix::fill( T val )
+    int fill( T val )
     {
         for( int i = 0; i < _size; i++ )
         {
@@ -93,7 +94,7 @@ public:
     }
 
     // set specific entry with smoothing
-    int Matrix::set( unsigned int col, unsigned int row, T val )
+    int set( unsigned int col, unsigned int row, T val )
     {
         if( col >= _size || row >= _size) return 1;
         
@@ -112,7 +113,7 @@ public:
     }
     
     // immediate set (no smoothing, for initialization)
-    int Matrix::setImmediate( unsigned int col, unsigned int row, T val )
+    int setImmediate( unsigned int col, unsigned int row, T val )
     {
         if( col >= _size || row >= _size) return 1;
         _data[col][row] = val;
@@ -123,14 +124,14 @@ public:
     }
 
     // get specific entry
-    T Matrix::get( unsigned int col, unsigned int row )
+    T get( unsigned int col, unsigned int row )
     {
         if( col >= _size || row >= _size) return 0;
         return _data[col][row];
     }
 
     // create an identity matrix of the current size
-    int Matrix::identity()
+    int identity()
     {
         // clear all entries
         for( int i = 0; i < _size; i++ ) {
@@ -141,14 +142,14 @@ public:
         return 0;
     }
 
-    int Matrix::size() { return _size; }
+    int size() { return _size; }
 
-    T Matrix::operator()( unsigned int col, unsigned int row )
+    T operator()( unsigned int col, unsigned int row )
     {
         return get( col, row );
     }
 
-    void Matrix::operator+=( T add )
+    void operator+=( T add )
     {
         for( int i = 0; i < _size; i++ )
         {
@@ -159,7 +160,7 @@ public:
         }
     }
 
-    void Matrix::operator*=( T mult )
+    void operator*=( T mult )
     {
         for( int i = 0; i < _size; i++ )
         {
@@ -170,7 +171,7 @@ public:
         }
     }
 
-    void Matrix::tick( SAMPLE* in, SAMPLE* out, unsigned nframes )
+    void tick( SAMPLE* in, SAMPLE* out, unsigned nframes )
     {
         memset( out, 0, sizeof( SAMPLE ) * _size * nframes );
         

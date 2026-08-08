@@ -32,7 +32,7 @@ public:
 	// 
 	//=======================================================================
 
-	SoundMatter::SoundMatter( unsigned int fs, unsigned int size = 4 )
+	SoundMatter( unsigned int fs, unsigned int size = 4 )
 	{
 		// sample rate
 		_fs = fs;
@@ -67,7 +67,7 @@ public:
 	//=======================================================================
 
 
-	SoundMatter::~SoundMatter()
+	~SoundMatter()
 	{
 		// destroy matter
 		for( int i = 0; i < num_grains; i++ ) { delete quantum[i]; quantum[i] = nullptr; }
@@ -90,7 +90,7 @@ public:
 	// 
 	//=======================================================================
 
-	double SoundMatter::tick()
+	double tick()
 	{
 		// output
 		double out = 0.0;
@@ -131,7 +131,7 @@ public:
 	//=======================================================================
 
 	// create a new 
-	void SoundMatter::newGrain( Quark* particle )
+	void newGrain( Quark* particle )
 	{
 		// calculate our new size using a randomized factor
 		float n_size = base_size + (  0.5 * ( random->tick() + 1.0 ) * random_size );
@@ -169,14 +169,14 @@ public:
 	// 
 	//=======================================================================
 
-	void SoundMatter::start() 
+	void start() 
 	{ 
 		// turn everything on
 		go = true;
 		for( int i = 0; i < num_grains; i++ ) quantum[i]->on();
 	}
 
-	void SoundMatter::stop() 
+	void stop() 
 	{ 
 		// turn everything off
 		go = false;
@@ -191,7 +191,7 @@ public:
 	// 
 	//=======================================================================
 
-	void SoundMatter::setSize( float n_size_ms )
+	void setSize( float n_size_ms )
 	{
 		base_size = n_size_ms;
 		for( int i = 0; i < num_grains; i++ ) 
@@ -203,33 +203,33 @@ public:
 		}
 	}
 	
-	float SoundMatter::getSize() { return base_size; }
+	float getSize() { return base_size; }
 
-	void SoundMatter::setPitch( float n_pitch )
+	void setPitch( float n_pitch )
 	{
 		pitch_slew->setTarget( n_pitch, 1000.f );
 		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
-	void SoundMatter::setPitchInstant( float n_pitch )
+	void setPitchInstant( float n_pitch )
 	{
 		pitch_slew->instant( n_pitch );
 		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
-	float SoundMatter::getPitch() { return pitch_slew->getTarget(); }
+	float getPitch() { return pitch_slew->getTarget(); }
 
-	void SoundMatter::setPosition( float n_position ) 
+	void setPosition( float n_position ) 
 	{
 		position_slew->setTarget( n_position, 240.f );
 	}
 
-	void SoundMatter::setPosition( unsigned int n_position )
+	void setPosition( unsigned int n_position )
 	{
 		position_slew->setTarget( (float)n_position / (float)this->size(), 40.f); // convert
 	}
 
-	float SoundMatter::getPosition() { return position_slew->getTarget(); }
+	float getPosition() { return position_slew->getTarget(); }
 
 	//=======================================================================
 	//
@@ -239,14 +239,14 @@ public:
 	// 
 	//=======================================================================
 
-	void SoundMatter::setRandomSize( float random_si ) { random_size = random_si; }
-	float SoundMatter::getRandomSize() { return random_size; }
+	void setRandomSize( float random_si ) { random_size = random_si; }
+	float getRandomSize() { return random_size; }
 
-	void SoundMatter::setRandomPitch( float random_pit ) { random_pitch = random_pit; }
-	float SoundMatter::getRandomPitch() { return random_pitch; }
+	void setRandomPitch( float random_pit ) { random_pitch = random_pit; }
+	float getRandomPitch() { return random_pitch; }
 
-	void SoundMatter::setRandomPosition( float random_pos_ms ) { random_position = random_pos_ms; }
-	float SoundMatter::getRandomPosition() { return random_position; }
+	void setRandomPosition( float random_pos_ms ) { random_position = random_pos_ms; }
+	float getRandomPosition() { return random_position; }
 
 	//=======================================================================
 	//
@@ -257,7 +257,7 @@ public:
 	// 
 	//=======================================================================
 
-	void SoundMatter::openFile( const char* path )
+	void openFile( const char* path )
 	{
 		if( internalBuffer )
 		{
@@ -297,7 +297,7 @@ public:
 	// 
 	//=======================================================================
 
-	void SoundMatter::closeFile()
+	void closeFile()
 	{
 		// we don't wanna delete what buffer is pointing to if it's not ours
 		if( internalBuffer )
@@ -329,7 +329,7 @@ public:
 	//=======================================================================
 
 	// provided an outside buffer, utilize this instead of an interally allocated one
-	void SoundMatter::linkOutsideBuffer( stk::StkFrames* n_buffer )
+	void linkOutsideBuffer( stk::StkFrames* n_buffer )
 	{
 		// if we're using our own, we need to dispose of it first
 		if( internalBuffer ) this->deleteBuffer();
@@ -349,7 +349,7 @@ public:
 	//=======================================================================
 
 	// how big is the buffer
-	unsigned int SoundMatter::size() { return buffer->size() / buffer->channels(); }
+	unsigned int size() { return buffer->size() / buffer->channels(); }
 
 	//=======================================================================
 	//
@@ -361,7 +361,7 @@ public:
 
 private:
 	// create internal audio buffer
-	void SoundMatter::createBuffer()
+	void createBuffer()
 	{
 		// buffer
 		buffer = new stk::StkFrames( 1, 1 );
@@ -372,7 +372,7 @@ private:
 	}
 
 	// delete internal audio buffer
-	void SoundMatter::deleteBuffer()
+	void deleteBuffer()
 	{
 		if( internalBuffer )
 		{

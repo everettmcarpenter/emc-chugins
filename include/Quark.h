@@ -16,7 +16,7 @@
 class Quark
 {
 public:
-	Quark::Quark( unsigned int fs )
+	Quark( unsigned int fs )
 	{
 		_fs = fs;
 		playback = new Phasor( _fs );
@@ -26,7 +26,7 @@ public:
 	}
 
 	// overloaded constructor
-	Quark::Quark( unsigned int fs, stk::StkFrames& source, unsigned int n_channel = 0 )
+	Quark( unsigned int fs, stk::StkFrames& source, unsigned int n_channel = 0 )
 	{
 		_fs = fs;
 		playback = new Phasor( _fs );
@@ -36,7 +36,7 @@ public:
 		this->setBuffer( source, n_channel );
 	}
 
-	Quark::~Quark()
+	~Quark()
 	{
 		delete playback; playback = nullptr;
 		delete position_slew; position_slew = nullptr;
@@ -45,7 +45,7 @@ public:
 		this->clearBuffer();
 	}
 
-	double Quark::tick()
+	double tick()
 	{
 		// output
 		double out = 0.0;
@@ -79,25 +79,25 @@ public:
 	}
 
 	// loop on
-	void Quark::loopOn() { loop = true; }
+	void loopOn() { loop = true; }
 
 	// loop off
-	void Quark::loopOff() { loop = false; }
+	void loopOff() { loop = false; }
 
 	// loop state
-	bool Quark::loopState() { return loop; }
+	bool loopState() { return loop; }
 
     // freeze and reset
-    void Quark::off() { go = false; window->reset(); }
+    void off() { go = false; window->reset(); }
 
     // on
-    void Quark::on() { go= true; this->trigger(); }
+    void on() { go= true; this->trigger(); }
 
     // quark state
-    bool Quark::state() { return go; }
+    bool state() { return go; }
 
     // shoot
-	void Quark::trigger() 
+	void trigger() 
 	{ 
 		go = true; 
 
@@ -117,10 +117,10 @@ public:
 	}
 
     // are we playing
-	bool Quark::windowState() { return window->state(); }
+	bool windowState() { return window->state(); }
 
 	// link audio buffer
-	void Quark::setBuffer( stk::StkFrames& source, unsigned int n_channel = 0 )
+	void setBuffer( stk::StkFrames& source, unsigned int n_channel = 0 )
 	{
 		go = false; // stop doing every thing
 		_buffer = &source; // store the location of our audio
@@ -130,7 +130,7 @@ public:
 	}
 
 	// clear buffer & set channel = 0
-	void Quark::clearBuffer()
+	void clearBuffer()
 	{
 		go = false;
 		_buffer = nullptr;
@@ -138,7 +138,7 @@ public:
 	}
 
 	// set position
-	void Quark::setPosition( float new_position )
+	void setPosition( float new_position )
 	{
 		// save out initially given position
 		position = new_position;
@@ -148,7 +148,7 @@ public:
 	}
 
 	// set position
-	void Quark::setPositionInstant( float new_position )
+	void setPositionInstant( float new_position )
 	{
 		// save out initially given position
 		position = new_position;
@@ -158,57 +158,57 @@ public:
 	}
 
 	// get position
-	float Quark::getPosition()
+	float getPosition()
 	{
 		return position_slew->getTarget();
 	}
 
 	// set pitch
-	void Quark::setPitch( float new_pitch )
+	void setPitch( float new_pitch )
 	{
 		pitch = new_pitch;
 	}
 
 	// set pitch instantly
-	void Quark::setPitchInstant( float new_pitch )
+	void setPitchInstant( float new_pitch )
 	{
 		pitch = new_pitch;
 		pitch_slew->instant( pitch );
 	}
 
 	// get pitch
-	float Quark::getPitch()
+	float getPitch()
 	{
 		return pitch_slew->getTarget();
 	}
 
 	// set size of window
-	void Quark::setSize( float new_size )
+	void setSize( float new_size )
 	{
 		segment_size_ms = new_size;
 	}
 
 	// get size of window in ms
-	float Quark::getSize()
+	float getSize()
 	{
 		return window->getSizeMs();
 	}
 
-	unsigned int Quark::bufferSize()
+	unsigned int bufferSize()
 	{
 		if( _buffer ) return _buffer->size() / _buffer->channels();
 		else return 0;
 	}
 
     // set channel ( default to 0 )
-    void Quark::setChannel( unsigned int n_channel )
+    void setChannel( unsigned int n_channel )
     {
         channel = n_channel;
         if( channel > ( _buffer->channels() - 1 ) ) channel = _buffer->channels();
     }
 
     // get which channel we're reading
-    unsigned int Quark::getChannel()
+    unsigned int getChannel()
     {
         return this->channel;
     }

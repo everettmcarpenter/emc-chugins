@@ -11,13 +11,13 @@ class Phasor
 {
 public:
     // constructor
-    Phasor::Phasor( t_CKFLOAT fs )
+    Phasor( t_CKFLOAT fs )
     {
         this->fs = fs;
     }
 
     // overloaded constructor
-    Phasor::Phasor( t_CKFLOAT fs, t_CKFLOAT freq, bool mode = false )
+    Phasor( t_CKFLOAT fs, t_CKFLOAT freq, bool mode = false )
     {
         this->fs = fs;
         this->oneShot = mode;
@@ -25,7 +25,7 @@ public:
     }
 
     // tick
-    SAMPLE Phasor::tick()
+    SAMPLE tick()
     {
         SAMPLE out = phase;
         if( !done ) phase += normFreq; // if we aren't done, move forward
@@ -43,7 +43,7 @@ public:
     }
 
     // return next tick value without advancing
-    SAMPLE Phasor::next()
+    SAMPLE next()
     {
         SAMPLE out = phase;
         out += normFreq;
@@ -52,7 +52,7 @@ public:
     }
 
     // set freq
-    void Phasor::setFrequency( t_CKFLOAT freq, t_CKBOOL reset = TRUE ) 
+    void setFrequency( t_CKFLOAT freq, t_CKBOOL reset = TRUE ) 
     { 
         if ( freq <= 0.0 ) { this->freq = normFreq = 0.f; }
         else { this->freq = freq; normFreq = this->freq / fs; }
@@ -60,21 +60,21 @@ public:
         if( reset ) this->reset();
     }
     // get freq
-    t_CKFLOAT Phasor::getFrequency() { return freq; }
+    t_CKFLOAT getFrequency() { return freq; }
     
     // safely reset sampling frequency
-    void Phasor::setSR( t_CKFLOAT fs ) { this->fs = fs; setFrequency( freq ); }
+    void setSR( t_CKFLOAT fs ) { this->fs = fs; setFrequency( freq ); }
     // retreive sampling frequency
-    t_CKFLOAT Phasor::getSR() { return fs; }
+    t_CKFLOAT getSR() { return fs; }
 
     // shoot!
-    void Phasor::trigger() { done = false; phase = 0.f; }
+    void trigger() { done = false; phase = 0.f; }
 
     // is it on
-    bool Phasor::state() { return done; }
+    bool state() { return done; }
 
     // reset
-    void Phasor::reset() { phase = 0.f; }
+    void reset() { phase = 0.f; }
 
 private:
     // instance data

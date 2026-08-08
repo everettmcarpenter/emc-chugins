@@ -7,13 +7,13 @@ class Smoother
 {
 public:
 	// constructor
-	Smoother::Smoother( t_CKINT fs )
+	Smoother( t_CKINT fs )
 	{
 		this->fs = fs;
 	}
 
 	// overloaded constructor
-	Smoother::Smoother( t_CKINT fs, t_CKFLOAT init )
+	Smoother( t_CKINT fs, t_CKFLOAT init )
 	{
 		this->fs = fs;
 		// set init value
@@ -21,7 +21,7 @@ public:
 	}
 
 	// set the target
-	void Smoother::setTarget( t_CKFLOAT target, t_CKFLOAT howLongMs = 30.f )
+	void setTarget( t_CKFLOAT target, t_CKFLOAT howLongMs = 30.f )
 	{
 		// convert interpolation time to hz and normalize it to the sample rate, then round it
 		t_CKINT rampLength = static_cast<t_CKINT>( ( howLongMs * 0.001 ) * fs );
@@ -37,7 +37,7 @@ public:
 	}
 
 	// move in time
-	t_CKFLOAT Smoother::tick()
+	t_CKFLOAT tick()
 	{
 		if( remaining > 0 )
 		{
@@ -58,7 +58,7 @@ public:
 	}
 
 	//	predict the future
-	t_CKFLOAT Smoother::fick()
+	t_CKFLOAT fick()
 	{
 		// return this
 		t_CKFLOAT next = current;
@@ -69,7 +69,7 @@ public:
 	}
 
 	// instant setup
-	void Smoother::instant( t_CKFLOAT target )
+	void instant( t_CKFLOAT target )
 	{
 		this->target = target;
 		current = target;
@@ -77,11 +77,11 @@ public:
 	}
 
 	// what's the current value?
-	t_CKFLOAT Smoother::getCurrent() { return current; }
+	t_CKFLOAT getCurrent() { return current; }
 	// what's the target?
-	t_CKFLOAT Smoother::getTarget() { return target; }
+	t_CKFLOAT getTarget() { return target; }
 	// are we moving? 
-	t_CKBOOL Smoother::isMoving() 
+	t_CKBOOL isMoving() 
 	{ 
 		if( remaining > 0 ) return TRUE;
 		else return FALSE; 

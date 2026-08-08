@@ -28,7 +28,7 @@ public:
 	//=======================================================================
 
 	// default constructor
-	Assemblage::Assemblage( unsigned int fs, unsigned int n_pieces = 4 )
+	Assemblage( unsigned int fs, unsigned int n_pieces = 4 )
 	{
 		// default number of pieces
 		num_pieces = n_pieces;
@@ -52,7 +52,7 @@ public:
 	// 
 	//=======================================================================
 
-	Assemblage::~Assemblage()
+	~Assemblage()
 	{
 		// destroy matter
 		for( int i = 0; i < num_pieces; i++ ) { delete collage[i]; collage[i] = nullptr; }
@@ -69,7 +69,7 @@ public:
 	// 
 	//=======================================================================
 
-	double Assemblage::tick()
+	double tick()
 	{
 		double out = 0.0; // return this
 		for( int i = 0; i < num_pieces; i++ )
@@ -81,7 +81,7 @@ public:
 	}
 
 	// this assumes we are outputting however many pieces we have in the assemblage, be careful! 
-	void Assemblage::tick( SAMPLE* in, SAMPLE* out, unsigned int frames )
+	void tick( SAMPLE* in, SAMPLE* out, unsigned int frames )
 	{
 		memset( out, 0, sizeof(SAMPLE) * num_pieces * frames); // clear
 
@@ -103,7 +103,7 @@ public:
 	//=======================================================================
 
 	// set all pitches given a collection of sizes
-	void Assemblage::setPitch( Chuck_ArrayFloat* pitches, const CK_DL_API& API )
+	void setPitch( Chuck_ArrayFloat* pitches, const CK_DL_API& API )
 	{
 		unsigned int size = API->object->array_float_size( pitches );
 		// assign
@@ -112,7 +112,7 @@ public:
 	}
 
 	// set all sizes given a collection of sizes
-	void Assemblage::setSize( Chuck_ArrayFloat* sizes, const CK_DL_API& API )
+	void setSize( Chuck_ArrayFloat* sizes, const CK_DL_API& API )
 	{
 		unsigned int size = API->object->array_float_size( sizes);
 		// assign
@@ -121,7 +121,7 @@ public:
 	}
 
 	// set all positions given a collection of position
-	void Assemblage::setPosition( Chuck_ArrayFloat* positions, const CK_DL_API& API )
+	void setPosition( Chuck_ArrayFloat* positions, const CK_DL_API& API )
 	{
 		unsigned int size = API->object->array_float_size( positions );
 		// assign
@@ -130,7 +130,7 @@ public:
 	}
 
 	// set all pitches to a single value
-	void Assemblage::setPitch( float pitch )
+	void setPitch( float pitch )
 	{
 		// assign
 		for( int i = 0; i < num_pieces; i++ ) collage[i]->setPitch( pitch );
@@ -138,7 +138,7 @@ public:
 	}
 
 	// set all sizes to a single value
-	void Assemblage::setSize( float size )
+	void setSize( float size )
 	{
 		// assign
 		for( int i = 0; i < num_pieces; i++ ) collage[i]->setSize( size );
@@ -146,7 +146,7 @@ public:
 	}
 
 	// set all positions to a single value
-	void Assemblage::setPosition( float position )
+	void setPosition( float position )
 	{
 		// assign
 		for( int i = 0; i < num_pieces; i++ ) collage[i]->setPosition( position );
@@ -162,7 +162,7 @@ public:
 	//=======================================================================
 
 	// set all pitches given a collection of sizes
-	void Assemblage::setRandomPitch( Chuck_ArrayFloat* pitches, const CK_DL_API& API )
+	void setRandomPitch( Chuck_ArrayFloat* pitches, const CK_DL_API& API )
 	{
 		unsigned int size = API->object->array_float_size( pitches );
 		// assign
@@ -171,7 +171,7 @@ public:
 	}
 
 	// set all sizes given a collection of sizes
-	void Assemblage::setRandomSize( Chuck_ArrayFloat* sizes, const CK_DL_API& API )
+	void setRandomSize( Chuck_ArrayFloat* sizes, const CK_DL_API& API )
 	{
 		unsigned int size = API->object->array_float_size( sizes);
 		// assign
@@ -180,7 +180,7 @@ public:
 	}
 
 	// set all positions given a collection of position
-	void Assemblage::setRandomPosition( Chuck_ArrayFloat* positions, const CK_DL_API& API )
+	void setRandomPosition( Chuck_ArrayFloat* positions, const CK_DL_API& API )
 	{
 		unsigned int size = API->object->array_float_size( positions );
 		// assign
@@ -189,21 +189,21 @@ public:
 	}
 
 	// set randomness
-	void Assemblage::setRandomPitch( float random )
+	void setRandomPitch( float random )
 	{
 		// assign
 		for( int i = 0; i < num_pieces; i++ ) collage[i]->setRandomPitch( random );
 	}
 
 	// set randomness
-	void Assemblage::setRandomSize( float random )
+	void setRandomSize( float random )
 	{
 		// assign
 		for( int i = 0; i < num_pieces; i++ ) collage[i]->setRandomSize( random );
 	}
 
 	// set randomness
-	void Assemblage::setRandomPosition( float random )
+	void setRandomPosition( float random )
 	{
 		// assign
 		for( int i = 0; i < num_pieces; i++ ) collage[i]->setRandomPosition( random );
@@ -218,14 +218,14 @@ public:
 	//=======================================================================
 
 	// start all function calls
-	void Assemblage::start()
+	void start()
 	{
 		// cycle
 		for( int i = 0; i < num_pieces; i++ ) collage[i]->start();
 	}
 
 	// stop all function calls
-	void Assemblage::stop()
+	void stop()
 	{
 		// cycle
 		for( int i = 0; i < num_pieces; i++ ) collage[i]->stop();
@@ -241,7 +241,7 @@ public:
 	//=======================================================================
 
 	// open up a file and have all our granulators point to it
-	void Assemblage::openFile( const char* path )
+	void openFile( const char* path )
 	{
 		// don't do anything
 		this->stop(); 
@@ -279,7 +279,7 @@ public:
 	// 
 	//=======================================================================
 
-	void Assemblage::closeFile()
+	void closeFile()
 	{
 		// stop doing anything
 		this->stop();
@@ -300,7 +300,7 @@ public:
 	//=======================================================================
 
 	// buffer size
-	unsigned int Assemblage::count()
+	unsigned int count()
 	{
 		return num_pieces;
 	}
@@ -315,7 +315,7 @@ public:
 	//=======================================================================
 
 	// buffer size
-	unsigned int Assemblage::samples()
+	unsigned int samples()
 	{
 		return buffer->size() / buffer->channels();
 	}
@@ -330,7 +330,7 @@ public:
 
 private:
 	// create internal audio buffer
-	void Assemblage::createBuffer()
+	void createBuffer()
 	{
 		// buffer
 		buffer = new stk::StkFrames(1, 1);
@@ -339,7 +339,7 @@ private:
 	}
 
 	// delete internal audio buffer
-	void Assemblage::deleteBuffer()
+	void deleteBuffer()
 	{
 		// destroy again
 		delete file_read; file_read = nullptr;

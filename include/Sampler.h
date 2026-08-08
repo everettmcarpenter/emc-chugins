@@ -1,17 +1,17 @@
 #ifndef SAMPLER_H
 	#define SAMPLER_H
 
-#include "../../include/stk/include/Stk.h"
-#include "../../include/stk/include/FileRead.h"
-#include "../../include/chugin.h"
-#include "../../include/Phasor.h"
-#include "../../include/Smoother.h"
+#include "stk/include/Stk.h"
+#include "stk/include/FileRead.h"
+#include "chugin.h"
+#include "Phasor.h"
+#include "Smoother.h"
 
 class Sampler
 {
 public:
 	// constructor
-	Sampler::Sampler( t_CKFLOAT fs )
+	Sampler( t_CKFLOAT fs )
 	{
 		stk::Stk::setSampleRate( fs ); // set global rate
 		playback = new Phasor( fs, 1.0f ); // new phasor
@@ -22,7 +22,7 @@ public:
 	}
 
 	// destructor
-	Sampler::~Sampler( void )
+	~Sampler( void )
 	{
 		CK_SAFE_DELETE( playback );
 		CK_SAFE_DELETE( pitch );
@@ -32,7 +32,7 @@ public:
 	}
 
 	// tick
-	SAMPLE Sampler::tick()
+	SAMPLE tick()
 	{
 		// interpolate pitch
 		playback->setFrequency( ( pitch->tick() * oneHert ), FALSE );
@@ -47,7 +47,7 @@ public:
 	}
 
 	// open file given a C string
-	t_CKFLOAT Sampler::openFile( const char* path )
+	t_CKFLOAT openFile( const char* path )
 	{
 		// if one is open, close the file and delete the buffer
 		if( reader->isOpen() ) { reader->close(); CK_SAFE_DELETE( buffer ); }
@@ -76,17 +76,17 @@ public:
 	}
 
 	// close file
-	void Sampler::closeFile()
+	void closeFile()
 	{
 		// delete
 		if( reader->isOpen() ) { reader->close(); CK_SAFE_DELETE( buffer ); }
 	}
 
 	// get file size
-	t_CKUINT Sampler::getFileSize() { return buffer->size() / buffer->channels(); }
+	t_CKUINT getFileSize() { return buffer->size() / buffer->channels(); }
 
 	// position get set
-	t_CKFLOAT Sampler::setPosition( t_CKFLOAT pos )
+	t_CKFLOAT setPosition( t_CKFLOAT pos )
 	{
 		if( pos <= 1.0 && pos >= 0 ) position->setTarget( pos * indexLimit, 5.f );
 		// return for courtesy
@@ -94,17 +94,17 @@ public:
 	}
 
 	// overload to add slew time
-	t_CKFLOAT Sampler::setPosition( t_CKFLOAT pos, t_CKFLOAT ms )
+	t_CKFLOAT setPosition( t_CKFLOAT pos, t_CKFLOAT ms )
 	{
 		if( pos <= 1.0 && pos >= 0 && ms > 0.f ) position->setTarget( pos * indexLimit, ms );
 		// return for courtesy
 		return position->getTarget();
 	}
 	
-	t_CKFLOAT Sampler::getPosition() { return position->getTarget(); }
+	t_CKFLOAT getPosition() { return position->getTarget(); }
 
 	// pitch get set
-	t_CKFLOAT Sampler::setPitch( t_CKFLOAT pit )
+	t_CKFLOAT setPitch( t_CKFLOAT pit )
 	{
 		// new target
 		pitch->setTarget( pit * oneHert, 5.f );
@@ -113,7 +113,7 @@ public:
 	}
 
 	// overload to add slew time
-	t_CKFLOAT Sampler::setPitch( t_CKFLOAT pit, t_CKFLOAT ms )
+	t_CKFLOAT setPitch( t_CKFLOAT pit, t_CKFLOAT ms )
 	{
 		// new target
 		if( ms > 0.f ) pitch->setTarget( pit * oneHert, ms );
@@ -122,10 +122,10 @@ public:
 		return pitch->getTarget();
 	}
 
-	t_CKFLOAT Sampler::getPitch() { return pitch->getTarget(); }
+	t_CKFLOAT getPitch() { return pitch->getTarget(); }
 
 	// set loop length
-	t_CKFLOAT Sampler::setLoopLength( t_CKFLOAT leng ) 
+	t_CKFLOAT setLoopLength( t_CKFLOAT leng ) 
 	{ 
 		if( leng > 0.0 && leng <= 1.0 ) { loopLength = leng; }
 		else loopLength = 1.f;
@@ -133,14 +133,14 @@ public:
 		return loopLength;
 	}
 
-	t_CKFLOAT Sampler::setLoopStart( t_CKFLOAT start )
+	t_CKFLOAT setLoopStart( t_CKFLOAT start )
 	{
 		if( start >= 0.0 && start < 1.0 ) loopStart = start;
 		return loopStart;
 	}
 
 	// set loop length from ms ( meant to syncronize looping with a grain window )
-	void Sampler::setLoopLengthWithWindow( t_CKFLOAT length_ms ) // an attempt to make legible code
+	void setLoopLengthWithWindow( t_CKFLOAT length_ms ) // an attempt to make legible code
 	{
 		// ms to samples
 		t_CKFLOAT windowSamples = ( length_ms * stk::Stk::sampleRate() ) / 1000.0;
@@ -151,7 +151,7 @@ public:
 	}
 
 	// experimental time stretch
-	t_CKUINT Sampler::stretch( t_CKUINT num )
+	t_CKUINT stretch( t_CKUINT num )
 	{
 		return 1;
 	}

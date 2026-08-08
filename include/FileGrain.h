@@ -27,7 +27,7 @@ class FileGrain
 {
 public:
 	// constructor
-	FileGrain::FileGrain( t_CKINT fs, t_CKFLOAT init_size = 100.f )
+	FileGrain( t_CKINT fs, t_CKFLOAT init_size = 100.f )
 	{
 		// set global sample rate
 		stk::Stk::setSampleRate( fs );
@@ -39,7 +39,7 @@ public:
 		myGrain->setWindowSize( init_size );
 	}
 
-	FileGrain::~FileGrain()
+	~FileGrain()
 	{
 		// delete
 		delete myGrain; myGrain = nullptr;
@@ -48,7 +48,7 @@ public:
 	}
 
 	// tick ( eventually this will just take the next sample in the file reader and granulate it )
-	SAMPLE FileGrain::tick()
+	SAMPLE tick()
     {
 		SAMPLE out = myGrain->tick( samp->tick() );
 		// move pitch
@@ -68,48 +68,48 @@ public:
     }
 
 	// overloaded tick 
-	SAMPLE FileGrain::tick( SAMPLE in )
+	SAMPLE tick( SAMPLE in )
 	{
 		return myGrain->tick( in ); // have the grain window the input 
 	}
 
 	// open file and update
-	void FileGrain::openFile( const char* path )
+	void openFile( const char* path )
 	{
 		// underlying sampler
 		samp->openFile( path );
 	}
 
 	// pitch
-	t_CKFLOAT FileGrain::setPitch( t_CKFLOAT pit )
+	t_CKFLOAT setPitch( t_CKFLOAT pit )
 	{
 		// save
 		myPitch = pit;
 		// return for fun
 		return myPitch;
 	}
-	t_CKFLOAT FileGrain::getPitch() { return myPitch; }
+	t_CKFLOAT getPitch() { return myPitch; }
 
 	// setters and getters for window rate ( grain size )
-	void FileGrain::setGrainSize( t_CKFLOAT rate )
+	void setGrainSize( t_CKFLOAT rate )
 	{
 		if( rate > 0.f ) myGrain->setWindowSize( rate ); // in ms
 	}
-	t_CKFLOAT FileGrain::getGrainSize() { return myGrain->getWindowSize(); }
+	t_CKFLOAT getGrainSize() { return myGrain->getWindowSize(); }
 
 	// random size
-	void FileGrain::setRandomGrainSize( t_CKFLOAT rand ) { myGrain->setRandomSize( rand ); }
-	t_CKFLOAT FileGrain::getRandomGrainSize() { return myGrain->getRandomSize(); }
+	void setRandomGrainSize( t_CKFLOAT rand ) { myGrain->setRandomSize( rand ); }
+	t_CKFLOAT getRandomGrainSize() { return myGrain->getRandomSize(); }
 
 	// set random pitch
-	void FileGrain::setRandomPitch( t_CKFLOAT random ) { random_pitch = random; }
+	void setRandomPitch( t_CKFLOAT random ) { random_pitch = random; }
 	// get random pitch
-	t_CKFLOAT FileGrain::getRandomPitch() { return random_pitch; }
+	t_CKFLOAT getRandomPitch() { return random_pitch; }
 
 	// set random position
-	void FileGrain::setRandomPosition( t_CKFLOAT random ) { random_position = random; }
+	void setRandomPosition( t_CKFLOAT random ) { random_position = random; }
 	// get random position 
-	t_CKFLOAT FileGrain::getRandomPosition() { return random_position; }
+	t_CKFLOAT getRandomPosition() { return random_position; }
 
 	// create grain
 	Granulator* myGrain = nullptr;

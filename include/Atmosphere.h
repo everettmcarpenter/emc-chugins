@@ -17,7 +17,7 @@
 class Atmosphere : public SoundMatter
 {
 public:
-	Atmosphere::Atmosphere( unsigned int fs, unsigned int n_order, unsigned int size = 1 ) : SoundMatter( fs, size )
+	Atmosphere( unsigned int fs, unsigned int n_order, unsigned int size = 1 ) : SoundMatter( fs, size )
 	{
 		// ambi
 		order = n_order;
@@ -52,7 +52,7 @@ public:
 		this->setPosition( 0.f );
 	}
 
-	Atmosphere::~Atmosphere()
+	~Atmosphere()
 	{
 		// destroy matter
 		for( int i = 0; i < ( num_grains_per_channel * num_channels ); i++ ) { delete quantum[i]; quantum[i] = nullptr; }
@@ -69,7 +69,7 @@ public:
 		delete buffer; buffer = nullptr;
 	}
 
-	void Atmosphere::tick( SAMPLE* in, SAMPLE* out, unsigned int frames ) 
+	void tick( SAMPLE* in, SAMPLE* out, unsigned int frames ) 
 	{
 		// if we're good to go
 		if( go )
@@ -91,7 +91,7 @@ public:
 					*/
 
 					// create new grain parameters if resting
-					if( quantum[q]->windowState() ) newGrain( *quantum[q] );
+					if( quantum[q]->windowState() ) newGrain( quantum[q] );
 					// if our grain is loop and finished, shoot off a new one
 					if( quantum[q]->windowState() && quantum[q]->loopState() ) quantum[q]->trigger();
 				}
@@ -112,7 +112,7 @@ public:
 		}
 	}
 
-	void Atmosphere::openFile( const char* path )
+	void openFile( const char* path )
 	{
 		// don't do anything
 		go = false;
@@ -141,7 +141,7 @@ public:
 		go = true;
 	}
 
-	void Atmosphere::closeFile()
+	void closeFile()
 	{
 		// stop doing anything
 		go = false;

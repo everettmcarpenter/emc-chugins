@@ -3,15 +3,15 @@
 
 // an event grain, produces one window of a grain
 
-#include "../../include/Phasor.h"
-#include "../../include/stk/include/Stk.h"
-#include "../../include/stk/include/FileRead.h"
+#include "Phasor.h"
+#include "stk/include/Stk.h"
+#include "stk/include/FileRead.h"
 #include "WindowFunctions.h"
 
 struct GrainEvent
 {
 	// constructor
-	GrainEvent::GrainEvent( unsigned int fs, unsigned int length_ms, int type = -1 ) // create window, the rest of this structs lifespan is playing the window back
+	GrainEvent( unsigned int fs, unsigned int length_ms, int type = -1 ) // create window, the rest of this structs lifespan is playing the window back
 	{
 		// set internal sample rate
 		this->_fs = fs;
@@ -32,14 +32,14 @@ struct GrainEvent
 	}
 
 	// destructor
-	GrainEvent::~GrainEvent() { delete reader; reader = nullptr; 
+	~GrainEvent() { delete reader; reader = nullptr; 
 								delete window; window = nullptr; 
 								delete buffer; buffer = nullptr;
 								delete pit; pit = nullptr;
 								delete bufferPlayer; bufferPlayer = nullptr; };
 
 	// tick func
-	double GrainEvent::tick() 
+	double tick() 
 	{ 
 		// get index
 		float index = reader->tick() * size_samp;
@@ -58,10 +58,10 @@ struct GrainEvent
 	}
 
 	// are we there yet
-	int GrainEvent::state() { return this->reader->state(); }
+	int state() { return this->reader->state(); }
 
 	// make a new grain
-	void GrainEvent::newGrain( float length_ms, int position, stk::FileRead* source, int type = -1 )
+	void newGrain( float length_ms, int position, stk::FileRead* source, int type = -1 )
 	{
 		// resize buffer
 		this->buffer->resize( msToNormalizedSamp( length_ms ) + 1 );
@@ -89,7 +89,7 @@ struct GrainEvent
 	}
 
 	// create a window 
-	void GrainEvent::setWindow( unsigned int size, int type )
+	void setWindow( unsigned int size, int type )
 	{
 		switch( type )
 		{
@@ -109,10 +109,10 @@ struct GrainEvent
 	}
 
 	// return size in milliseconds
-	float GrainEvent::getSizeMs() { return normalizedSampToMs( this->size_samp ); }
+	float getSizeMs() { return normalizedSampToMs( this->size_samp ); }
 
-	unsigned int GrainEvent::msToNormalizedSamp( float ms ) { return static_cast<unsigned int>( 0.5 + ( ms * 0.001 ) * this->_fs ); }
-	float GrainEvent::normalizedSampToMs( unsigned int samp ) { return ( samp * 1000.0f ) / this->_fs; }
+	unsigned int msToNormalizedSamp( float ms ) { return static_cast<unsigned int>( 0.5 + ( ms * 0.001 ) * this->_fs ); }
+	float normalizedSampToMs( unsigned int samp ) { return ( samp * 1000.0f ) / this->_fs; }
 
 	Phasor* bufferPlayer = nullptr;
 	Phasor* reader = nullptr; // reads through window
