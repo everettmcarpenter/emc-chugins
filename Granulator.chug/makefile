@@ -12,6 +12,7 @@ CK_SRC_PATH?=../include
 # where to install chugin
 CHUGIN_PATH?=/usr/local/lib/chuck
 
+LIBS=/usr/lib/libstk.so -lstdc++ -lm -lpthread
 
 # ---------------------------------------------------------------------------- #
 # you won't generally need to change anything below this line for a new chugin #
@@ -95,12 +96,11 @@ all: $(CHUG)
 
 $(CHUG): $(C_OBJECTS) $(CXX_OBJECTS)
 ifeq ($(CK_CHUGIN_STATIC),0)
-	$(LD) $(LDFLAGS) -o $@ $^
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
 else
 	ar rv $@ $^
 	ranlib $@
 endif
-
 $(C_OBJECTS): %.o: %.c
 	$(CC) $(FLAGS) -c -o $@ $<
 

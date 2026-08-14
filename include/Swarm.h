@@ -11,13 +11,9 @@
 #ifndef FILE_GRAIN_H
 	#define FILE_GRAIN_H
 
-#define __LITTLE_ENDIAN__
-#define _CRT_SECURE_NO_WARNINGS
-#define _CRT_NONSTDC_NO_DEPRECATE
-
-#include "stk/include/FileRead.h"
-#include "stk/include/Noise.h"
-#include "stk/include/Stk.h"
+#include <stk/FileRead.h>
+#include <stk/Noise.h>
+#include <stk/Stk.h>
 #include "Quark.h"
 
 class SoundMatter

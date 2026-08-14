@@ -7,7 +7,7 @@
 # CHUGIN_PATH=/usr/local/lib/chuck
 
 # compiler flags
-FLAGS=-D__LINUX_ALSA__ -D__PLATFORM_LINUX__ -I$(CK_SRC_PATH) -fPIC
+FLAGS=-D__LINUX_ALSA__ -D__PLATFORM_LINUX__ -I$(CK_SRC_PATH) -fPIC -lstk
 # linker flags
 LDFLAGS=-shared
 

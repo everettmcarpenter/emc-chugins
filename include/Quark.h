@@ -7,8 +7,8 @@
 #include "Phasor.h"
 #include "Smoother.h"
 #include "Windower.h"
-#include "stk/include/Stk.h"
-#include "stk/include/FileRead.h"
+#include <stk/Stk.h>
+#include <stk/FileRead.h>
 
 #define GRAIN_IN_PROGRESS false 
 #define GRAIN_DONE true

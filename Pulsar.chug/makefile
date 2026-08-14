@@ -95,12 +95,11 @@ all: $(CHUG)
 
 $(CHUG): $(C_OBJECTS) $(CXX_OBJECTS)
 ifeq ($(CK_CHUGIN_STATIC),0)
-	$(LD) $(LDFLAGS) -o $@ $^
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
 else
 	ar rv $@ $^
 	ranlib $@
 endif
-
 $(C_OBJECTS): %.o: %.c
 	$(CC) $(FLAGS) -c -o $@ $<
 
