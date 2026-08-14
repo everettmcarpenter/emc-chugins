@@ -11,9 +11,9 @@
 #ifndef FILE_GRAIN_H
 	#define FILE_GRAIN_H
 
-#include <stk/FileRead.h>
-#include <stk/Noise.h>
-#include <stk/Stk.h>
+#include "stk/include/FileRead.h"
+#include "stk/include/Noise.h"
+#include "stk/include/Stk.h"
 #include "Quark.h"
 
 class SoundMatter
@@ -96,12 +96,12 @@ public:
 			// cycle through
 			for( int i = 0; i < num_grains; i++ ) 
 			{
-				// the amalgamation of sound
-				out += quantum[i]->tick();
 				// create new grain parameters if resting
 				if( quantum[i]->windowState() ) newGrain( quantum[i] );
+				// the amalgamation of sound
+				out += quantum[i]->tick();
 				// if our grain is loop and finished, shoot off a new one
-				if( quantum[i]->windowState() && quantum[i]->loopState() ) quantum[i]->trigger();
+				// if( quantum[i]->windowState() && quantum[i]->loopState() ) quantum[i]->trigger();
 			}
 			// don't use tick functions in loops! that defeats the point of a time normalized tick function everett!
 			// anyways, advance
@@ -154,7 +154,10 @@ public:
 		// also instantly jump so that we aren't drifting forever
 		particle->setPositionInstant( n_position );
 		// debug
-		// printf( "Size %f, pitch %f, position %f \n", n_size, n_pitch, n_position );
+		
+		std::printf( "size %f \t ", n_size );
+		std::printf( "pitch %f \t", n_pitch );
+		std::printf( "position %f \n", n_position );
 	}
 
 	//=======================================================================
@@ -203,7 +206,7 @@ public:
 
 	void setPitch( float n_pitch )
 	{
-		pitch_slew->setTarget( n_pitch, 1000.f );
+		pitch_slew->setTarget( n_pitch, 100.f );
 		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 

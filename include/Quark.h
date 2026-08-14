@@ -7,8 +7,8 @@
 #include "Phasor.h"
 #include "Smoother.h"
 #include "Windower.h"
-#include <stk/Stk.h>
-#include <stk/FileRead.h>
+#include "stk/include/Stk.h"
+#include "stk/include/FileRead.h"
 
 #define GRAIN_IN_PROGRESS false 
 #define GRAIN_DONE true
@@ -144,7 +144,7 @@ public:
 		position = new_position;
 		// clamp and scale
 		float segment_offset = std::max( 0.f, std::min( file_size_frames * position, (float)( file_size_frames - 1 ) ) );
-		position_slew->setTarget( segment_offset, 1.f );
+		// position_slew->setTarget( segment_offset, 1000.f );
 	}
 
 	// set position

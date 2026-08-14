@@ -357,7 +357,7 @@ CK_DLL_MFUN( assemblage_setGrainSize )
     Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
 
     t_CKFLOAT size = GET_NEXT_FLOAT( ARGS );
-    
+
     if( a_obj ) a_obj->setSize( size );
 }
 
@@ -398,7 +398,7 @@ CK_DLL_MFUN( assemblage_setPosition )
 
     t_CKFLOAT pos = GET_NEXT_FLOAT( ARGS );
     
-    if( a_obj ) a_obj->setSize( pos );
+    if( a_obj ) a_obj->setPosition( pos );
 }
 
 CK_DLL_MFUN( assemblage_set2Position )
