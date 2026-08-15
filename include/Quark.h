@@ -67,11 +67,19 @@ public:
 			// if we aren't graining
 			else if( this->windowState() == GRAIN_DONE )
 			{
+				if( toGo ) // if we have a spacer
+				{
+					--toGo;
+				}
+				else // if not, just go
+				{
+					// start a new grain
+					if( loop ) this->trigger();
+					toGo = gapSize; // set our gap size for next time
+
+				}
 				// debug
 				// printf( "Position %f, Pitch %f, Window size (ms) %f \n", position_slew->getCurrent(), pitch_slew->getCurrent(), window->getSizeMs() );
-
-				// start a new grain
-				if( loop ) this->trigger();
 			}
 		}
 		// return
@@ -213,6 +221,18 @@ public:
         return this->channel;
     }
 
+	// set gap size in samples
+	void setGap( unsigned int gap_samp )
+	{
+		gapSize = gap_samp;
+		toGo = gapSize; // this overwrites the current gap size, let's see if we like that
+	}
+
+	unsigned int getGap()
+	{
+		return gapSize;
+	}
+
 private:
 	Phasor* playback = nullptr;
 	Smoother* pitch_slew = nullptr;
@@ -226,8 +246,10 @@ private:
 	float current_segment_size_ms = 100.f; // this is "memory" variable used in the tick function
 	float pitch = 1.f; // base pitch
 	unsigned int file_size_frames = 0; // file size in frames ( samples / channels )
-	bool go = false;
-	bool loop = true;
+	bool go = false; // are we making sound
+	bool loop = true; // are we looping sound
+	unsigned int toGo = 0; // how many samples to go for the next or current gap
+	unsigned int gapSize = 0; // how many samples are gaps 
 };
 
 #endif /* QUARK_H */

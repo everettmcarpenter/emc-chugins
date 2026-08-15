@@ -83,6 +83,7 @@ CK_DLL_MFUN( assemblage_openFile );
 CK_DLL_MFUN( assemblage_closeFile );
 
 CK_DLL_MFUN( assemblage_samples );
+CK_DLL_MFUN( assemblage_space );
 
 // this is a special offset reserved for chugin internal data
 t_CKINT assemblage_data_offset = 0;
@@ -97,7 +98,7 @@ CK_DLL_INFO( Assemblage )
     // the version string of this chugin, e.g., "v1.2.1"
     QUERY->setinfo( QUERY, CHUGIN_INFO_CHUGIN_VERSION, "" );
     // the author(s) of this chugin, e.g., "Alice Baker & Carl Donut"
-    QUERY->setinfo( QUERY, CHUGIN_INFO_AUTHORS, "" );
+    QUERY->setinfo( QUERY, CHUGIN_INFO_AUTHORS, "Everett M. Carpenter" );
     // text description of this chugin; what is it? what does it do? who is it for?
     QUERY->setinfo( QUERY, CHUGIN_INFO_DESCRIPTION, "" );
     // (optional) URL of the homepage for this chugin
@@ -247,6 +248,9 @@ CK_DLL_QUERY( Assemblage )
 
     QUERY->add_mfun( QUERY, assemblage_samples, "int", "samples" );
     QUERY->doc_func( QUERY, "Return how many samples are in the active file." );
+
+    QUERY->add_mfun( QUERY, assemblage_space, "void", "spacer" );
+    QUERY->add_arg( QUERY, "dur", "time" );
 
     // this reserves a variable in the ChucK internal class to store 
     // referene to the c++ class we defined above
@@ -507,3 +511,11 @@ CK_DLL_MFUN( assemblage_count )
     else RETURN->v_int = -1;
 }
 
+CK_DLL_MFUN( assemblage_space )
+{
+    // get our c++ class pointer
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    
+    t_CKDUR space_time = GET_NEXT_DUR( ARGS );
+    if( a_obj ) a_obj->setGap( (unsigned int)space_time );
+}

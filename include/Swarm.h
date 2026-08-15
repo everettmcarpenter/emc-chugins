@@ -155,9 +155,11 @@ public:
 		particle->setPositionInstant( n_position );
 		// debug
 		
+		/*
 		std::printf( "size %f \t ", n_size );
 		std::printf( "pitch %f \t", n_pitch );
 		std::printf( "position %f \n", n_position );
+		*/
 	}
 
 	//=======================================================================
@@ -229,6 +231,19 @@ public:
 	}
 
 	float getPosition() { return position_slew->getTarget(); }
+
+	void setGap(unsigned int gap_samp)
+	{
+		for( int i = 0; i < num_grains; i++ )
+		{
+			quantum[i]->setGap( gap_samp );
+		}
+	}
+
+	unsigned int getGap()
+	{
+		return quantum[0]->getGap();
+	}
 
 	//=======================================================================
 	//

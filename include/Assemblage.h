@@ -153,6 +153,17 @@ public:
 		// how do we save this?
 	}
 
+	void setGap( unsigned int gap_samp )
+	{
+		// assign
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->setGap( gap_samp );
+	}
+
+	unsigned int getGap()
+	{
+		collage[0]->getGap();
+	}
+
 	//=======================================================================
 	//
 	//	names: setRandom* 
