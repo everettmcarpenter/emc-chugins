@@ -137,6 +137,14 @@ public:
 		// how do we save this? maybe we just retrieve the targets of the sound matter(s) and fit them into a chuck array?
 	}
 
+	// set all pitches to a single value
+	void setPitch( float pitch, float ms_to )
+	{
+		// assign
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->setPitch( pitch, ms_to );
+		// how do we save this? maybe we just retrieve the targets of the sound matter(s) and fit them into a chuck array?
+	}
+
 	// set all sizes to a single value
 	void setSize( float size )
 	{
@@ -153,6 +161,14 @@ public:
 		// how do we save this?
 	}
 
+	// set all positions to a single value
+	void setPosition( float position, float ms_to )
+	{
+		// assign
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->setPosition( position, ms_to );
+		// how do we save this?
+	}
+
 	void setGap( unsigned int gap_samp )
 	{
 		// assign
@@ -161,7 +177,7 @@ public:
 
 	unsigned int getGap()
 	{
-		collage[0]->getGap();
+		return collage[0]->getGap();
 	}
 
 	//=======================================================================

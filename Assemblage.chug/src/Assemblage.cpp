@@ -60,14 +60,15 @@ CK_DLL_MFUN( assemblage_set2RandomGrainSize );
 
 CK_DLL_MFUN( assemblage_setPitch );
 CK_DLL_MFUN( assemblage_set2Pitch );
+CK_DLL_MFUN( assemblage_set3Pitch );
 CK_DLL_MFUN( assemblage_setRandomPitch );
 CK_DLL_MFUN( assemblage_set2RandomPitch );
 
 CK_DLL_MFUN( assemblage_setPosition );
 CK_DLL_MFUN( assemblage_set2Position );
+CK_DLL_MFUN( assemblage_set3Position );
 CK_DLL_MFUN( assemblage_setRandomPosition );
 CK_DLL_MFUN( assemblage_set2RandomPosition );
-
 
 CK_DLL_MFUN( assemblage_getGrainSize );
 CK_DLL_MFUN( assemblage_getRandomGrainSize );
@@ -83,6 +84,7 @@ CK_DLL_MFUN( assemblage_openFile );
 CK_DLL_MFUN( assemblage_closeFile );
 
 CK_DLL_MFUN( assemblage_samples );
+CK_DLL_MFUN( assemblage_duration );
 CK_DLL_MFUN( assemblage_space );
 
 // this is a special offset reserved for chugin internal data
@@ -200,6 +202,11 @@ CK_DLL_QUERY( Assemblage )
     QUERY->add_arg( QUERY, "float[]", "pitch" );
     QUERY->doc_func( QUERY, "Set pitch/rate of internal file." );
 
+    QUERY->add_mfun( QUERY, assemblage_set3Pitch, "void", "pitch" );
+    QUERY->add_arg( QUERY, "float", "pitch" );
+    QUERY->add_arg( QUERY, "dur", "interpolation" );
+    QUERY->doc_func( QUERY, "Set pitch/rate of internal file." );
+
     QUERY->add_mfun( QUERY, assemblage_set2RandomPitch, "void", "randomPitch" );
     QUERY->add_arg( QUERY, "float[]", "randomness" );
     QUERY->doc_func( QUERY, "Set randomness of pitch." );
@@ -208,6 +215,11 @@ CK_DLL_QUERY( Assemblage )
 
     QUERY->add_mfun( QUERY, assemblage_set2Position, "void", "position" );
     QUERY->add_arg( QUERY, "float[]", "position" );
+    QUERY->doc_func( QUERY, "Set position of assemblage in file." );
+
+    QUERY->add_mfun( QUERY, assemblage_set3Position, "void", "position" );
+    QUERY->add_arg( QUERY, "float", "position" );
+    QUERY->add_arg( QUERY, "dur", "interpolation" );
     QUERY->doc_func( QUERY, "Set position of assemblage in file." );
 
     QUERY->add_mfun( QUERY, assemblage_set2RandomPosition, "void", "randomPosition" );
@@ -248,6 +260,9 @@ CK_DLL_QUERY( Assemblage )
 
     QUERY->add_mfun( QUERY, assemblage_samples, "int", "samples" );
     QUERY->doc_func( QUERY, "Return how many samples are in the active file." );
+
+    QUERY->add_mfun( QUERY, assemblage_duration, "dur", "duration" );
+    QUERY->doc_func( QUERY, "Length of file as a ChucK duration." );
 
     QUERY->add_mfun( QUERY, assemblage_space, "void", "spacer" );
     QUERY->add_arg( QUERY, "dur", "time" );
@@ -395,6 +410,19 @@ CK_DLL_MFUN( assemblage_set2Pitch )
     if( a_obj ) a_obj->setPitch( pitches, API );
 }
 
+CK_DLL_MFUN( assemblage_set3Pitch )
+{
+    // get our c++ class pointer
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+
+    t_CKFLOAT pitch = GET_NEXT_FLOAT( ARGS );
+    t_CKDUR time_to = GET_NEXT_DUR( ARGS );
+    
+    double srate_khz = ( ( double )API->vm->srate( VM ) / 1000.0 ); 
+
+    if( a_obj ) a_obj->setPitch( pitch, ( time_to ) / srate_khz );
+}
+
 CK_DLL_MFUN( assemblage_setPosition )
 {
     // get our c++ class pointer
@@ -413,6 +441,19 @@ CK_DLL_MFUN( assemblage_set2Position )
     Chuck_ArrayFloat* positions = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
     
     if( a_obj ) a_obj->setPosition( positions, API );
+}
+
+CK_DLL_MFUN( assemblage_set3Position )
+{
+    // get our c++ class pointer
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+
+    t_CKFLOAT pos = GET_NEXT_FLOAT( ARGS );
+    t_CKDUR time_to = GET_NEXT_DUR( ARGS );
+
+    double srate_khz = ( ( double )API->vm->srate( VM ) / 1000.0 ); 
+    
+    if( a_obj ) a_obj->setPosition( pos, ( time_to ) / srate_khz );
 }
 
 CK_DLL_MFUN( assemblage_setRandomGrainSize ) // need to implement this on the Assemblage side
@@ -500,6 +541,15 @@ CK_DLL_MFUN( assemblage_samples )
     
     if( a_obj ) RETURN->v_int = a_obj->samples();
     else RETURN->v_int = -1;
+}
+
+CK_DLL_MFUN( assemblage_duration )
+{
+    // get our c++ class pointer
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    
+    if( a_obj ) RETURN->v_dur = a_obj->samples();
+    else RETURN->v_dur = 0;
 }
 
 CK_DLL_MFUN( assemblage_count )

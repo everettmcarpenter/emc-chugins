@@ -212,6 +212,12 @@ public:
 		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
+	void setPitch( float n_pitch, float ms_to )
+	{
+		pitch_slew->setTarget( n_pitch, ms_to );
+		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
+	}
+
 	void setPitchInstant( float n_pitch )
 	{
 		pitch_slew->instant( n_pitch );
@@ -223,6 +229,11 @@ public:
 	void setPosition( float n_position ) 
 	{
 		position_slew->setTarget( n_position, 240.f );
+	}
+
+	void setPosition( float n_position, float ms_to ) 
+	{
+		position_slew->setTarget( n_position, ms_to );
 	}
 
 	void setPosition( unsigned int n_position )
