@@ -1,21 +1,21 @@
 @import "Line"
 
-Assemblage grain("../include/Leeds-Bells.wav", 32) => Gain vol( 2.0 ) => NRev rev( 0.05 ) => dac;
+Assemblage grain("../include/Leeds-Bells.wav", 16) => Gain vol( 1.5 ) => NRev rev( 0.05 ) => dac;
 
 Line grainSize => blackhole; 
 
 grain.size( 25.0 );
-grain.randomSize( 250.0 );
-grain.randomPosition( 85.0 );
+grain.randomSize( 5.0 );
 
 spork ~ tether( grain, grainSize, "size" );
 
-grain.pitch( [ 0.4 ] );
+grain.position( Math.randomf() );
 
-grain.position( 1.0, grain.duration() * 2.0 );
+5::second => now;
+
 grain.pitch( [ 10.5, 4.0, 43.0, 2.0, 0.9 ], [ 5::second, 20::second, 1::second, 800::ms, 45::second ] );
 
-grainSize.set( [ 18.8, 0.015, 0.001, 0.49, 0.032, 1.0 ], [ grain.duration() / 6.0, grain.duration() / 6.0, grain.duration() / 6.0, grain.duration() / 6.0, grain.duration() / 6.0, grain.duration() / 6.0 ] );
+grainSize.set( [ 0.8, 0.015, 0.001, 0.49, 0.032, 1.0 ], [ grain.duration() / 6.0, grain.duration() / 6.0, grain.duration() / 6.0, grain.duration() / 6.0, grain.duration() / 6.0, grain.duration() / 6.0 ] );
 grainSize.keyOn();
 
 45::second => now;

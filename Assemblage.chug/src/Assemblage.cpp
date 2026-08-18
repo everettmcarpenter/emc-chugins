@@ -61,6 +61,8 @@ CK_DLL_MFUN( assemblage_set2RandomGrainSize );
 CK_DLL_MFUN( assemblage_setPitch );
 CK_DLL_MFUN( assemblage_set2Pitch );
 CK_DLL_MFUN( assemblage_set3Pitch );
+CK_DLL_MFUN( assemblage_set4Pitch );
+
 CK_DLL_MFUN( assemblage_setRandomPitch );
 CK_DLL_MFUN( assemblage_set2RandomPitch );
 
@@ -205,6 +207,11 @@ CK_DLL_QUERY( Assemblage )
     QUERY->add_mfun( QUERY, assemblage_set3Pitch, "void", "pitch" );
     QUERY->add_arg( QUERY, "float", "pitch" );
     QUERY->add_arg( QUERY, "dur", "interpolation" );
+    QUERY->doc_func( QUERY, "Set pitch/rate of internal file." );
+
+    QUERY->add_mfun( QUERY, assemblage_set4Pitch, "void", "pitch" );
+    QUERY->add_arg( QUERY, "float[]", "pitch" );
+    QUERY->add_arg( QUERY, "dur[]", "interpolation" );
     QUERY->doc_func( QUERY, "Set pitch/rate of internal file." );
 
     QUERY->add_mfun( QUERY, assemblage_set2RandomPitch, "void", "randomPitch" );
@@ -421,6 +428,19 @@ CK_DLL_MFUN( assemblage_set3Pitch )
     double srate_khz = ( ( double )API->vm->srate( VM ) / 1000.0 ); 
 
     if( a_obj ) a_obj->setPitch( pitch, ( time_to ) / srate_khz );
+}
+
+CK_DLL_MFUN( assemblage_set4Pitch )
+{
+    // get our c++ class pointer
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+
+    Chuck_ArrayFloat* pitches = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
+    Chuck_ArrayFloat* times_to = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
+    
+    double srate_khz = ( ( double )API->vm->srate( VM ) / 1000.0 ); 
+
+    if( a_obj ) a_obj->setPitch( pitches, times_to, VM, API );
 }
 
 CK_DLL_MFUN( assemblage_setPosition )

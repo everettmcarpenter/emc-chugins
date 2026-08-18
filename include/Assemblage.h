@@ -111,6 +111,16 @@ public:
 		// how do we save this? maybe we just retrieve the targets of the sound matter(s) and fit them into a chuck array?
 	}
 
+	// set all pitches given a collection of sizes
+	void setPitch( Chuck_ArrayFloat* pitches, Chuck_ArrayFloat* times_to, Chuck_VM *VM, const CK_DL_API& API )
+	{
+		unsigned int size = API->object->array_float_size( pitches );
+		double srate_khz = ( ( double )API->vm->srate( VM ) / 1000.0 ); 
+		// assign
+		for( int i = 0; i < size; i++ ) collage[i]->setPitch( API->object->array_float_get_idx( pitches, i % size ), API->object->array_float_get_idx( times_to, i % size ) / srate_khz );
+		// how do we save this? maybe we just retrieve the targets of the sound matter(s) and fit them into a chuck array?
+	}
+
 	// set all sizes given a collection of sizes
 	void setSize( Chuck_ArrayFloat* sizes, const CK_DL_API& API )
 	{
