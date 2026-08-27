@@ -6,6 +6,7 @@
 // -----------------------------------------------------
 
 #define DELETE_ARRAY( x ) { delete[] x; x = nullptr; }
+#define DELETE_OBJ( x ) { delete x; x = nullptr; }
 
 template <typename T> 
 class CircularBuffer
@@ -72,7 +73,7 @@ class CircularBuffer
 
 	void get( T* out, unsigned int num_outs ) // buffered get
 	{
-		for( int i = 0; i < num_outs; i++ ) // write = read will be caught by this->get()
+		for( int i = 0; i < num_outs; i++ ) // write = read will be caught by this->get
 		{
 			out[i] = this->get(); // dude check that out
 		}
