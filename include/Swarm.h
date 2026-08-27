@@ -62,7 +62,6 @@ public:
 	// 
 	//=======================================================================
 
-
 	~SoundMatter()
 	{
 		// destroy matter
@@ -130,7 +129,7 @@ public:
 	void newGrain( Quark* particle )
 	{
 		// calculate our new size using a randomized factor
-		float n_size = base_size + (  0.5 * ( random->tick() + 1.0 ) * random_size );
+		float n_size = base_size + ( 0.5 * ( random->tick() + 1.0 ) * random_size );
 		// clamp value 
 		n_size = std::max( 1.f, n_size );
 		// provide new value to quark
@@ -153,6 +152,7 @@ public:
 		n_position = std::max( 0.f, std::min( n_position, 1.f ) );
 		// also instantly jump so that we aren't drifting forever
 		particle->setPositionInstant( n_position );
+
 		// debug
 		
 		/*
@@ -243,17 +243,18 @@ public:
 
 	float getPosition() { return position_slew->getTarget(); }
 
-	void setGap(unsigned int gap_samp)
+	void setGap( unsigned int gap_samp )
 	{
+		base_gap = gap_samp;
 		for( int i = 0; i < num_grains; i++ )
 		{
-			quantum[i]->setGap( gap_samp );
+			quantum[i]->setGap( base_gap );
 		}
 	}
 
 	unsigned int getGap()
 	{
-		return quantum[0]->getGap();
+		return base_gap;
 	}
 
 	//=======================================================================
@@ -272,6 +273,9 @@ public:
 
 	void setRandomPosition( float random_pos_ms ) { random_position = random_pos_ms; }
 	float getRandomPosition() { return random_position; }
+
+	void setRandomGap( unsigned int random_gp ) { random_gap = random_gp; }
+	unsigned int getRandomGap() { return random_gap; }
 
 	//=======================================================================
 	//
@@ -427,7 +431,9 @@ protected:
 	float random_position = 0.f; // in milliseconds
 	float random_pitch = 0.f; // in multiple of the source file
 	float random_size = 0.f; // in ms
+	unsigned int random_gap = 0;
 	float base_size = 200.f; // in ms
+	unsigned int base_gap = 0;
 	bool go = false;
 	bool internalBuffer = true;
 };

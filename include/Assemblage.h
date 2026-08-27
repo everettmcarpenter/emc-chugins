@@ -2,6 +2,7 @@
 	#define ASSEMBLAGE_H
 
 #include "Swarm.h"
+#include "SoundFile.h"
 #include "chugin.h"
 
 //=======================================================================
@@ -107,7 +108,7 @@ public:
 	{
 		unsigned int size = API->object->array_float_size( pitches );
 		// assign
-		for( int i = 0; i < size; i++ ) collage[i]->setPitch( API->object->array_float_get_idx( pitches, i % size ) );
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->setPitch( API->object->array_float_get_idx( pitches, i % size ) );
 		// how do we save this? maybe we just retrieve the targets of the sound matter(s) and fit them into a chuck array?
 	}
 
@@ -117,16 +118,16 @@ public:
 		unsigned int size = API->object->array_float_size( pitches );
 		double srate_khz = ( ( double )API->vm->srate( VM ) / 1000.0 ); 
 		// assign
-		for( int i = 0; i < size; i++ ) collage[i]->setPitch( API->object->array_float_get_idx( pitches, i % size ), API->object->array_float_get_idx( times_to, i % size ) / srate_khz );
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->setPitch( API->object->array_float_get_idx( pitches, i % size ), API->object->array_float_get_idx( times_to, i % size ) / srate_khz );
 		// how do we save this? maybe we just retrieve the targets of the sound matter(s) and fit them into a chuck array?
 	}
 
 	// set all sizes given a collection of sizes
 	void setSize( Chuck_ArrayFloat* sizes, const CK_DL_API& API )
 	{
-		unsigned int size = API->object->array_float_size( sizes);
+		unsigned int size = API->object->array_float_size( sizes );
 		// assign
-		for( int i = 0; i < size; i++ ) collage[i]->setSize( API->object->array_float_get_idx( sizes, i % size ) );
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->setSize( API->object->array_float_get_idx( sizes, i % size ) );
 		// how do we save this?
 	}
 
@@ -135,7 +136,16 @@ public:
 	{
 		unsigned int size = API->object->array_float_size( positions );
 		// assign
-		for( int i = 0; i < size; i++ ) collage[i]->setPosition( (float)API->object->array_float_get_idx( positions, i % size ) );
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->setPosition( (float)API->object->array_float_get_idx( positions, i % size ) );
+		// how do we save this?
+	}
+
+	// set all positions given a collection of position
+	void setGap( Chuck_ArrayFloat* gaps, const CK_DL_API& API )
+	{
+		unsigned int size = API->object->array_float_size( gaps );
+		// assign
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->setGap( (unsigned int)API->object->array_float_get_idx( gaps, i % size ) );
 		// how do we save this?
 	}
 
@@ -225,6 +235,15 @@ public:
 		// how do we save this?
 	}
 
+	// set all positions given a collection of position
+	void setRandomGap( Chuck_ArrayFloat* gaps, const CK_DL_API& API )
+	{
+		unsigned int size = API->object->array_float_size( gaps );
+		// assign
+		for( int i = 0; i < size; i++ ) collage[i]->setRandomPosition( (unsigned int)API->object->array_float_get_idx( gaps, i % size ) );
+		// how do we save this?
+	}
+
 	// set randomness
 	void setRandomPitch( float random )
 	{
@@ -244,6 +263,13 @@ public:
 	{
 		// assign
 		for( int i = 0; i < num_pieces; i++ ) collage[i]->setRandomPosition( random );
+	}
+
+	// set all positions given a collection of position
+	void setRandomGap( unsigned int random )
+	{
+		// assign
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->setRandomGap( random );
 	}
 
 	//=======================================================================
@@ -305,6 +331,27 @@ public:
 		for( int i = 0; i < num_pieces; i++ ) { collage[i]->linkOutsideBuffer( buffer ); }
 		
 		// good to go
+		this->start();
+	}
+
+	void linkBuffer( stk::StkFrames* n_buffer )
+	{
+		// don't want to call on a deleted buffer
+		this->stop();
+		
+		// if one is open, close the file and delete the buffer
+		if( file_read->isOpen() ) file_read->close();
+		
+		// clear 
+		delete buffer;
+
+		// have our buffer just point to the new one
+		buffer = n_buffer;
+
+		// give to quarks and assign them to channels
+		for( int i = 0; i < num_pieces; i++ ) { collage[i]->linkOutsideBuffer( buffer ); }		
+
+		// it is now safe to call on a deleted buffer
 		this->start();
 	}
 

@@ -76,7 +76,6 @@ public:
 					// start a new grain
 					if( loop ) this->trigger();
 					toGo = gapSize; // set our gap size for next time
-
 				}
 				// debug
 				// printf( "Position %f, Pitch %f, Window size (ms) %f \n", position_slew->getCurrent(), pitch_slew->getCurrent(), window->getSizeMs() );
@@ -239,6 +238,7 @@ private:
 	Smoother* position_slew = nullptr;
 	Windower* window = nullptr;
 	stk::StkFrames* _buffer = nullptr;
+
 	unsigned int _fs = 0; // our internal sample rate
     unsigned int channel = 0; // which channel of the buffer to read
 	float position = 0.f; // base position

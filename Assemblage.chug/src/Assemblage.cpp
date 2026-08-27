@@ -38,6 +38,8 @@
 // include chugin header
 #include "../../include/chugin.h"
 #include "../../include/Assemblage.h"
+#include "../../include/SoundFile.h"
+// #include "../../SoundFile.chug/src/SoundFile.cpp"
 
 // general includes
 #include <iostream>
@@ -84,11 +86,15 @@ CK_DLL_MFUN( assemblage_getRandomPosition );
 CK_DLL_MFUN( assemblage_count );
 CK_DLL_MFUN( assemblage_openFile );
 CK_DLL_MFUN( assemblage_closeFile );
+CK_DLL_MFUN( assemblage_openExternalFile );
 
 CK_DLL_MFUN( assemblage_samples );
 CK_DLL_MFUN( assemblage_duration );
-CK_DLL_MFUN( assemblage_space );
 
+CK_DLL_MFUN( assemblage_setSpace );
+CK_DLL_MFUN( assemblage_getSpace );
+CK_DLL_MFUN( assemblage_setRandomSpace );
+CK_DLL_MFUN( assemblage_getRandomSpace );
 // this is a special offset reserved for chugin internal data
 t_CKINT assemblage_data_offset = 0;
 
@@ -262,6 +268,10 @@ CK_DLL_QUERY( Assemblage )
     QUERY->add_arg( QUERY, "string", "file" );
     QUERY->doc_func( QUERY, "Open file at the given path." );
 
+    QUERY->add_mfun( QUERY, assemblage_openExternalFile, "void", "openFile" );
+    QUERY->add_arg( QUERY, "Object", "file" );
+    QUERY->doc_func( QUERY, "Utilize provided audio buffer." );
+
     QUERY->add_mfun( QUERY, assemblage_closeFile, "void", "closeFile" );
     QUERY->doc_func( QUERY, "Close the active file." );
 
@@ -271,8 +281,16 @@ CK_DLL_QUERY( Assemblage )
     QUERY->add_mfun( QUERY, assemblage_duration, "dur", "duration" );
     QUERY->doc_func( QUERY, "Length of file as a ChucK duration." );
 
-    QUERY->add_mfun( QUERY, assemblage_space, "void", "spacer" );
+    QUERY->add_mfun( QUERY, assemblage_setSpace, "void", "spacer" );
     QUERY->add_arg( QUERY, "dur", "time" );
+
+    QUERY->add_mfun( QUERY, assemblage_getSpace, "dur", "spacer" );
+    QUERY->doc_func( QUERY, "Get size of space" );
+
+    QUERY->add_mfun( QUERY, assemblage_setRandomSpace, "void", "randomSpace" );
+    QUERY->add_arg( QUERY, "dur", "time" );
+
+    QUERY->add_mfun( QUERY, assemblage_getRandomSpace, "dur", "randomSpace" );
 
     // this reserves a variable in the ChucK internal class to store 
     // referene to the c++ class we defined above
@@ -546,6 +564,17 @@ CK_DLL_MFUN( assemblage_openFile )
     if( g_obj ) g_obj->openFile( API->object->str( path ) );
 }
 
+CK_DLL_MFUN( assemblage_openExternalFile )
+{
+    // get granulator
+    Assemblage* g_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+
+    // get file
+    SoundFile* myBuffer = (SoundFile*)GET_NEXT_OBJECT( ARGS );
+	std::cout << "Assemblage receiving file size: " << myBuffer->fileSize() << std::endl;
+    // if( g_obj && myBuffer ) g_obj->linkBuffer( (stk::StkFrames*)myBuffer->buffer() );
+}
+
 CK_DLL_MFUN( assemblage_closeFile )
 {
     // get granulator
@@ -581,11 +610,36 @@ CK_DLL_MFUN( assemblage_count )
     else RETURN->v_int = -1;
 }
 
-CK_DLL_MFUN( assemblage_space )
+CK_DLL_MFUN( assemblage_setSpace )
 {
     // get our c++ class pointer
     Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
     
     t_CKDUR space_time = GET_NEXT_DUR( ARGS );
     if( a_obj ) a_obj->setGap( (unsigned int)space_time );
+}
+
+CK_DLL_MFUN( assemblage_getSpace )
+{
+    // get our c++ class pointer
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    
+    if( a_obj ) RETURN->v_dur = a_obj->getGap();
+}
+
+CK_DLL_MFUN( assemblage_setRandomSpace )
+{
+    // get our c++ class pointer
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    
+    t_CKDUR space_time = GET_NEXT_DUR( ARGS );
+    if( a_obj ) a_obj->setRandomGap( (unsigned int)space_time );
+}
+
+CK_DLL_MFUN( assemblage_getRandomSpace )
+{
+    // get our c++ class pointer
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    
+    // if( a_obj ) RETURN->v_dur = a_obj->getRandomGap();
 }
