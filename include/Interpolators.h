@@ -23,6 +23,8 @@ T lerp( T lhs, T rhs, double distance )
     }
 }
 
+// allpass interpolation
+// https://ccrma.stanford.edu/~jos/pasp/First_Order_Allpass_Interpolation.html
 template <typename T>
 T allpass( T lhs, T rhs, T past, double distance )
 {
