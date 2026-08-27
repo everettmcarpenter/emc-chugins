@@ -36,7 +36,7 @@
 //-----------------------------------------------------------------------------
 
 // include chugin header
-#include "chugin.h"
+#include "../include/chugin.h"
 
 // general includes
 #include <iostream>

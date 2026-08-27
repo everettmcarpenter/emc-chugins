@@ -1,103 +1,87 @@
-//-----------------------------------------------------------------------------
-// name: class CBufferSimple
-// desc: circular buffer - one reader one writer ( stolen from chuck! )
-//-----------------------------------------------------------------------------
-class CBufferSimple
+// -----------------------------------------------------
+//	
+//	Simple circular template buffer that assumes you are
+//	using a type defined in the c++ standard.  
+// 
+// -----------------------------------------------------
+
+#define DELETE_ARRAY( x ) { delete[] x; x = nullptr; }
+
+template <typename T> 
+class CircularBuffer
 {
-	CBufferSimple::CBufferSimple()
+	CircularBuffer()
 	{
-	    m_data = NULL;
-	    m_data_width = m_read_offset = m_write_offset = m_max_elem = 0;
+		_data = nullptr; // set our data pointer to nothing
+		_width = _readPosition = _writePosition =_size = 0; // we don't know the size of these yet
 	}
 
-	CBufferSimple::~CBufferSimple()
+	~CircularBuffer()
 	{
-	    this->cleanup();
+		this->cleanup();
 	}
 
-	bool CBufferSimple::initialize( unsigned int num_elem, unsigned int width )
+	void cleanup()
 	{
-	    // cleanup
-	    cleanup();
-
-	    // allocate
-	    m_data = (double *)malloc( num_elem * width );
-	    if( !m_data )
-	        return false;
-
-	    m_data_width = width;
-	    m_read_offset = 0;
-	    m_write_offset = 0;
-	    m_max_elem = num_elem;
-
-	    return true;
+		DELETE_ARRAY( _data );
+		_width = _readPosition = _writePosition =_size = 0; 
 	}
 
-	void CBufferSimple::cleanup()
+	bool initialize( unsigned int size )
 	{
-	    if( !m_data )
-	        return;
+		this->cleanup(); // clean 
 
-	    free( m_data );
+		if( !size ) // then we have size 0
+		{
+			return false; // not a good idea to make a buffer of size 0
+		}
 
-	    m_data = NULL;
-	    m_data_width = m_read_offset = m_write_offset = m_max_elem = 0;
+		_size = size; // number of T that we have
+		_data = new T[_size]; // allocate 
+		_width = sizeof( T ); // this is how big a single entry is 
+		_maxIndex = _size - 1; // easy
+
+		return true; // cool
 	}
 
-	void CBufferSimple::put( void * data, unsigned int num_elem )
+	void put( T entry ) // single put
 	{
-	    unsigned int i, j;
-	    double * d = (double *)data;
-
-	    // copy
-	    for( i = 0; i < num_elem; i++ )
-	    {
-	        for( j = 0; j < m_data_width; j++ )
-	        {
-	            m_data[m_write_offset*m_data_width+j] = d[i*m_data_width+j];
-	        }
-
-	        // move the write
-	        // Aug 2014 - spencer
-	        // change to fully "atomic" increment+wrap
-	        m_write_offset = (m_write_offset + 1) % m_max_elem;
-	    }
-   	}
-
-	unsigned int CBufferSimple::get( void * data, unsigned int num_elem )
-	{
-	    unsigned int i, j;
-	    double * d = (double *)data;
-
-	    // read catch up with write
-	    if( m_read_offset == m_write_offset )
-	        return 0;
-
-	    // copy
-	    for( i = 0; i < num_elem; i++ )
-	    {
-	        for( j = 0; j < m_data_width; j++ )
-	        {
-	            d[i*m_data_width+j] = m_data[m_read_offset*m_data_width+j];
-	        }
-
-	        // move read
-	        m_read_offset = (m_read_offset + 1) % m_max_elem;
-
-	        // catch up
-	        if( m_read_offset == m_write_offset )
-	        {
-	            i++;
-	            break;
-	        }
-	    }
-	    // return number of elems
-	    return 1; // shouldn't it return i?
+		_data[_writePosition] = entry; // put 
+		_writePosition = ( _writePosition++ ) % _size; // if _writePosition == _size, set to 0 
 	}
-protected:
-    double* m_data;
-    unsigned int m_data_width;
-    unsigned int m_read_offset;
-    unsigned int m_write_offset;
-    unsigned int m_max_elem;
+
+	void put( T* entries, unsigned int num_entries ) // buffered put
+	{
+		for( int i = 0; i < num_entries; i++ )
+		{
+			this->put( entries[i] ); // dude check that out
+		}
+	}
+
+	T get() // single get
+	{
+		if( _writePosition == _readPosition )
+		{
+			return 0; // don't want to read the future while we write the past
+		}
+
+		T out = _data[_readPosition]; // buy it
+		_readPosition = ( _readPosition++ ) % _size; // break it
+		return out; // use it
+	}
+
+	void get( T* out, unsigned int num_outs ) // buffered get
+	{
+		for( int i = 0; i < num_outs; i++ ) // write = read will be caught by this->get()
+		{
+			out[i] = this->get(); // dude check that out
+		}
+	}
+	
+	T* _data; // actual data
+	unsigned int _size; // how many of T in _data
+	unsigned int _maxIndex; // largest index of _data
+	unsigned int _width; // size of a single T
+	unsigned int _readPosition; // where are we reading
+	unsigned int _writePosition; // where are we writing
 };
