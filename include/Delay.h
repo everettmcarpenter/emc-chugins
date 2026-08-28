@@ -36,7 +36,7 @@ class Delay
         DELETE_OBJ( _buffer );
     }
 
-    T tick( T in )
+    virtual T tick( T in )
     {
         _buffer->put( in ); // input to buffer
         return _buffer->get(); // output from buffer

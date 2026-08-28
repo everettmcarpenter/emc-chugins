@@ -8,6 +8,8 @@
 #define DELETE_ARRAY( x ) { delete[] x; x = nullptr; }
 #define DELETE_OBJ( x ) { delete x; x = nullptr; }
 
+#include "Interpolators.h"
+
 template <typename T> 
 class CircularBuffer
 {
@@ -71,6 +73,14 @@ class CircularBuffer
 		return out; // use it
 	}
 
+	T get( float index ) // get but don't push out ( so we can index the buffer )
+	{
+		int lhs = static_cast<unsigned int>( index ); // round down
+		int rhs = lhs + 1 > _maxIndex ? _maxIndex : lhs + 1; // if lhs is the edge of our buffer size, we do that ... ( the edge of buffer size )
+		double fractional = index - lhs; // the decimal
+		T interpolated = lerp( _data[lhs], _data[lhs + 1], fractional ); // linear interpolation
+	}
+	
 	void get( T* out, unsigned int num_outs ) // buffered get
 	{
 		for( int i = 0; i < num_outs; i++ ) // write = read will be caught by this->get
@@ -78,6 +88,7 @@ class CircularBuffer
 			out[i] = this->get(); // dude check that out
 		}
 	}
+
 	
 	T* _data; // actual data
 	unsigned int _size; // how many of T in _data
