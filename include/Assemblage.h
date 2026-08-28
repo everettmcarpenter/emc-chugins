@@ -140,6 +140,16 @@ public:
 		// how do we save this?
 	}
 
+	// set all positions given some times
+	void setPosition( Chuck_ArrayFloat* positions, Chuck_ArrayFloat* times_to, Chuck_VM* VM, const CK_DL_API& API )
+	{
+		unsigned int size = API->object->array_float_size( positions );
+		double srate_khz = ( ( double )API->vm->srate( VM ) / 1000.0 ); 
+		// assign
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->setPosition( API->object->array_float_get_idx( positions, i % size ), API->object->array_float_get_idx( times_to, i % size ) / srate_khz );
+		// how do we save this? maybe we just retrieve the targets of the sound matter(s) and fit them into a chuck array?
+	}
+
 	// set all positions given a collection of position
 	void setGap( Chuck_ArrayFloat* gaps, const CK_DL_API& API )
 	{

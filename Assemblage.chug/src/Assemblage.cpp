@@ -71,6 +71,7 @@ CK_DLL_MFUN( assemblage_set2RandomPitch );
 CK_DLL_MFUN( assemblage_setPosition );
 CK_DLL_MFUN( assemblage_set2Position );
 CK_DLL_MFUN( assemblage_set3Position );
+CK_DLL_MFUN( assemblage_set4Position );
 CK_DLL_MFUN( assemblage_setRandomPosition );
 CK_DLL_MFUN( assemblage_set2RandomPosition );
 
@@ -92,6 +93,7 @@ CK_DLL_MFUN( assemblage_samples );
 CK_DLL_MFUN( assemblage_duration );
 
 CK_DLL_MFUN( assemblage_setSpace );
+CK_DLL_MFUN( assemblage_set2Space );
 CK_DLL_MFUN( assemblage_getSpace );
 CK_DLL_MFUN( assemblage_setRandomSpace );
 CK_DLL_MFUN( assemblage_getRandomSpace );
@@ -235,6 +237,12 @@ CK_DLL_QUERY( Assemblage )
     QUERY->add_arg( QUERY, "dur", "interpolation" );
     QUERY->doc_func( QUERY, "Set position of assemblage in file." );
 
+	QUERY->add_mfun( QUERY, assemblage_set3Position, "void", "position" );
+    QUERY->add_arg( QUERY, "float[]", "position" );
+    QUERY->add_arg( QUERY, "dur[]", "interpolation" );
+    QUERY->doc_func( QUERY, "Set position of assemblage in file." );
+	
+
     QUERY->add_mfun( QUERY, assemblage_set2RandomPosition, "void", "randomPosition" );
     QUERY->add_arg( QUERY, "float[]", "randomness" );
     QUERY->doc_func( QUERY, "Set randomness of position." );
@@ -283,6 +291,9 @@ CK_DLL_QUERY( Assemblage )
 
     QUERY->add_mfun( QUERY, assemblage_setSpace, "void", "spacer" );
     QUERY->add_arg( QUERY, "dur", "time" );
+
+	QUERY->add_mfun( QUERY, assemblage_set2Space, "void", "spacer" );
+    QUERY->add_arg( QUERY, "dur[]", "time" );	
 
     QUERY->add_mfun( QUERY, assemblage_getSpace, "dur", "spacer" );
     QUERY->doc_func( QUERY, "Get size of space" );
@@ -456,8 +467,6 @@ CK_DLL_MFUN( assemblage_set4Pitch )
     Chuck_ArrayFloat* pitches = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
     Chuck_ArrayFloat* times_to = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
     
-    double srate_khz = ( ( double )API->vm->srate( VM ) / 1000.0 ); 
-
     if( a_obj ) a_obj->setPitch( pitches, times_to, VM, API );
 }
 
@@ -492,6 +501,17 @@ CK_DLL_MFUN( assemblage_set3Position )
     double srate_khz = ( ( double )API->vm->srate( VM ) / 1000.0 ); 
     
     if( a_obj ) a_obj->setPosition( pos, ( time_to ) / srate_khz );
+}
+
+CK_DLL_MFUN( assemblage_set4Position )
+{
+    // get our c++ class pointer
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+
+    Chuck_ArrayFloat* positions = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
+    Chuck_ArrayFloat* times_to = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
+    
+    if( a_obj ) a_obj->setPosition( positions, times_to, VM, API );
 }
 
 CK_DLL_MFUN( assemblage_setRandomGrainSize ) // need to implement this on the Assemblage side
@@ -617,6 +637,16 @@ CK_DLL_MFUN( assemblage_setSpace )
     
     t_CKDUR space_time = GET_NEXT_DUR( ARGS );
     if( a_obj ) a_obj->setGap( (unsigned int)space_time );
+}
+
+CK_DLL_MFUN( assemblage_set2Space )
+{
+    // get our c++ class pointer
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+ 
+    Chuck_ArrayFloat* space_time = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
+
+    if( a_obj ) a_obj->setGap( space_time, API );
 }
 
 CK_DLL_MFUN( assemblage_getSpace )
