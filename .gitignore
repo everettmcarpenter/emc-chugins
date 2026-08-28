@@ -1,6 +1,7 @@
 /.vscode
 /Grain.chug/.vs
 /Grain.chug/.vscode
+*.o
 *.obj
 *.recipe
 /Grain.chug/Grain/x64
