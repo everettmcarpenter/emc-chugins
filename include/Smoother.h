@@ -7,13 +7,13 @@ class Smoother
 {
 public:
 	// constructor
-	Smoother( t_CKINT fs )
+	Smoother( int fs )
 	{
 		this->fs = fs;
 	}
 
 	// overloaded constructor
-	Smoother( t_CKINT fs, t_CKFLOAT init )
+	Smoother( int fs, double init )
 	{
 		this->fs = fs;
 		// set init value
@@ -21,10 +21,26 @@ public:
 	}
 
 	// set the target
-	void setTarget( t_CKFLOAT target, t_CKFLOAT howLongMs = 30.f )
+	void setTarget( double target, double howLongMs = 30.f )
 	{
-		// convert interpolation time to hz and normalize it to the sample rate, then round it
-		t_CKINT rampLength = static_cast<t_CKINT>( ( howLongMs * 0.001 ) * fs );
+		// ms -> samples & round up ( number of samples we will need to get to target )
+		int rampLength = static_cast<int>( msToSamples( howLongMs ) );
+		// if it's going to take less than 1 sample to interpolate, just use one sample
+		if( rampLength < 1 ) rampLength = 1;
+
+		// set new target
+		this->target = target;
+		// new increment 
+		increment = ( this->target - current ) / rampLength;
+		// how many left ( ramp length )
+		remaining = rampLength;
+	}
+
+	// set the target
+	void setTarget( double target, unsigned int samplesToGo = 1000 )
+	{
+		// ms -> samples & round up ( number of samples we will need to get to target )
+		unsigned int rampLength = samplesToGo;
 		// if it's going to take less than 1 sample to interpolate, just use one sample
 		if( rampLength < 1 ) rampLength = 1;
 
@@ -37,7 +53,7 @@ public:
 	}
 
 	// move in time
-	t_CKFLOAT tick()
+	double tick()
 	{
 		if( remaining > 0 )
 		{
@@ -58,10 +74,10 @@ public:
 	}
 
 	//	predict the future
-	t_CKFLOAT fick()
+	double fick()
 	{
 		// return this
-		t_CKFLOAT next = current;
+		double next = current;
 		// if there are no more steps to take, jump to the target
 		if ( remaining != 0 ) next += increment;
 		// return for courtesy
@@ -69,34 +85,39 @@ public:
 	}
 
 	// instant setup
-	void instant( t_CKFLOAT target )
+	void instant( double target )
 	{
 		this->target = target;
 		current = target;
 		remaining = 0;
 	}
 
+	double msToSamples( double ms )
+	{
+		return ( ( ms * fs ) / 1000.0 );
+	}
+
 	// what's the current value?
-	t_CKFLOAT getCurrent() { return current; }
+	double getCurrent() { return current; }
 	// what's the target?
-	t_CKFLOAT getTarget() { return target; }
+	double getTarget() { return target; }
 	// are we moving? 
-	t_CKBOOL isMoving() 
+	int isMoving() 
 	{ 
 		if( remaining > 0 ) return TRUE;
 		else return FALSE; 
 	}
 
 	// sample rate
-	t_CKFLOAT fs = 0.f; 
+	double fs = 0.f; 
 	// target value 
-	t_CKFLOAT target = 0.f;
+	double target = 0.f;
 	// current value
-	t_CKFLOAT current = 0.f;
+	double current = 0.f;
 	// increment
-	t_CKFLOAT increment = 0.2f;
+	double increment = 0.2f;
 	// how many samples "left" 
-	t_CKINT remaining = 0;
+	int remaining = 0;
 };
 
 #endif

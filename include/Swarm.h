@@ -8,8 +8,8 @@
 // 
 //==========================================================
 
-#ifndef FILE_GRAIN_H
-	#define FILE_GRAIN_H
+#ifndef SOUNDMATTER_H
+	#define SOUNDMATTER_H
 
 #include "stk/include/FileRead.h"
 #include "stk/include/Noise.h"
@@ -62,17 +62,22 @@ public:
 	// 
 	//=======================================================================
 
-	~SoundMatter()
+	virtual ~SoundMatter()
 	{
 		// destroy matter
-		for( int i = 0; i < num_grains; i++ ) { delete quantum[i]; quantum[i] = nullptr; }
-		delete[] quantum; quantum = nullptr;
+		if( quantum )
+		{
+			for( int i = 0; i < num_grains; i++ ) CK_SAFE_DELETE( quantum[i] );
+			CK_SAFE_DELETE_ARRAY( quantum );
+		}
 		// destroy again
-		delete random; random = nullptr;
+		CK_SAFE_DELETE( file_read );
 		// destroy again
-		delete position_slew; position_slew = nullptr;
+		CK_SAFE_DELETE( random );
 		// destroy again
-		delete pitch_slew; pitch_slew = nullptr;
+		CK_SAFE_DELETE( position_slew );
+		// destroy again
+		CK_SAFE_DELETE( pitch_slew );
 		// delete buf
 		this->deleteBuffer();
 	}
@@ -129,27 +134,27 @@ public:
 	void newGrain( Quark* particle )
 	{
 		// calculate our new size using a randomized factor
-		float n_size = base_size + ( 0.5 * ( random->tick() + 1.0 ) * random_size );
+		double n_size = base_size + ( 0.5 * ( random->tick() + 1.0 ) * random_size );
 		// clamp value 
-		n_size = std::max( 1.f, n_size );
+		n_size = std::max( 1.0, n_size );
 		// provide new value to quark
 		particle->setSize( n_size );
 
 		// pitch is easy(ish), same as above
-		float n_pitch = pitch_slew->getCurrent() + ( 0.5 * ( random->tick() + 1.0 ) * random_pitch );
+		double n_pitch = pitch_slew->getCurrent() + ( 0.5 * ( random->tick() + 1.0 ) * random_pitch );
 		// clamp
-		n_pitch = std::max( 0.f, n_pitch );
+		n_pitch = std::max( 0.0, n_pitch );
 		// have the particle instantly jump there, if it slews, then quarks will just endlessy drift through pitch space
 		particle->setPitchInstant( n_pitch );
 
 		// this one is the worst
-		float random_offset_frames = ( random_position * 0.001f ) * _fs; // convert random_position to samples
+		double random_offset_frames = ( random_position * 0.001f ) * _fs; // convert random_position to samples
 		// divide by the buffer size 
-		random_offset_frames /= (float)this->size();
+		random_offset_frames /= (double)this->size();
 		// create randomized position
-		float n_position = position_slew->getCurrent() + ( 0.5 * ( random->tick() + 1.0 ) * random_offset_frames );
+		double n_position = position_slew->getCurrent() + ( 0.5 * ( random->tick() + 1.0 ) * random_offset_frames );
 		// clamp, of course
-		n_position = std::max( 0.f, std::min( n_position, 1.f ) );
+		n_position = std::max( 0.0, std::min( n_position, 1.0 ) );
 		// also instantly jump so that we aren't drifting forever
 		particle->setPositionInstant( n_position );
 
@@ -206,19 +211,25 @@ public:
 	
 	float getSize() { return base_size; }
 
-	void setPitch( float n_pitch )
+	void setPitch( double n_pitch )
 	{
 		pitch_slew->setTarget( n_pitch, 100.f );
 		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
-	void setPitch( float n_pitch, float ms_to )
+	void setPitch( double n_pitch, double ms_to )
 	{
 		pitch_slew->setTarget( n_pitch, ms_to );
 		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
-	void setPitchInstant( float n_pitch )
+	void setPitch( double n_pitch, unsigned int samp_to )
+	{
+		pitch_slew->setTarget( n_pitch, samp_to );
+		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
+	}
+
+	void setPitchInstant( double n_pitch )
 	{
 		pitch_slew->instant( n_pitch );
 		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
@@ -226,14 +237,19 @@ public:
 
 	float getPitch() { return pitch_slew->getTarget(); }
 
-	void setPosition( float n_position ) 
+	void setPosition( double n_position ) 
 	{
 		position_slew->setTarget( n_position, 240.f );
 	}
 
-	void setPosition( float n_position, float ms_to ) 
+	void setPosition( double n_position, double ms_to ) 
 	{
 		position_slew->setTarget( n_position, ms_to );
+	}
+
+	void setPosition( double n_position, unsigned int samp_to ) 
+	{
+		position_slew->setTarget( n_position, samp_to );
 	}
 
 	void setPosition( unsigned int n_position )
@@ -328,17 +344,18 @@ public:
 
 	void closeFile()
 	{
+		// stop doing anything
+		go = false;
+
 		// we don't wanna delete what buffer is pointing to if it's not ours
 		if( internalBuffer )
 		{
-			// stop doing anything
-			go = false;
 			// close the file
-			file_read->close();
+			if( file_read->isOpen() ) file_read->close();
 			// unlink the quarks
 			for( int i = 0; i < num_grains; i++ ) quantum[i]->clearBuffer();
 			// clear buffer
-			delete buffer; buffer = nullptr;
+			CK_SAFE_DELETE( buffer );
 		}
 		else 
 		{
@@ -388,7 +405,7 @@ public:
 	// 
 	//=======================================================================
 
-private:
+protected:
 	// create internal audio buffer
 	void createBuffer()
 	{
@@ -403,14 +420,14 @@ private:
 	// delete internal audio buffer
 	void deleteBuffer()
 	{
-		if( internalBuffer )
+		if( internalBuffer && buffer )
 		{
 			// destroy again
-			delete file_read; file_read = nullptr;
+			CK_SAFE_DELETE( file_read );
 			// once more
-			delete buffer; buffer = nullptr;
+			CK_SAFE_DELETE( buffer );
 		}
-		else
+		else if( !internalBuffer )
 		{
 			buffer = nullptr;
 		}

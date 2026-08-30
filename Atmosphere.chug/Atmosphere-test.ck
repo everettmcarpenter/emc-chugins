@@ -19,18 +19,19 @@
 //--------------------------------------------------------------------
 
 // instantiate a Atmosphere
-Atmosphere1 obj => WvOut record[4] => dac;
+Atmosphere1 obj("1stOrder.wav") => WvOut record[4] => dac;
 
 for( int i; i < record.size(); i++ ) record[i].wavFilename("test"+i+".wav");
 
 // call obj.param() with argument of 5; same as obj.param(5)
 for( int i; i < 500; i++ )
 {
-    obj.param( ( 1 + i ) * 1.5 );
+    obj.size( ( 1 + i ) * 1.5 );
     10::ms => now;
+	// print
+	<<< obj.size() >>>;
 }
 
 for( int i; i < record.size(); i++ ) record[i].closeFile();
 
-// print
-<<< obj.param() >>>;
+
