@@ -42,6 +42,8 @@ public:
 		position_slew = new Smoother( _fs );
 		// pitch_slew
 		pitch_slew = new Smoother( _fs );
+
+		if( quantum ) CK_SAFE_DELETE_ARRAY( quantum );
 		// create matter
 		quantum = new Quark*[num_grains];
 		// configure matter
@@ -55,18 +57,11 @@ public:
 	~Atmosphere()
 	{
 		// destroy matter
-		for( int i = 0; i < ( num_grains_per_channel * num_channels ); i++ ) { delete quantum[i]; quantum[i] = nullptr; }
-		delete[] quantum; quantum = nullptr;
-		// destroy again
-		delete file_read; file_read = nullptr;
-		// destroy again
-		delete random; random = nullptr;
-		// destroy again
-		delete position_slew; position_slew = nullptr;
-		// destroy again
-		delete pitch_slew; pitch_slew = nullptr;
-		// once more
-		delete buffer; buffer = nullptr;
+		if( quantum )
+		{
+			for( int i = 0; i < ( num_grains_per_channel * num_channels ); i++ ) CK_SAFE_DELETE( quantum[i] );
+			CK_SAFE_DELETE_ARRAY( quantum );	
+		}
 	}
 
 	void tick( SAMPLE* in, SAMPLE* out, unsigned int frames ) 
