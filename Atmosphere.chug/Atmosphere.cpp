@@ -33,6 +33,8 @@ CK_DLL_MFUN( atmosphere1_setPosition );
 CK_DLL_MFUN( atmosphere1_set2Position );
 CK_DLL_MFUN( atmosphere1_getPosition );
 
+CK_DLL_MFUN( atmosphere1_duration );
+
 // for chugins extending UGen, this is mono synthesis function for 1 sample
 CK_DLL_TICKF( atmosphere1_tickf );
 
@@ -132,6 +134,7 @@ CK_DLL_QUERY( Atmosphere )
     // example of adding getter method
     QUERY->add_mfun( QUERY, atmosphere1_getPosition, "float", "position" );
 	
+	QUERY->add_mfun( QUERY, atmosphere1_duration, "dur", "duration" );
     
     // this reserves a variable in the ChucK internal class to store 
     // referene to the c++ class we defined above
@@ -328,4 +331,13 @@ CK_DLL_MFUN( atmosphere1_getPosition )
 
     // call getParam() and set the return value
     RETURN->v_float = a_obj->getPosition();
+}
+
+
+CK_DLL_MFUN( atmosphere1_duration )
+{
+	// get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere1_data_offset );
+
+	RETURN->v_dur = (unsigned int)a_obj->size();
 }
