@@ -175,12 +175,25 @@ public:
 		// how do we save this? maybe we just retrieve the targets of the sound matter(s) and fit them into a chuck array?
 	}
 
+	// return the pitch of the first collage (helpful when not using arrays)
+	float getBasePitch()
+	{
+		return collage[0]->getPitch();
+	}
+
+
 	// set all sizes to a single value
 	void setSize( float size )
 	{
 		// assign
 		for( int i = 0; i < num_pieces; i++ ) collage[i]->setSize( size );
 		// how do we save this?
+	}
+
+	// return the size of the first collage (helpful when not using arrays)
+	float getBaseSize()
+	{
+		return collage[0]->getSize();
 	}
 
 	// set all positions to a single value
@@ -197,6 +210,12 @@ public:
 		// assign
 		for( int i = 0; i < num_pieces; i++ ) collage[i]->setPosition( position, ms_to );
 		// how do we save this?
+	}
+
+	// return the position of the first collage (helpful when not using arrays)
+	float getBasePosition()
+	{
+		return collage[0]->getPosition();
 	}
 
 	void setGap( unsigned int gap_samp )
@@ -280,6 +299,24 @@ public:
 	{
 		// assign
 		for( int i = 0; i < num_pieces; i++ ) collage[i]->setRandomGap( random );
+	}
+
+	// return the random size of the first collage (helpful when not using arrays)
+	float getBaseRandomSize()
+	{
+		return collage[0]->getRandomSize();
+	}
+
+	// return the random pitch of the first collage (helpful when not using arrays)
+	float getBaseRandomPitch()
+	{
+		return collage[0]->getRandomPitch();
+	}
+
+	// return the random position of the first collage (helpful when not using arrays)
+	float getBaseRandomPosition()
+	{
+		return collage[0]->getRandomPosition();
 	}
 
 	//=======================================================================
