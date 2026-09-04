@@ -224,7 +224,7 @@ public:
 	void setGap( unsigned int gap_samp )
 	{
 		gapSize = gap_samp;
-		toGo = gapSize; // this overwrites the current gap size, let's see if we like that
+		// toGo = gapSize; // this overwrites the current gap size, let's see if we like that ( if this is commented out, we didn't like that )
 	}
 
 	unsigned int getGap()
