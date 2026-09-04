@@ -90,7 +90,7 @@ public:
 	// 
 	//=======================================================================
 
-	double tick()
+	virtual double tick()
 	{
 		// output
 		double out = 0.0;
@@ -205,6 +205,7 @@ public:
 			// we gotta wrap around 
 			float n_size = base_size + ( random->tick() * random_size );
 			n_size = std::max( 1.f, n_size );
+			// std::cout << "quark " << i << " size " << n_size << std::endl;
 			quantum[i]->setSize( n_size );
 		}
 	}
