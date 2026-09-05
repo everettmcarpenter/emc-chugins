@@ -180,7 +180,8 @@ public:
 		double n_pitch = pitch_slew->getCurrent() + ( 0.5 * ( random->tick() + 1.0 ) * random_pitch );
 		// clamp
 		n_pitch = std::max( 0.0, n_pitch );
-		// have the particle instantly jump there, if it slews, then quarks will just endlessy drift through pitch space
+		// have the particle instantly jump there, if it slews, then quarks will just endlessy drift through pitch 
+		
 		particle->setPitchInstant( n_pitch );
 
 		// this one is the worst

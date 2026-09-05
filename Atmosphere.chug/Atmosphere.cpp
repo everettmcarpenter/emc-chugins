@@ -125,6 +125,7 @@ CK_DLL_QUERY( Atmosphere )
     // register default constructor
     QUERY->add_ctor( QUERY, atmosphere1_2ctor );
     QUERY->add_arg( QUERY, "string", "file" );
+	QUERY->add_arg( QUERY, "int", "grains" );
 
     // register the destructor (probably no need to change)
     QUERY->add_dtor( QUERY, atmosphere1_dtor );
@@ -195,7 +196,8 @@ CK_DLL_QUERY( Atmosphere )
     // register default constructor
     QUERY->add_ctor( QUERY, atmosphere2_2ctor );
     QUERY->add_arg( QUERY, "string", "file" );
-
+	QUERY->add_arg( QUERY, "int" , "grains" );
+	
     // register the destructor (probably no need to change)
     QUERY->add_dtor( QUERY, atmosphere2_dtor );
 
@@ -300,9 +302,10 @@ CK_DLL_CTOR( atmosphere1_2ctor )
     OBJ_MEMBER_INT( SELF, atmosphere1_data_offset ) = 0;
 
     Chuck_String* path =  GET_NEXT_STRING( ARGS );
+	t_CKINT grains = GET_NEXT_INT( ARGS );
     
     // instantiate our internal c++ class representation
-    Atmosphere * a_obj = new Atmosphere( API->vm->srate( VM ), 1, 1 );
+    Atmosphere * a_obj = new Atmosphere( API->vm->srate( VM ), 1, grains );
     if( !a_obj->openFile( API->object->str( path ) ) ) 
     {
         printf("Atmosphere: Unable to load audio file\n");
@@ -582,9 +585,10 @@ CK_DLL_CTOR( atmosphere2_2ctor )
     OBJ_MEMBER_INT( SELF, atmosphere2_data_offset ) = 0;
 
     Chuck_String* path =  GET_NEXT_STRING( ARGS );
+	t_CKINT grains = GET_NEXT_INT( ARGS );
     
     // instantiate our internal c++ class representation
-    Atmosphere * a_obj = new Atmosphere( API->vm->srate( VM ), 2, 1 );
+    Atmosphere * a_obj = new Atmosphere( API->vm->srate( VM ), 2, grains );
     if( !a_obj->openFile( API->object->str( path ) ) ) 
     {
         printf("Atmosphere: Unable to load audio file\n");
