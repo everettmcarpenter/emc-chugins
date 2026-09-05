@@ -1,3 +1,3 @@
-Atmosphere2 obj( "1stOrder.wav" ) => blackhole;
+Atmosphere2 obj( "yuo.wav" ) => blackhole;
 
-2::second => now;
+4::second => now;

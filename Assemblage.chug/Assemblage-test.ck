@@ -19,6 +19,6 @@
 //--------------------------------------------------------------------
 
 // instantiate a Assemblage
-Assemblage obj( "../include/808cymbal.wav" ) => blackhole;
+Assemblage obj( "../include/dad.wav" ) => blackhole;
 
 3::second => now;

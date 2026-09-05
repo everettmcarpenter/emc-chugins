@@ -33,21 +33,25 @@ public:
 		// sample rate
 		_fs = fs;
 		stk::Stk::setSampleRate( _fs );
+		// make a buffer
 		this->createBuffer();
 		// num
 		num_grains = size;
 		// scale down
 		scale = 1.0 / num_grains;
+		// read
+		file_read = new stk::FileRead();
 		// random
 		random = new stk::Noise( time( NULL ) );
 		// positional_slew 
 		position_slew = new Smoother( _fs );
 		// pitch_slew
 		pitch_slew = new Smoother( _fs );
+
 		// create matter
-		quantum = new Quark*[num_grains];
+		this->createQuarks( num_grains, _fs, buffer );
 		// configure matter
-		for( int i = 0; i < num_grains; i++ ) { quantum[i] = new Quark( fs, *buffer ); quantum[i]->on(); }
+		for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->on();
 		// init
 		this->setSize( this->base_size );
 		this->setPitchInstant( 1.f );
@@ -62,14 +66,21 @@ public:
 	// 
 	//=======================================================================
 
-	virtual ~SoundMatter()
+	~SoundMatter()
 	{
 		// destroy matter
-		if( quantum )
+		for( unsigned int i = 0; i < num_grains; i++ ) 
 		{
-			for( int i = 0; i < num_grains; i++ ) CK_SAFE_DELETE( quantum[i] );
-			CK_SAFE_DELETE_ARRAY( quantum );
+			if( quantum[i] ) 
+			{
+				quantum[i]->off();
+				CK_SAFE_DELETE( quantum[i] );
+			}
 		}
+		CK_SAFE_DELETE_ARRAY( quantum );
+
+		// delete buf
+		this->deleteBuffer();
 		// destroy again
 		CK_SAFE_DELETE( file_read );
 		// destroy again
@@ -78,8 +89,7 @@ public:
 		CK_SAFE_DELETE( position_slew );
 		// destroy again
 		CK_SAFE_DELETE( pitch_slew );
-		// delete buf
-		this->deleteBuffer();
+
 	}
 
 	//=======================================================================
@@ -179,14 +189,14 @@ public:
 	{ 
 		// turn everything on
 		go = true;
-		for( int i = 0; i < num_grains; i++ ) quantum[i]->on();
+		for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->on();
 	}
 
 	void stop() 
 	{ 
 		// turn everything off
 		go = false;
-		for( int i = 0; i < num_grains; i++ ) quantum[i]->off();
+		for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->off();
 	}
 
 	//=======================================================================
@@ -200,7 +210,7 @@ public:
 	void setSize( float n_size_ms )
 	{
 		base_size = n_size_ms;
-		for( int i = 0; i < num_grains; i++ ) 
+		for( unsigned int i = 0; i < num_grains; i++ ) 
 		{
 			// we gotta wrap around 
 			float n_size = base_size + ( random->tick() * random_size );
@@ -215,25 +225,25 @@ public:
 	void setPitch( double n_pitch )
 	{
 		pitch_slew->setTarget( n_pitch, 100.f );
-		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
+		// for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
 	void setPitch( double n_pitch, double ms_to )
 	{
 		pitch_slew->setTarget( n_pitch, ms_to );
-		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
+		// for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
 	void setPitch( double n_pitch, unsigned int samp_to )
 	{
 		pitch_slew->setTarget( n_pitch, samp_to );
-		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
+		// for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
 	void setPitchInstant( double n_pitch )
 	{
 		pitch_slew->instant( n_pitch );
-		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
+		// for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
 	float getPitch() { return pitch_slew->getTarget(); }
@@ -263,7 +273,7 @@ public:
 	void setGap( unsigned int gap_samp )
 	{
 		base_gap = gap_samp;
-		for( int i = 0; i < num_grains; i++ )
+		for( unsigned int i = 0; i < num_grains; i++ )
 		{
 			quantum[i]->setGap( base_gap );
 		}
@@ -322,16 +332,19 @@ public:
 			// open!
 			file_read->open( cppString );
 
-			// resize!
-			buffer = new stk::StkFrames( 0.f, file_read->fileSize(), file_read->channels() );
-			// sample rate
-			buffer->setDataRate( file_read->fileRate() );
-			// read!
-			file_read->read( *buffer, 0, true );
-			// give to quarks and assign them to channels
-			for( int i = 0; i < num_grains; i++ ) { quantum[i]->setBuffer( *buffer, i % buffer->channels() ); }
-			// good to go
-			go = true;
+			if( file_read->isOpen() )
+			{
+				// resize!
+				buffer = new stk::StkFrames( 0.f, file_read->fileSize(), file_read->channels() );
+				// sample rate
+				buffer->setDataRate( file_read->fileRate() );
+				// read!
+				file_read->read( *buffer, 0, true );
+				// give to quarks and assign them to channels
+				for( unsigned int i = 0; i < num_grains; i++ ) { quantum[i]->setBuffer( *buffer, i % buffer->channels() ); }
+				// good to go
+				go = true;
+			}
 		}
 	}
 
@@ -354,14 +367,14 @@ public:
 			// close the file
 			if( file_read->isOpen() ) file_read->close();
 			// unlink the quarks
-			for( int i = 0; i < num_grains; i++ ) quantum[i]->clearBuffer();
+			for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->clearBuffer();
 			// clear buffer
 			CK_SAFE_DELETE( buffer );
 		}
 		else 
 		{
 			// have the quarks stop listening
-			for( int i = 0; i < num_grains; i++ ) quantum[i]->clearBuffer();
+			for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->clearBuffer();
 			// if someone called this and we aren't using our own buffer, it's probably best to assume the outside buffer we're using is goiung to be deleted
 			buffer = nullptr;
 		}
@@ -383,7 +396,7 @@ public:
 		// point to this!
 		buffer = n_buffer;
 		// give to quarks and assign them to channels
-		for( int i = 0; i < num_grains; i++ ) { quantum[i]->setBuffer( *buffer, i % buffer->channels() ); }
+		for( unsigned int i = 0; i < num_grains; i++ ) { quantum[i]->setBuffer( *buffer, i % buffer->channels() ); }
 		internalBuffer = false; // we're using an outside buffer
 	}
 
@@ -412,8 +425,6 @@ protected:
 	{
 		// buffer
 		buffer = new stk::StkFrames( 1, 1 );
-		// read
-		file_read = new stk::FileRead();
 		// is there an internal buffer?
 		internalBuffer = true;
 	}
@@ -421,19 +432,23 @@ protected:
 	// delete internal audio buffer
 	void deleteBuffer()
 	{
-		if( internalBuffer && buffer )
-		{
-			// destroy again
-			CK_SAFE_DELETE( file_read );
-			// once more
-			CK_SAFE_DELETE( buffer );
-		}
-		else if( !internalBuffer )
-		{
-			buffer = nullptr;
-		}
-		// is/was there an internal buffer?
-		internalBuffer = false;
+	    if( internalBuffer )
+	    {
+	        CK_SAFE_DELETE( buffer );
+	    }
+	    else if( !internalBuffer )
+	    {
+	        buffer = nullptr;
+	    }
+	    internalBuffer = false;
+	}
+
+	// allocate quarks
+	void createQuarks( unsigned int count, unsigned int fs, stk::StkFrames* buffer )
+	{
+		// create matter
+		quantum = new Quark*[count];
+		for( unsigned int i = 0; i < count; i++ ) quantum[i] = new Quark( fs, *buffer );
 	}
 	
 protected:
