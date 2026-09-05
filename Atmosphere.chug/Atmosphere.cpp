@@ -16,9 +16,7 @@
 
 // declaration of chugin constructor
 CK_DLL_CTOR( atmosphere1_ctor );
-CK_DLL_CTOR( atmosphere2_ctor );
 CK_DLL_CTOR( atmosphere1_2ctor );
-CK_DLL_CTOR( atmosphere2_2ctor );
 
 // declaration of chugin desctructor
 CK_DLL_DTOR( atmosphere1_dtor );
@@ -46,8 +44,39 @@ CK_DLL_MFUN( atmosphere1_duration );
 // for chugins extending UGen, this is mono synthesis function for 1 sample
 CK_DLL_TICKF( atmosphere1_tickf );
 
+// declaration of chugin constructor
+CK_DLL_CTOR( atmosphere2_ctor );
+CK_DLL_CTOR( atmosphere2_2ctor );
+
+// declaration of chugin desctructor
+CK_DLL_DTOR( atmosphere2_dtor );
+
+// example of getter/setter
+CK_DLL_MFUN( atmosphere2_setGrainSize );
+CK_DLL_MFUN( atmosphere2_getGrainSize );
+CK_DLL_MFUN( atmosphere2_setRandomGrainSize );
+CK_DLL_MFUN( atmosphere2_getRandomGrainSize );
+
+CK_DLL_MFUN( atmosphere2_setPitch );
+CK_DLL_MFUN( atmosphere2_set2Pitch );
+CK_DLL_MFUN( atmosphere2_getPitch );
+CK_DLL_MFUN( atmosphere2_setRandomPitch );
+CK_DLL_MFUN( atmosphere2_getRandomPitch );
+
+CK_DLL_MFUN( atmosphere2_setPosition );
+CK_DLL_MFUN( atmosphere2_set2Position );
+CK_DLL_MFUN( atmosphere2_getPosition );
+CK_DLL_MFUN( atmosphere2_setRandomPosition );
+CK_DLL_MFUN( atmosphere2_getRandomPosition );
+
+CK_DLL_MFUN( atmosphere2_duration );
+
+// for chugins extending UGen, this is mono synthesis function for 1 sample
+CK_DLL_TICKF( atmosphere2_tickf );
+
 // this is a special offset reserved for chugin internal data
 t_CKINT atmosphere1_data_offset = 0;
+t_CKINT atmosphere2_data_offset = 0;
 
 //-----------------------------------------------------------------------------
 // info function: ChucK calls this when loading/probing the chugin
@@ -168,76 +197,76 @@ CK_DLL_QUERY( Atmosphere )
     QUERY->add_arg( QUERY, "string", "file" );
 
     // register the destructor (probably no need to change)
-    QUERY->add_dtor( QUERY, atmosphere1_dtor );
+    QUERY->add_dtor( QUERY, atmosphere2_dtor );
 
     // for UGens only: add tick function
     // NOTE a non-UGen class should remove or comment out this next line
-    QUERY->add_ugen_funcf( QUERY, atmosphere1_tickf, NULL, 0, 4 );
+    QUERY->add_ugen_funcf( QUERY, atmosphere2_tickf, NULL, 0, 9 );
     // NOTE: if this is to be a UGen with more than 1 channel,
     // e.g., a multichannel UGen -- will need to use add_ugen_funcf()
     // and declare a tickf function using CK_DLL_TICKF
     // example of adding setter method
-    QUERY->add_mfun( QUERY, atmosphere1_setGrainSize, "float", "size" );
+    QUERY->add_mfun( QUERY, atmosphere2_setGrainSize, "float", "size" );
     // example of adding argument to the above method
     QUERY->add_arg( QUERY, "float", "size" );
 
     // example of adding getter method
-    QUERY->add_mfun( QUERY, atmosphere1_getGrainSize, "float", "size" );
+    QUERY->add_mfun( QUERY, atmosphere2_getGrainSize, "float", "size" );
 
-    QUERY->add_mfun( QUERY, atmosphere1_setRandomGrainSize, "float", "randomSize" );
+    QUERY->add_mfun( QUERY, atmosphere2_setRandomGrainSize, "float", "randomSize" );
     // example of adding argument to the above method
     QUERY->add_arg( QUERY, "float", "size" );
 
     // example of adding getter method
-    QUERY->add_mfun( QUERY, atmosphere1_getRandomGrainSize, "float", "randomSize" );
+    QUERY->add_mfun( QUERY, atmosphere2_getRandomGrainSize, "float", "randomSize" );
 
 	// example of adding setter method
-    QUERY->add_mfun( QUERY, atmosphere1_setPitch, "float", "pitch" );
+    QUERY->add_mfun( QUERY, atmosphere2_setPitch, "float", "pitch" );
     // example of adding argument to the above method
     QUERY->add_arg( QUERY, "float", "pitch" );
 
 	// example of adding setter method
-    QUERY->add_mfun( QUERY, atmosphere1_set2Pitch, "float", "pitch" );
+    QUERY->add_mfun( QUERY, atmosphere2_set2Pitch, "float", "pitch" );
     // example of adding argument to the above method
     QUERY->add_arg( QUERY, "float", "pitch" );
     QUERY->add_arg( QUERY, "dur", "interp" );	
 	
     // example of adding getter method
-    QUERY->add_mfun( QUERY, atmosphere1_getPitch, "float", "pitch" );
+    QUERY->add_mfun( QUERY, atmosphere2_getPitch, "float", "pitch" );
 
-    QUERY->add_mfun( QUERY, atmosphere1_setRandomPitch, "float", "randomPitch" );
+    QUERY->add_mfun( QUERY, atmosphere2_setRandomPitch, "float", "randomPitch" );
     // example of adding argument to the above method
     QUERY->add_arg( QUERY, "float", "size" );
 
     // example of adding getter method
-    QUERY->add_mfun( QUERY, atmosphere1_getRandomPitch, "float", "randomPitch" );
+    QUERY->add_mfun( QUERY, atmosphere2_getRandomPitch, "float", "randomPitch" );
 
 	// example of adding setter method
-    QUERY->add_mfun( QUERY, atmosphere1_setPosition, "float", "position" );
+    QUERY->add_mfun( QUERY, atmosphere2_setPosition, "float", "position" );
     // example of adding argument to the above method
     QUERY->add_arg( QUERY, "float", "position" );
 
 	// example of adding setter method
-    QUERY->add_mfun( QUERY, atmosphere1_set2Position, "float", "position" );
+    QUERY->add_mfun( QUERY, atmosphere2_set2Position, "float", "position" );
     // example of adding argument to the above method
     QUERY->add_arg( QUERY, "float", "position" );
     QUERY->add_arg( QUERY, "dur", "interp" );	
 
     // example of adding getter method
-    QUERY->add_mfun( QUERY, atmosphere1_getPosition, "float", "position" );
+    QUERY->add_mfun( QUERY, atmosphere2_getPosition, "float", "position" );
 
-    QUERY->add_mfun( QUERY, atmosphere1_setRandomPosition, "float", "randomPosition" );
+    QUERY->add_mfun( QUERY, atmosphere2_setRandomPosition, "float", "randomPosition" );
     // example of adding argument to the above method
     QUERY->add_arg( QUERY, "float", "size" );
 
     // example of adding getter method
-    QUERY->add_mfun( QUERY, atmosphere1_getRandomPosition, "float", "randomPosition" );
+    QUERY->add_mfun( QUERY, atmosphere2_getRandomPosition, "float", "randomPosition" );
 	
-	QUERY->add_mfun( QUERY, atmosphere1_duration, "dur", "duration" );
+	QUERY->add_mfun( QUERY, atmosphere2_duration, "dur", "duration" );
     
     // this reserves a variable in the ChucK internal class to store 
     // referene to the c++ class we defined above
-    atmosphere1_data_offset = QUERY->add_mvar( QUERY, "int", "@a_data", false );
+    atmosphere2_data_offset = QUERY->add_mvar( QUERY, "int", "@a_data", false );
 
     // ------------------------------------------------------------------------
     // end the class definition
@@ -258,7 +287,6 @@ CK_DLL_CTOR( atmosphere1_ctor )
     
     // instantiate our internal c++ class representation
     Atmosphere * a_obj = new Atmosphere( API->vm->srate( VM ), 1, 1 );
-    a_obj->openFile( "../include/1stordergrain.wav" );
     
     // store the pointer in the ChucK object member
     OBJ_MEMBER_INT( SELF, atmosphere1_data_offset ) = (t_CKINT)a_obj;
@@ -275,39 +303,11 @@ CK_DLL_CTOR( atmosphere1_2ctor )
     
     // instantiate our internal c++ class representation
     Atmosphere * a_obj = new Atmosphere( API->vm->srate( VM ), 1, 1 );
-    a_obj->openFile( API->object->str( path ) );
-    
-    // store the pointer in the ChucK object member
-    OBJ_MEMBER_INT( SELF, atmosphere1_data_offset ) = (t_CKINT)a_obj;
-}
-
-
-// implementation for the default constructor
-CK_DLL_CTOR( atmosphere2_ctor )
-{
-    // get the offset where we'll store our internal c++ class pointer
-    OBJ_MEMBER_INT( SELF, atmosphere1_data_offset ) = 0;
-    
-    // instantiate our internal c++ class representation
-    Atmosphere * a_obj = new Atmosphere( API->vm->srate( VM ), 2, 1 );
-    a_obj->openFile( "../include/1stordergrain.wav" );
-    
-    // store the pointer in the ChucK object member
-    OBJ_MEMBER_INT( SELF, atmosphere1_data_offset ) = (t_CKINT)a_obj;
-}
-
-
-// implementation for the default constructor
-CK_DLL_CTOR( atmosphere2_2ctor )
-{
-    // get the offset where we'll store our internal c++ class pointer
-    OBJ_MEMBER_INT( SELF, atmosphere1_data_offset ) = 0;
-
-    Chuck_String* path =  GET_NEXT_STRING( ARGS );
-    
-    // instantiate our internal c++ class representation
-    Atmosphere * a_obj = new Atmosphere( API->vm->srate( VM ), 2, 1 );
-    a_obj->openFile( API->object->str( path ) );
+    if( !a_obj->openFile( API->object->str( path ) ) ) 
+    {
+        printf("Atmosphere: Unable to load audio file\n");
+        return;
+    }
     
     // store the pointer in the ChucK object member
     OBJ_MEMBER_INT( SELF, atmosphere1_data_offset ) = (t_CKINT)a_obj;
@@ -319,6 +319,7 @@ CK_DLL_DTOR( atmosphere1_dtor )
 {
     // get our c++ class pointer
     Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere1_data_offset );
+
     // clean up (this macro tests for NULL, deletes, and zeros out the variable)
     CK_SAFE_DELETE( a_obj );
     // set the data field to 0
@@ -556,6 +557,288 @@ CK_DLL_MFUN( atmosphere1_duration )
 {
 	// get our c++ class pointer
     Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere1_data_offset );
+
+	RETURN->v_dur = (unsigned int)a_obj->size();
+}
+
+// implementation for the default constructor
+CK_DLL_CTOR( atmosphere2_ctor )
+{
+    // get the offset where we'll store our internal c++ class pointer
+    OBJ_MEMBER_INT( SELF, atmosphere2_data_offset ) = 0;
+    
+    // instantiate our internal c++ class representation
+    Atmosphere * a_obj = new Atmosphere( API->vm->srate( VM ), 2, 1 );
+    
+    // store the pointer in the ChucK object member
+    OBJ_MEMBER_INT( SELF, atmosphere2_data_offset ) = (t_CKINT)a_obj;
+}
+
+
+// implementation for the default constructor
+CK_DLL_CTOR( atmosphere2_2ctor )
+{
+    // get the offset where we'll store our internal c++ class pointer
+    OBJ_MEMBER_INT( SELF, atmosphere2_data_offset ) = 0;
+
+    Chuck_String* path =  GET_NEXT_STRING( ARGS );
+    
+    // instantiate our internal c++ class representation
+    Atmosphere * a_obj = new Atmosphere( API->vm->srate( VM ), 2, 1 );
+    if( !a_obj->openFile( API->object->str( path ) ) ) 
+    {
+        printf("Atmosphere: Unable to load audio file\n");
+        return;
+    }
+    
+    // store the pointer in the ChucK object member
+    OBJ_MEMBER_INT( SELF, atmosphere2_data_offset ) = (t_CKINT)a_obj;
+}
+
+
+// implementation for the destructor
+CK_DLL_DTOR( atmosphere2_dtor )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // clean up (this macro tests for NULL, deletes, and zeros out the variable)
+    CK_SAFE_DELETE( a_obj );
+    // set the data field to 0
+    OBJ_MEMBER_INT( SELF, atmosphere2_data_offset ) = 0;
+}
+
+
+// implementation for tick function (relevant only for UGens)
+CK_DLL_TICKF( atmosphere2_tickf )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+ 
+    // invoke our tick function; store in the magical out variable
+    if( a_obj ) a_obj->tick( in, out, nframes );
+
+    // yes
+    return TRUE;
+}
+
+
+// example implementation for setter
+CK_DLL_MFUN( atmosphere2_setGrainSize )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // get next argument
+    // NOTE argument type must match what is specified above in CK_DLL_QUERY
+    // NOTE this advances the ARGS pointer, so save in variable for re-use
+    t_CKFLOAT n_size = GET_NEXT_FLOAT( ARGS );
+    
+    // call setParam() and set the return value
+    a_obj->setSize( n_size );
+    
+    RETURN->v_float = a_obj->getSize();
+}
+
+
+// example implementation for getter
+CK_DLL_MFUN( atmosphere2_getGrainSize )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // call getParam() and set the return value
+    RETURN->v_float = a_obj->getSize();
+}
+
+
+// example implementation for setter
+CK_DLL_MFUN( atmosphere2_setPitch )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // get next argument
+    // NOTE argument type must match what is specified above in CK_DLL_QUERY
+    // NOTE this advances the ARGS pointer, so save in variable for re-use
+    t_CKFLOAT n_pitch = GET_NEXT_FLOAT( ARGS );
+    
+    // call setParam() and set the return value
+    a_obj->setPitch( n_pitch );
+    
+    RETURN->v_float = a_obj->getPitch();
+}
+
+
+// example implementation for setter
+CK_DLL_MFUN( atmosphere2_set2Pitch )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // get next argument
+    // NOTE argument type must match what is specified above in CK_DLL_QUERY
+    // NOTE this advances the ARGS pointer, so save in variable for re-use
+    t_CKFLOAT n_pitch = GET_NEXT_FLOAT( ARGS );
+	t_CKDUR n_duration = GET_NEXT_DUR( ARGS );
+    
+    // call setParam() and set the return value
+    a_obj->setPitch( n_pitch, (unsigned int)n_duration  );
+    
+    RETURN->v_float = a_obj->getPitch();
+}
+
+
+// example implementation for getter
+CK_DLL_MFUN( atmosphere2_getPitch )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // call getParam() and set the return value
+    RETURN->v_float = a_obj->getPitch();
+}
+
+
+// example implementation for setter
+CK_DLL_MFUN( atmosphere2_setPosition )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // get next argument
+    // NOTE argument type must match what is specified above in CK_DLL_QUERY
+    // NOTE this advances the ARGS pointer, so save in variable for re-use
+    t_CKFLOAT n_position = GET_NEXT_FLOAT( ARGS );
+    
+    // call setParam() and set the return value
+    a_obj->setPosition( n_position );
+    
+    RETURN->v_float = a_obj->getPosition();
+}
+
+
+// example implementation for setter
+CK_DLL_MFUN( atmosphere2_set2Position )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // get next argument
+    // NOTE argument type must match what is specified above in CK_DLL_QUERY
+    // NOTE this advances the ARGS pointer, so save in variable for re-use
+    t_CKFLOAT n_position = GET_NEXT_FLOAT( ARGS );
+   	t_CKDUR n_duration = GET_NEXT_DUR( ARGS );
+
+    // call setParam() and set the return value
+    a_obj->setPosition( n_position, (unsigned int)n_duration );
+    
+    RETURN->v_float = a_obj->getPosition();
+}
+
+
+// example implementation for getter
+CK_DLL_MFUN( atmosphere2_getPosition )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // call getParam() and set the return value
+    RETURN->v_float = a_obj->getPosition();
+}
+
+
+// example implementation for setter
+CK_DLL_MFUN( atmosphere2_setRandomGrainSize )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // get next argument
+    // NOTE argument type must match what is specified above in CK_DLL_QUERY
+    // NOTE this advances the ARGS pointer, so save in variable for re-use
+    t_CKFLOAT n_size = GET_NEXT_FLOAT( ARGS );
+    
+    // call setParam() and set the return value
+    a_obj->setRandomSize( n_size );
+    
+    RETURN->v_float = a_obj->getRandomSize();
+}
+
+
+// example implementation for getter
+CK_DLL_MFUN( atmosphere2_getRandomGrainSize )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // call getParam() and set the return value
+    RETURN->v_float = a_obj->getRandomSize();
+}
+
+
+// example implementation for setter
+CK_DLL_MFUN( atmosphere2_setRandomPitch )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // get next argument
+    // NOTE argument type must match what is specified above in CK_DLL_QUERY
+    // NOTE this advances the ARGS pointer, so save in variable for re-use
+    t_CKFLOAT n_size = GET_NEXT_FLOAT( ARGS );
+    
+    // call setParam() and set the return value
+    a_obj->setRandomPitch( n_size );
+    
+    RETURN->v_float = a_obj->getRandomPitch();
+}
+
+
+// example implementation for getter
+CK_DLL_MFUN( atmosphere2_getRandomPitch )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // call getParam() and set the return value
+    RETURN->v_float = a_obj->getRandomPitch();
+}
+
+
+// example implementation for setter
+CK_DLL_MFUN( atmosphere2_setRandomPosition )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // get next argument
+    // NOTE argument type must match what is specified above in CK_DLL_QUERY
+    // NOTE this advances the ARGS pointer, so save in variable for re-use
+    t_CKFLOAT n_size = GET_NEXT_FLOAT( ARGS );
+    
+    // call setParam() and set the return value
+    a_obj->setRandomPosition( n_size );
+    
+    RETURN->v_float = a_obj->getRandomPosition();
+}
+
+
+// example implementation for getter
+CK_DLL_MFUN( atmosphere2_getRandomPosition )
+{
+    // get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
+
+    // call getParam() and set the return value
+    RETURN->v_float = a_obj->getRandomPosition();
+}
+
+
+CK_DLL_MFUN( atmosphere2_duration )
+{
+	// get our c++ class pointer
+    Atmosphere * a_obj = (Atmosphere *)OBJ_MEMBER_INT( SELF, atmosphere2_data_offset );
 
 	RETURN->v_dur = (unsigned int)a_obj->size();
 }
