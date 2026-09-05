@@ -341,6 +341,13 @@ public:
 		for( int i = 0; i < num_pieces; i++ ) collage[i]->stop();
 	}
 
+	// stop all function calls
+	void sync()
+	{
+		// cycle
+		for( int i = 0; i < num_pieces; i++ ) collage[i]->sync();
+	}
+
 	//=======================================================================
 	//
 	//	name(s): openFile 

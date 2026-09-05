@@ -100,25 +100,42 @@ public:
 	// 
 	//=======================================================================
 
-	virtual double tick()
+	double tick()
 	{
 		// output
 		double out = 0.0;
+		bool allQuiet = true;
 		// if we're good to go
 		if( go )
 		{
 			// cycle through
 			for( int i = 0; i < num_grains; i++ ) 
 			{
-				// create new grain parameters if resting
-				if( quantum[i]->windowState() ) newGrain( quantum[i] );
+				// create new grain parameters if resting and we aren't syncing
+				if( quantum[i]->windowState() ) 
+				{
+					if( !waitingToSync ) 
+					{
+						newGrain( quantum[i] );
+						allQuiet = false; // if we aren't waiting to sync, then we aren't all quiet
+					}
+				}
+				else // if the state is non-zero, it's finished, therefore if it is zero, it is still actively making sound
+				{
+					allQuiet = false;
+				}
 				// the amalgamation of sound
 				out += quantum[i]->tick();
 				// if our grain is loop and finished, shoot off a new one
 				// if( quantum[i]->windowState() && quantum[i]->loopState() ) quantum[i]->trigger();
 			}
-			// don't use tick functions in loops! that defeats the point of a time normalized tick function everett!
-			// anyways, advance
+			// if we made it all the way through that loop without catching a grain that is making sound, we're all quiet
+			if( allQuiet ) 
+			{
+				waitingToSync = false;
+				for( int i = 0; i < num_grains; i++ ) quantum[i]->loopOn(); // turn the loop back on
+			} 
+			// advance
 			pitch_slew->tick();
 			position_slew->tick();
 			// scale because if we don't prevent blowing our ears out, ChucK definitely won't!
@@ -201,6 +218,20 @@ public:
 
 	//=======================================================================
 	//
+	//	name(s): sync
+	//	desc: stops all grains and starts them again
+	//	args: none
+	// 
+	//=======================================================================
+
+	void sync()
+	{
+		waitingToSync = true;
+		for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->loopOff();
+	}
+
+	//=======================================================================
+	//
 	//	name(s): set*, get* (and variations)
 	//	desc: set the size, pitch and position of underlying quarks
 	//	args: size pitch or position
@@ -268,7 +299,7 @@ public:
 		position_slew->setTarget( (float)n_position / (float)this->size(), 40.f); // convert
 	}
 
-	float getPosition() { return position_slew->getTarget(); }
+	float getPosition() { return position_slew->getCurrent(); }
 
 	void setGap( unsigned int gap_samp )
 	{
@@ -469,6 +500,7 @@ protected:
 	unsigned int base_gap = 0;
 	bool go = false;
 	bool internalBuffer = true;
+	bool waitingToSync = false;
 };
 
 #endif

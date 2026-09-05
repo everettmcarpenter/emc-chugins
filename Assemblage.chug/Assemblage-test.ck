@@ -18,7 +18,89 @@
 //    `chuck --chugin:Assemblage.chug Assemblage-test.ck -v3`
 //--------------------------------------------------------------------
 
-// instantiate a Assemblage
-Assemblage obj( "../include/dad.wav" ) => blackhole;
+@import "Rec.ck"
 
-3::second => now;
+Rec.auto();
+
+// instantiate a Assemblage
+Collage obj( "../include/Noise-Room.wav", 8 ) => Gain vol( 1.25 ) => Pan2 p => dac;
+obj => NRev rev( 0.1 ) => Gain revVolume( 0.8 ) => dac;
+obj => DelayA del( 386::ms ) => Envelope env( 5::ms, 1.0 ) => PitShift down( 0.25, 1.0 ) => Bitcrusher bc => FoldbackSaturator fold => PoleZero blocker => del;
+del => Gain feedbackDelayVolume( 0.5 ) => dac;
+
+fold.threshold( 0.4 );
+
+SinOsc subl( 42.0 ) => ADSR adsrl( 1::ms, 800::ms, 0.7, 1000::ms ) => Dyno expandl => Gain fadel( 0.5 ) => dac.chan( 0 );
+expandl.expand();
+SinOsc subr( 40.0 ) => ADSR adsrr( 1::ms, 800::ms, 0.7, 1000::ms ) => Dyno expandr => Gain fader( 0.5 ) => dac.chan( 1 );
+expandr.expand();
+
+bc.bits( 12 );
+bc.downsample( 2 );
+
+.95 => blocker.blockZero;
+
+obj.size( 23.0 );
+obj.randomSize( 4.0 );
+obj.position( 1.0, obj.duration() );
+
+spork ~ subRhythm();
+spork ~ panning();
+
+while( obj.position() < 1.0 )
+{
+	( ( Math.randomf() * 6.0 ) + 0.1 )::second => now;
+	env.keyOn();
+	obj.sync();
+	obj.pitch( 0.2 );
+	obj.randomPitch( 8.0 );
+	obj.size( 50.0 );
+	obj.randomSize( 4.0 );
+	obj.randomPosition( 5000.0 );
+	// bc.bits( Math.random2( 2, 32 ) );
+	// bc.downsample( Math.random2( 1, 16 ) );
+	( ( Math.randomf() * 6.0 ) + 0.1 )::second => now;
+	env.keyOff();
+	obj.pitch( 1.0 );
+	obj.size( 125.0 );
+	obj.randomSize( 28.0 );
+	obj.randomPosition( 0.0 );
+	obj.randomPitch( 0.0 );
+	if( Math.randomf() <= 0.4 ) obj.pitch( Math.randomf() * 1.0, 0.01::second );
+}
+
+fun void subRhythm()
+{
+	while( true )
+	{
+		adsrl.keyOn();
+		adsrr.keyOn();
+		1.5::second => now;
+		adsrl.keyOff();
+		adsrr.keyOff();
+		3::second => now;
+		if( Math.randomf() < 0.2 ) 
+		{
+			subl.freq( 42.0 * 1.1 );
+			subr.freq( 40.0 * 1.4 );
+		}
+		else if( subl.freq() != 42.0 ) 
+		{
+			subl.freq( 42.0 );
+			subr.freq( 40.0 );
+		}
+	}
+}
+
+fun void panning()
+{
+	pi / 128.0 => float increment;
+	float phase;
+	while( true )
+	{
+		p.pan( Math.sin( phase ) );
+		if( phase >= 2.0 * pi ) 2.0 * pi -=> phase;
+		increment +=> phase; 
+		50::ms => now;
+	}
+}

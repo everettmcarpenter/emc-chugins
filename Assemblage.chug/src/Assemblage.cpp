@@ -97,6 +97,8 @@ CK_DLL_MFUN( assemblage_set2Space );
 CK_DLL_MFUN( assemblage_getSpace );
 CK_DLL_MFUN( assemblage_setRandomSpace );
 CK_DLL_MFUN( assemblage_getRandomSpace );
+
+CK_DLL_MFUN( assemblage_sync );
 // this is a special offset reserved for chugin internal data
 t_CKINT assemblage_data_offset = 0;
 
@@ -272,6 +274,9 @@ CK_DLL_QUERY( Assemblage )
     QUERY->add_mfun( QUERY, assemblage_count, "int", "count" );
     QUERY->doc_func( QUERY, "How many pieces." );
 
+    QUERY->add_mfun( QUERY, assemblage_sync, "void", "sync" );
+    QUERY->doc_func( QUERY, "Have all grains complete their current cycle, and once they're all done, they start all together." );
+
     QUERY->add_mfun( QUERY, assemblage_openFile, "void", "openFile" );
     QUERY->add_arg( QUERY, "string", "file" );
     QUERY->doc_func( QUERY, "Open file at the given path." );
@@ -421,6 +426,9 @@ CK_DLL_QUERY( Assemblage )
 
     QUERY->add_mfun( QUERY, assemblage_count, "int", "count" );
     QUERY->doc_func( QUERY, "How many pieces." );
+
+    QUERY->add_mfun( QUERY, assemblage_sync, "void", "sync" );
+    QUERY->doc_func( QUERY, "Have all grains complete their current cycle, and once they're all done, they start all together." );
 
     QUERY->add_mfun( QUERY, assemblage_openFile, "void", "openFile" );
     QUERY->add_arg( QUERY, "string", "file" );
@@ -761,6 +769,14 @@ CK_DLL_MFUN( assemblage_duration )
     
     if( a_obj ) RETURN->v_dur = a_obj->samples();
     else RETURN->v_dur = 0;
+}
+
+CK_DLL_MFUN( assemblage_sync )
+{
+    // get our c++ class pointer
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    
+    if( a_obj ) a_obj->sync();
 }
 
 CK_DLL_MFUN( assemblage_count )
