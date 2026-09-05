@@ -47,7 +47,7 @@ public:
 		// create matter
 		quantum = new Quark*[num_grains];
 		// configure matter
-		for( int i = 0; i < num_grains; i++ ) { quantum[i] = new Quark( fs, *buffer ); quantum[i]->on(); }
+		for( unsigned int i = 0; i < num_grains; i++ ) { quantum[i] = new Quark( fs, *buffer ); quantum[i]->on(); }
 		// init
 		this->setSize( this->base_size );
 		this->setPitchInstant( 1.f );
@@ -67,7 +67,7 @@ public:
 		// destroy matter
 		if( quantum )
 		{
-			for( int i = 0; i < num_grains; i++ ) CK_SAFE_DELETE( quantum[i] );
+			for( unsigned int i = 0; i < num_grains; i++ ) CK_SAFE_DELETE( quantum[i] );
 			CK_SAFE_DELETE_ARRAY( quantum );
 		}
 		// destroy again
@@ -98,7 +98,7 @@ public:
 		if( go )
 		{
 			// cycle through
-			for( int i = 0; i < num_grains; i++ ) 
+			for( unsigned int i = 0; i < num_grains; i++ ) 
 			{
 				// create new grain parameters if resting
 				if( quantum[i]->windowState() ) newGrain( quantum[i] );
@@ -109,6 +109,7 @@ public:
 			}
 			// don't use tick functions in loops! that defeats the point of a time normalized tick function everett!
 			// anyways, advance
+			size_slew->tick();
 			pitch_slew->tick();
 			position_slew->tick();
 			// scale because if we don't prevent blowing our ears out, ChucK definitely won't!
@@ -179,14 +180,14 @@ public:
 	{ 
 		// turn everything on
 		go = true;
-		for( int i = 0; i < num_grains; i++ ) quantum[i]->on();
+		for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->on();
 	}
 
 	void stop() 
 	{ 
 		// turn everything off
 		go = false;
-		for( int i = 0; i < num_grains; i++ ) quantum[i]->off();
+		for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->off();
 	}
 
 	//=======================================================================
@@ -200,7 +201,7 @@ public:
 	void setSize( float n_size_ms )
 	{
 		base_size = n_size_ms;
-		for( int i = 0; i < num_grains; i++ ) 
+		for( unsigned int i = 0; i < num_grains; i++ ) 
 		{
 			// we gotta wrap around 
 			float n_size = base_size + ( random->tick() * random_size );
@@ -215,25 +216,25 @@ public:
 	void setPitch( double n_pitch )
 	{
 		pitch_slew->setTarget( n_pitch, 100.f );
-		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
+		// for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
 	void setPitch( double n_pitch, double ms_to )
 	{
 		pitch_slew->setTarget( n_pitch, ms_to );
-		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
+		// for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
 	void setPitch( double n_pitch, unsigned int samp_to )
 	{
 		pitch_slew->setTarget( n_pitch, samp_to );
-		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
+		// for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
 	void setPitchInstant( double n_pitch )
 	{
 		pitch_slew->instant( n_pitch );
-		// for( int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
+		// for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
 	float getPitch() { return pitch_slew->getTarget(); }
@@ -263,7 +264,7 @@ public:
 	void setGap( unsigned int gap_samp )
 	{
 		base_gap = gap_samp;
-		for( int i = 0; i < num_grains; i++ )
+		for( unsigned int i = 0; i < num_grains; i++ )
 		{
 			quantum[i]->setGap( base_gap );
 		}
@@ -329,7 +330,7 @@ public:
 			// read!
 			file_read->read( *buffer, 0, true );
 			// give to quarks and assign them to channels
-			for( int i = 0; i < num_grains; i++ ) { quantum[i]->setBuffer( *buffer, i % buffer->channels() ); }
+			for( unsigned int i = 0; i < num_grains; i++ ) { quantum[i]->setBuffer( *buffer, i % buffer->channels() ); }
 			// good to go
 			go = true;
 		}
@@ -354,14 +355,14 @@ public:
 			// close the file
 			if( file_read->isOpen() ) file_read->close();
 			// unlink the quarks
-			for( int i = 0; i < num_grains; i++ ) quantum[i]->clearBuffer();
+			for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->clearBuffer();
 			// clear buffer
 			CK_SAFE_DELETE( buffer );
 		}
 		else 
 		{
 			// have the quarks stop listening
-			for( int i = 0; i < num_grains; i++ ) quantum[i]->clearBuffer();
+			for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->clearBuffer();
 			// if someone called this and we aren't using our own buffer, it's probably best to assume the outside buffer we're using is goiung to be deleted
 			buffer = nullptr;
 		}
@@ -383,7 +384,7 @@ public:
 		// point to this!
 		buffer = n_buffer;
 		// give to quarks and assign them to channels
-		for( int i = 0; i < num_grains; i++ ) { quantum[i]->setBuffer( *buffer, i % buffer->channels() ); }
+		for( unsigned int i = 0; i < num_grains; i++ ) { quantum[i]->setBuffer( *buffer, i % buffer->channels() ); }
 		internalBuffer = false; // we're using an outside buffer
 	}
 
@@ -441,6 +442,7 @@ protected:
 	stk::Noise* random = nullptr; // randomization
 	stk::FileRead* file_read = nullptr; // this opens up a file
 	stk::StkFrames* buffer = nullptr; // everyone reads from here
+	Smoother* size_slew = nullptr; // slew grain size
 	Smoother* position_slew = nullptr; // this enables us to slew our position from a high level [0.0,1.0]
 	Smoother* pitch_slew = nullptr; // slew pitch from high level
 	unsigned int num_grains = 0; // number of grains

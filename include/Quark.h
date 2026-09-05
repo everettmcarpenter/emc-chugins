@@ -223,6 +223,7 @@ public:
 	// set gap size in samples
 	void setGap( unsigned int gap_samp )
 	{
+		if( gapSize >= (  1.5 * this->_fs ) ) toGo = gapSize; // if the current gap is large than or equal to 1.5 seconds, override it
 		gapSize = gap_samp;
 		// toGo = gapSize; // this overwrites the current gap size, let's see if we like that ( if this is commented out, we didn't like that )
 	}
