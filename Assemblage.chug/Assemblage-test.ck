@@ -23,17 +23,21 @@
 Rec.auto();
 
 // instantiate a Assemblage
-Collage obj( "../include/Noise-Room.wav", 8 ) => Gain vol( 1.25 ) => Pan2 p => dac;
+Collage obj( "../include/Leeds-Bells.wav", 8 ) => Gain vol( 1.25 ) => Pan2 p => dac;
 obj => NRev rev( 0.1 ) => Gain revVolume( 0.8 ) => dac;
-obj => DelayA del( 386::ms ) => Envelope env( 5::ms, 1.0 ) => PitShift down( 0.25, 1.0 ) => Bitcrusher bc => FoldbackSaturator fold => PoleZero blocker => del;
-del => Gain feedbackDelayVolume( 0.5 ) => dac;
+obj => DelayA del( 386::ms ) => Envelope env( 5::ms, 1.4 ) => PitShift down( 0.25, 1.0 ) => Bitcrusher bc => Distort deldist => PoleZero blocker => del;
+del => Gain feedbackDelayVolume( 0.7 ) => dac;
 
-fold.threshold( 0.4 );
+deldist.mode( 1 );
 
-SinOsc subl( 42.0 ) => ADSR adsrl( 1::ms, 800::ms, 0.7, 1000::ms ) => Dyno expandl => Gain fadel( 0.5 ) => dac.chan( 0 );
+SinOsc subl( 42.0 ) => ADSR adsrl( 1::ms, 800::ms, 0.4, 1000::ms ) => Gain ampl( 2.78 ) => Distort distl  => Dyno expandl => Gain fadel( 0.2 ) => dac.chan( 0 );
+SinOsc harml( 21.0 ) => Gain volharml( 0.2 ) => adsrl;
 expandl.expand();
-SinOsc subr( 40.0 ) => ADSR adsrr( 1::ms, 800::ms, 0.7, 1000::ms ) => Dyno expandr => Gain fader( 0.5 ) => dac.chan( 1 );
+distl.mode( 1 );
+SinOsc subr( 40.0 ) => ADSR adsrr( 1::ms, 800::ms, 0.4, 1000::ms ) => Gain ampr( 2.98 ) => Distort distr =>  Dyno expandr => Gain fader( 0.2 ) => dac.chan( 1 );
+SinOsc harmr( 20.0 ) => Gain volharmr( 0.2 ) => adsrr;
 expandr.expand();
+distr.mode( 1 );
 
 bc.bits( 12 );
 bc.downsample( 2 );
@@ -81,8 +85,8 @@ fun void subRhythm()
 		3::second => now;
 		if( Math.randomf() < 0.2 ) 
 		{
-			subl.freq( 42.0 * 1.1 );
-			subr.freq( 40.0 * 1.4 );
+			subl.freq( 42.0 * 0.76 );
+			subr.freq( 42.0 * 0.8 );
 		}
 		else if( subl.freq() != 42.0 ) 
 		{
