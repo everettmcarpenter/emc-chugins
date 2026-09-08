@@ -133,7 +133,11 @@ public:
 			if( allQuiet ) 
 			{
 				waitingToSync = false;
-				for( int i = 0; i < num_grains; i++ ) quantum[i]->loopOn(); // turn the loop back on
+				for( int i = 0; i < num_grains; i++ ) 
+				{
+					quantum[i]->loopOn(); // turn the loop back on
+					quantum[i]->trigger();
+				}
 			} 
 			// advance
 			pitch_slew->tick();

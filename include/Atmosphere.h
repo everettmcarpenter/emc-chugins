@@ -115,6 +115,7 @@ public:
 
 	void tick( SAMPLE* in, SAMPLE* out, unsigned int frames ) 
 	{
+		bool allQuiet = true;
 		// if we're good to go
 		if( go )
 		{
@@ -122,22 +123,43 @@ public:
 			// start up the machine
 			for( unsigned int f = 0; f < frames; f++ )
 			{
-				for( unsigned int q = 0; q < ( num_grains_per_channel * num_channels ); q++ ) 
+				for( unsigned int q = 0; q < num_grains; q++ ) 
 				{
 					// what channel does this particle belong to?
 					unsigned int channel = quantum[q]->getChannel();
 					// get audio and hope the channel index is within bounds
 					out[f * num_channels + channel] += quantum[q]->tick();
-
+					
 					/*
 					*	Idea: each frame check if all grains are off, if they are, shoot them all off, otherwise, wait until they are all completed. 
 					*	If this works well, consider how each grain can be delayed/changed to create variation across the channels
 					*/
 
 					// create new grain parameters if resting
-					if( quantum[q]->windowState() ) newGrain( quantum[q] );
+					if( quantum[q]->windowState() ) 
+					{
+						if( !waitingToSync )
+						{
+							newGrain( quantum[q] );
+							allQuiet = false;
+						}
+					}
+					else
+					{
+						allQuiet = false;
+					}			
 					// if our grain is loop and finished, shoot off a new one
 					if( quantum[q]->windowState() && quantum[q]->loopState() ) quantum[q]->trigger();
+				}
+				
+				if( allQuiet )
+				{
+					waitingToSync = false;
+					for( unsigned int i = 0; i < num_grains; i++ ) 
+					{
+						quantum[i]->loopOn();
+						quantum[i]->trigger();
+					}
 				}
 				
 				// scale the outgoing buffer ( is this more effecient than scaling every time we add the quantum tick to the output? i don't know )
@@ -146,7 +168,7 @@ public:
 					// yes, yes, scale the output
 					out[f * num_channels + c] *= scale; 
 					// why not soft clip while we're at it
-					out[f * num_channels + c] = tanh( out[f * num_channels + c] );
+					// out[f * num_channels + c] = tanh( out[f * num_channels + c] );
 				}
 
 				// advance in time
@@ -228,6 +250,20 @@ public:
 
 	//=======================================================================
 	//
+	//	name(s): sync
+	//	desc: stops all grains and starts them again
+	//	args: none
+	// 
+	//=======================================================================
+
+	void sync()
+	{
+		waitingToSync = true;
+		for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->loopOff();
+	}
+
+	//=======================================================================
+	//
 	//	name(s): set*, get* (and variations)
 	//	desc: set the size, pitch and position of underlying quarks
 	//	args: size pitch or position
@@ -273,7 +309,9 @@ public:
 		// for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
-	float getPitch() { return pitch_slew->getTarget(); }
+	float getPitch() { return pitch_slew->getCurrent(); }
+	
+	float getTargetPitch() { return pitch_slew->getTarget(); }
 
 	void setPosition( double n_position ) 
 	{
@@ -295,7 +333,9 @@ public:
 		position_slew->setTarget( (float)n_position / (float)this->size(), 40.f); // convert
 	}
 
-	float getPosition() { return position_slew->getTarget(); }
+	float getPosition() { return position_slew->getCurrent(); }
+
+	float getTargetPosition() { return position_slew->getTarget(); }
 
 	void setGap( unsigned int gap_samp )
 	{
@@ -498,6 +538,7 @@ protected:
 	unsigned int base_gap = 0;
 	bool go = false;
 	bool internalBuffer = true;
+	bool waitingToSync = false;
 
 	// ambisonic
 	unsigned int num_grains_per_channel = 0; // number of grains per channel

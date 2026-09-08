@@ -77,8 +77,8 @@ public:
 					if( loop ) 
 					{
 						this->trigger();
-						toGo = gapSize; // set our gap size for next time
 					}
+					toGo = gapSize; // set our gap size for next time
 				}
 				// debug
 				// printf( "Position %f, Pitch %f, Window size (ms) %f \n", position_slew->getCurrent(), pitch_slew->getCurrent(), window->getSizeMs() );
