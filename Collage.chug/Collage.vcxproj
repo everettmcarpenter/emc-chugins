@@ -17,28 +17,65 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\include\stk\src\FileRead.cpp" />
+    <ClCompile Include="..\include\stk\src\Noise.cpp" />
+    <ClCompile Include="..\include\stk\src\Stk.cpp" />
+    <ClCompile Include="src\Collage.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\Assemblage.h" />
+    <ClInclude Include="..\include\Atmosphere.h" />
+    <ClInclude Include="..\include\chugin.h" />
+    <ClInclude Include="..\include\CircularBuffer.h" />
+    <ClInclude Include="..\include\Delay.h" />
+    <ClInclude Include="..\include\Distort.h" />
+    <ClInclude Include="..\include\FileGrain.h" />
+    <ClInclude Include="..\include\Grain.h" />
+    <ClInclude Include="..\include\GrainEvent.h" />
+    <ClInclude Include="..\include\Interpolators.h" />
+    <ClInclude Include="..\include\Phasor.h" />
+    <ClInclude Include="..\include\Pulsar.h" />
+    <ClInclude Include="..\include\Quark.h" />
+    <ClInclude Include="..\include\Sampler.h" />
+    <ClInclude Include="..\include\Smoother.h" />
+    <ClInclude Include="..\include\SoundFile.h" />
+    <ClInclude Include="..\include\stk\include\FileRead.h" />
+    <ClInclude Include="..\include\stk\include\Noise.h" />
+    <ClInclude Include="..\include\stk\include\Stk.h" />
+    <ClInclude Include="..\include\Swarm.h" />
+    <ClInclude Include="..\include\Windower.h" />
+    <ClInclude Include="..\include\WindowFunctions.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{458E4FD7-5ABA-5A14-E481-C6E5C34732ED}</ProjectGuid>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)/Microsoft.Cpp.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -121,11 +158,5 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="Collage.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Collage.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Targets" />
 </Project>
