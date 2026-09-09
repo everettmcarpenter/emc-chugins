@@ -45,71 +45,71 @@
 #include <iostream>
 
 // declaration of chugin constructor
-CK_DLL_CTOR( assemblage_ctor );
-CK_DLL_CTOR( assemblage_2ctor );
-CK_DLL_CTOR( assemblage_3ctor );
-CK_DLL_CTOR( assemblage_4ctor );
+CK_DLL_CTOR( collage_ctor );
+CK_DLL_CTOR( collage_2ctor );
+CK_DLL_CTOR( collage_3ctor );
+CK_DLL_CTOR( collage_4ctor );
 // declaration of chugin desctructor
-CK_DLL_DTOR( assemblage_dtor );
+CK_DLL_DTOR( collage_dtor );
 
 // for chugins extending UGen, this is mono synthesis function for 1 sample
-CK_DLL_TICK( assemblage_tick );
+CK_DLL_TICK( collage_tick );
 
-CK_DLL_MFUN( assemblage_setGrainSize );
-CK_DLL_MFUN( assemblage_set2GrainSize );
-CK_DLL_MFUN( assemblage_setRandomGrainSize );
-CK_DLL_MFUN( assemblage_set2RandomGrainSize );
+CK_DLL_MFUN( collage_setGrainSize );
+CK_DLL_MFUN( collage_set2GrainSize );
+CK_DLL_MFUN( collage_setRandomGrainSize );
+CK_DLL_MFUN( collage_set2RandomGrainSize );
 
-CK_DLL_MFUN( assemblage_setPitch );
-CK_DLL_MFUN( assemblage_set2Pitch );
-CK_DLL_MFUN( assemblage_set3Pitch );
-CK_DLL_MFUN( assemblage_set4Pitch );
+CK_DLL_MFUN( collage_setPitch );
+CK_DLL_MFUN( collage_set2Pitch );
+CK_DLL_MFUN( collage_set3Pitch );
+CK_DLL_MFUN( collage_set4Pitch );
 
-CK_DLL_MFUN( assemblage_setRandomPitch );
-CK_DLL_MFUN( assemblage_set2RandomPitch );
+CK_DLL_MFUN( collage_setRandomPitch );
+CK_DLL_MFUN( collage_set2RandomPitch );
 
-CK_DLL_MFUN( assemblage_setPosition );
-CK_DLL_MFUN( assemblage_set2Position );
-CK_DLL_MFUN( assemblage_set3Position );
-CK_DLL_MFUN( assemblage_set4Position );
-CK_DLL_MFUN( assemblage_setRandomPosition );
-CK_DLL_MFUN( assemblage_set2RandomPosition );
+CK_DLL_MFUN( collage_setPosition );
+CK_DLL_MFUN( collage_set2Position );
+CK_DLL_MFUN( collage_set3Position );
+CK_DLL_MFUN( collage_set4Position );
+CK_DLL_MFUN( collage_setRandomPosition );
+CK_DLL_MFUN( collage_set2RandomPosition );
 
-CK_DLL_MFUN( assemblage_getGrainSize );
-CK_DLL_MFUN( assemblage_getRandomGrainSize );
+CK_DLL_MFUN( collage_getGrainSize );
+CK_DLL_MFUN( collage_getRandomGrainSize );
 
-CK_DLL_MFUN( assemblage_getPitch );
-CK_DLL_MFUN( assemblage_getTargetPitch );
-CK_DLL_MFUN( assemblage_getRandomPitch );
+CK_DLL_MFUN( collage_getPitch );
+CK_DLL_MFUN( collage_getTargetPitch );
+CK_DLL_MFUN( collage_getRandomPitch );
 
-CK_DLL_MFUN( assemblage_getPosition );
-CK_DLL_MFUN( assemblage_getTargetPosition );
-CK_DLL_MFUN( assemblage_getRandomPosition );
+CK_DLL_MFUN( collage_getPosition );
+CK_DLL_MFUN( collage_getTargetPosition );
+CK_DLL_MFUN( collage_getRandomPosition );
 
-CK_DLL_MFUN( assemblage_count );
-CK_DLL_MFUN( assemblage_openFile );
-CK_DLL_MFUN( assemblage_closeFile );
-CK_DLL_MFUN( assemblage_openExternalFile );
+CK_DLL_MFUN( collage_count );
+CK_DLL_MFUN( collage_openFile );
+CK_DLL_MFUN( collage_closeFile );
+CK_DLL_MFUN( collage_openExternalFile );
 
-CK_DLL_MFUN( assemblage_samples );
-CK_DLL_MFUN( assemblage_duration );
+CK_DLL_MFUN( collage_samples );
+CK_DLL_MFUN( collage_duration );
 
-CK_DLL_MFUN( assemblage_setSpace );
-CK_DLL_MFUN( assemblage_set2Space );
-CK_DLL_MFUN( assemblage_getSpace );
-CK_DLL_MFUN( assemblage_setRandomSpace );
-CK_DLL_MFUN( assemblage_getRandomSpace );
+CK_DLL_MFUN( collage_setSpace );
+CK_DLL_MFUN( collage_set2Space );
+CK_DLL_MFUN( collage_getSpace );
+CK_DLL_MFUN( collage_setRandomSpace );
+CK_DLL_MFUN( collage_getRandomSpace );
 
-CK_DLL_MFUN( assemblage_sync );
+CK_DLL_MFUN( collage_sync );
 // this is a special offset reserved for chugin internal data
-t_CKINT assemblage_data_offset = 0;
+t_CKINT collage_data_offset = 0;
 
 //-----------------------------------------------------------------------------
 // info function: ChucK calls this when loading/probing the chugin
 // NOTE: please customize these info fields below; they will be used for
 // chugins loading, probing, and package management and documentation
 //-----------------------------------------------------------------------------
-CK_DLL_INFO( Assemblage )
+CK_DLL_INFO( Collage )
 {
     // the version string of this chugin, e.g., "v1.2.1"
     QUERY->setinfo( QUERY, CHUGIN_INFO_CHUGIN_VERSION, "" );
@@ -128,193 +128,139 @@ CK_DLL_INFO( Assemblage )
 // query function: ChucK calls this when loading the chugin
 // modify this function to define this chugin's API and language extensions
 //-----------------------------------------------------------------------------
-CK_DLL_QUERY( Assemblage )
+CK_DLL_QUERY( Collage )
 {
     // generally, don't change this...
-    QUERY->setname( QUERY, "Assemblage" );
+    QUERY->setname( QUERY, "Collage" );
 
-    // ------------------------------------------------------------------------
-    // begin class definition(s); will be compiled, verified,
-    // and added to the chuck host type system for use
-    // ------------------------------------------------------------------------
-    // NOTE to create a non-UGen class, change the second argument
-    // to extend a different ChucK class (e.g., "Object")
-    QUERY->begin_class( QUERY, "Assemblage", "UGen" );
+    QUERY->begin_class( QUERY, "Collage", "UGen" );
 
-    // register default constructor
-    QUERY->add_ctor( QUERY, assemblage_ctor );
-    // NOTE constructors can be overloaded like any other functions,
-    // each overloaded constructor begins with `QUERY->add_ctor()`
-    // followed by a sequence of `QUERY->add_arg()`
-    QUERY->add_ctor( QUERY, assemblage_2ctor );
+    QUERY->add_ctor( QUERY, collage_ctor );
+
+    QUERY->add_ctor( QUERY, collage_2ctor );
     QUERY->add_arg( QUERY, "string", "file" );
     QUERY->add_arg( QUERY, "int", "num" );
 
-    QUERY->add_ctor( QUERY, assemblage_3ctor );
+    QUERY->add_ctor( QUERY, collage_3ctor );
     QUERY->add_arg( QUERY, "string", "file" );
 
-    QUERY->add_ctor( QUERY, assemblage_4ctor );
+    QUERY->add_ctor( QUERY, collage_4ctor );
     QUERY->add_arg( QUERY, "int", "number" );
 
-    // register the destructor (probably no need to change)
-    QUERY->add_dtor( QUERY, assemblage_dtor );
+    QUERY->add_dtor( QUERY, collage_dtor );
 
-    // for UGens only: add tick function
-    // NOTE a non-UGen class should remove or comment out this next line
-    QUERY->add_ugen_func( QUERY, assemblage_tick, NULL, 0, 1 );
-    // NOTE: if this is to be a UGen with more than 1 channel,
-    // e.g., a multichannel UGen -- will need to use add_ugen_funcf()
-    // and declare a tickf function using CK_DLL_TICKF
+    QUERY->add_ugen_func( QUERY, collage_tick, NULL, 0, 1 );
 
     // ===========================================================================================
 
-    QUERY->add_mfun( QUERY, assemblage_setGrainSize, "void", "size" );
+    QUERY->add_mfun( QUERY, collage_setGrainSize, "void", "size" );
     QUERY->add_arg( QUERY, "float", "size" );
     QUERY->doc_func( QUERY, "Set assemblage size in ms." );
 
-    QUERY->add_mfun( QUERY, assemblage_setRandomGrainSize, "void", "randomSize" );
+    QUERY->add_mfun( QUERY, collage_setRandomGrainSize, "void", "randomSize" );
     QUERY->add_arg( QUERY, "float", "randomness" );
     QUERY->doc_func( QUERY, "Set randomness of assemblage size. (Additive, this is a random number between 0 and 'randomSize' which is added to the base assemblage size)" );
 
     // ===========================================================================================
 
-    QUERY->add_mfun( QUERY, assemblage_setPitch, "void", "pitch" );
+    QUERY->add_mfun( QUERY, collage_setPitch, "void", "pitch" );
     QUERY->add_arg( QUERY, "float", "pitch" );
     QUERY->doc_func( QUERY, "Set pitch/rate of internal file." );
 
-    QUERY->add_mfun( QUERY, assemblage_setRandomPitch, "void", "randomPitch" );
+    QUERY->add_mfun( QUERY, collage_setRandomPitch, "void", "randomPitch" );
     QUERY->add_arg( QUERY, "float", "randomness" );
     QUERY->doc_func( QUERY, "Set randomness of pitch." );
 
     // ===========================================================================================
 
-    QUERY->add_mfun( QUERY, assemblage_setPosition, "void", "position" );
+    QUERY->add_mfun( QUERY, collage_setPosition, "void", "position" );
     QUERY->add_arg( QUERY, "float", "position" );
     QUERY->doc_func( QUERY, "Set position of assemblage in file." );
 
     /*
-    QUERY->add_mfun( QUERY, assemblage_set2Position, "void", "position" );
+    QUERY->add_mfun( QUERY, collage_setPosition, "void", "position" );
     QUERY->add_arg( QUERY, "int", "position" );
     QUERY->doc_func( QUERY, "Set position of assemblage in file." );
     */
 
-    QUERY->add_mfun( QUERY, assemblage_setRandomPosition, "void", "randomPosition" );
+    QUERY->add_mfun( QUERY, collage_setRandomPosition, "void", "randomPosition" );
     QUERY->add_arg( QUERY, "float", "randomness" );
     QUERY->doc_func( QUERY, "Set randomness of position." );
 
     // ===========================================================================================
 
-    QUERY->add_mfun(QUERY, assemblage_set2GrainSize, "void", "size");
-    QUERY->add_arg(QUERY, "float[]", "size");
-    QUERY->doc_func(QUERY, "Set assemblage size in ms.");
-
-    QUERY->add_mfun( QUERY, assemblage_set2RandomGrainSize, "void", "randomSize" );
-    QUERY->add_arg( QUERY, "float[]", "randomness" );
-    QUERY->doc_func( QUERY, "Set randomness of assemblage size. (Additive, this is a random number between 0 and 'randomSize' which is added to the base assemblage size)" );
-
-    // ===========================================================================================
-
-    QUERY->add_mfun( QUERY, assemblage_set2Pitch, "void", "pitch" );
-    QUERY->add_arg( QUERY, "float[]", "pitch" );
-    QUERY->doc_func( QUERY, "Set pitch/rate of internal file." );
-
-    QUERY->add_mfun( QUERY, assemblage_set3Pitch, "void", "pitch" );
+    QUERY->add_mfun( QUERY, collage_set3Pitch, "void", "pitch" );
     QUERY->add_arg( QUERY, "float", "pitch" );
     QUERY->add_arg( QUERY, "dur", "interpolation" );
     QUERY->doc_func( QUERY, "Set pitch/rate of internal file." );
 
-    QUERY->add_mfun( QUERY, assemblage_set4Pitch, "void", "pitch" );
-    QUERY->add_arg( QUERY, "float[]", "pitch" );
-    QUERY->add_arg( QUERY, "dur[]", "interpolation" );
-    QUERY->doc_func( QUERY, "Set pitch/rate of internal file." );
-
-    QUERY->add_mfun( QUERY, assemblage_set2RandomPitch, "void", "randomPitch" );
-    QUERY->add_arg( QUERY, "float[]", "randomness" );
-    QUERY->doc_func( QUERY, "Set randomness of pitch." );
-
     // ===========================================================================================
 
-    QUERY->add_mfun( QUERY, assemblage_set2Position, "void", "position" );
-    QUERY->add_arg( QUERY, "float[]", "position" );
-    QUERY->doc_func( QUERY, "Set position of assemblage in file." );
-
-    QUERY->add_mfun( QUERY, assemblage_set3Position, "void", "position" );
+    QUERY->add_mfun( QUERY, collage_set3Position, "void", "position" );
     QUERY->add_arg( QUERY, "float", "position" );
     QUERY->add_arg( QUERY, "dur", "interpolation" );
     QUERY->doc_func( QUERY, "Set position of assemblage in file." );
 
-	QUERY->add_mfun( QUERY, assemblage_set3Position, "void", "position" );
-    QUERY->add_arg( QUERY, "float[]", "position" );
-    QUERY->add_arg( QUERY, "dur[]", "interpolation" );
-    QUERY->doc_func( QUERY, "Set position of assemblage in file." );
-	
-
-    QUERY->add_mfun( QUERY, assemblage_set2RandomPosition, "void", "randomPosition" );
-    QUERY->add_arg( QUERY, "float[]", "randomness" );
-    QUERY->doc_func( QUERY, "Set randomness of position." );
-
     // ===========================================================================================
-    /*
-    QUERY->add_mfun( QUERY, assemblage_getGrainSize, "float[]", "size" );
+
+    QUERY->add_mfun( QUERY, collage_getGrainSize, "float", "size" );
     QUERY->doc_func( QUERY, "Get assemblage size in ms." );
 
-    QUERY->add_mfun( QUERY, assemblage_getRandomGrainSize, "float[]", "randomSize" );
+    QUERY->add_mfun( QUERY, collage_getRandomGrainSize, "float", "randomSize" );
     QUERY->doc_func( QUERY, "Get randomness of assemblage size." );
 
-    QUERY->add_mfun( QUERY, assemblage_getPitch, "float[]", "pitch" );
+    QUERY->add_mfun( QUERY, collage_getPitch, "float", "pitch" );
     QUERY->doc_func( QUERY, "Get the pitch/rate of internal file." );
 
-    QUERY->add_mfun( QUERY, assemblage_getRandomPitch, "float[]", "randomPitch" );
+    QUERY->add_mfun( QUERY, collage_getTargetPitch, "float", "targetPitch" );
+    QUERY->doc_func( QUERY, "Get the target pitch/rate of internal file." );
+
+    QUERY->add_mfun( QUERY, collage_getRandomPitch, "float", "randomPitch" );
     QUERY->doc_func( QUERY, "Get randomness of pitch." );
 
-    QUERY->add_mfun( QUERY, assemblage_getPosition, "float[]", "position" );
+    QUERY->add_mfun( QUERY, collage_getPosition, "float", "position" );
     QUERY->doc_func( QUERY, "Get position of assemblage." );
 
-    QUERY->add_mfun( QUERY, assemblage_getRandomPosition, "float[]", "randomPosition" );
+    QUERY->add_mfun( QUERY, collage_getTargetPosition, "float", "targetPosition" );
+    QUERY->doc_func( QUERY, "Get target position of assemblage." );
+
+    QUERY->add_mfun( QUERY, collage_getRandomPosition, "float", "randomPosition" );
     QUERY->doc_func( QUERY, "Get randomness of position." );
-    */
+
     // ===========================================================================================
 
-    QUERY->add_mfun( QUERY, assemblage_count, "int", "count" );
+    QUERY->add_mfun( QUERY, collage_count, "int", "count" );
     QUERY->doc_func( QUERY, "How many pieces." );
 
-    QUERY->add_mfun( QUERY, assemblage_sync, "void", "sync" );
+    QUERY->add_mfun( QUERY, collage_sync, "void", "sync" );
     QUERY->doc_func( QUERY, "Have all grains complete their current cycle, and once they're all done, they start all together." );
 
-    QUERY->add_mfun( QUERY, assemblage_openFile, "void", "openFile" );
+    QUERY->add_mfun( QUERY, collage_openFile, "void", "openFile" );
     QUERY->add_arg( QUERY, "string", "file" );
     QUERY->doc_func( QUERY, "Open file at the given path." );
 
-    QUERY->add_mfun( QUERY, assemblage_openExternalFile, "void", "openFile" );
+    QUERY->add_mfun( QUERY, collage_openExternalFile, "void", "openFile" );
     QUERY->add_arg( QUERY, "Object", "file" );
     QUERY->doc_func( QUERY, "Utilize provided audio buffer." );
 
-    QUERY->add_mfun( QUERY, assemblage_closeFile, "void", "closeFile" );
+    QUERY->add_mfun( QUERY, collage_closeFile, "void", "closeFile" );
     QUERY->doc_func( QUERY, "Close the active file." );
 
-    QUERY->add_mfun( QUERY, assemblage_samples, "int", "samples" );
+    QUERY->add_mfun( QUERY, collage_samples, "int", "samples" );
     QUERY->doc_func( QUERY, "Return how many samples are in the active file." );
 
-    QUERY->add_mfun( QUERY, assemblage_duration, "dur", "duration" );
+    QUERY->add_mfun( QUERY, collage_duration, "dur", "duration" );
     QUERY->doc_func( QUERY, "Length of file as a ChucK duration." );
 
-    QUERY->add_mfun( QUERY, assemblage_setSpace, "void", "spacer" );
+    QUERY->add_mfun( QUERY, collage_setSpace, "void", "spacer" );
     QUERY->add_arg( QUERY, "dur", "time" );
 
-	QUERY->add_mfun( QUERY, assemblage_set2Space, "void", "spacer" );
-    QUERY->add_arg( QUERY, "dur[]", "time" );	
-
-    QUERY->add_mfun( QUERY, assemblage_getSpace, "dur", "spacer" );
+    QUERY->add_mfun( QUERY, collage_getSpace, "dur", "spacer" );
     QUERY->doc_func( QUERY, "Get size of space" );
-
-    QUERY->add_mfun( QUERY, assemblage_setRandomSpace, "void", "randomSpace" );
-    QUERY->add_arg( QUERY, "dur", "time" );
-
-    QUERY->add_mfun( QUERY, assemblage_getRandomSpace, "dur", "randomSpace" );
 
     // this reserves a variable in the ChucK internal class to store 
     // referene to the c++ class we defined above
-    assemblage_data_offset = QUERY->add_mvar( QUERY, "int", "@g_data", false );
+    collage_data_offset = QUERY->add_mvar( QUERY, "int", "@g_data", false );
 
     // ------------------------------------------------------------------------
     // end the class definition
@@ -328,23 +274,23 @@ CK_DLL_QUERY( Assemblage )
 
 
 // implementation for the default constructor
-CK_DLL_CTOR( assemblage_ctor )
+CK_DLL_CTOR( collage_ctor )
 {
     // get the offset where we'll store our internal c++ class pointer
-    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = 0;
+    OBJ_MEMBER_INT( SELF, collage_data_offset ) = 0;
     
     // instantiate our internal c++ class representation
     Assemblage * a_obj = new Assemblage( API->vm->srate(VM) );
     
     // store the pointer in the ChucK object member
-    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = (t_CKINT)a_obj;
+    OBJ_MEMBER_INT( SELF, collage_data_offset ) = (t_CKINT)a_obj;
 }
 
 // implementation for the default constructor
-CK_DLL_CTOR( assemblage_2ctor )
+CK_DLL_CTOR( collage_2ctor )
 {
     // get the offset where we'll store our internal c++ class pointer
-    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = 0;
+    OBJ_MEMBER_INT( SELF, collage_data_offset ) = 0;
     
     Chuck_String* path =  GET_NEXT_STRING( ARGS );
     t_CKINT num_grains = GET_NEXT_INT( ARGS );
@@ -355,14 +301,14 @@ CK_DLL_CTOR( assemblage_2ctor )
     a_obj->openFile( API->object->str( path ) );
     
     // store the pointer in the ChucK object member
-    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = (t_CKINT)a_obj;
+    OBJ_MEMBER_INT( SELF, collage_data_offset ) = (t_CKINT)a_obj;
 }
 
 // implementation for the default constructor
-CK_DLL_CTOR( assemblage_3ctor )
+CK_DLL_CTOR( collage_3ctor )
 {
     // get the offset where we'll store our internal c++ class pointer
-    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = 0;
+    OBJ_MEMBER_INT( SELF, collage_data_offset ) = 0;
     
     Chuck_String* path =  GET_NEXT_STRING( ARGS );
 
@@ -371,14 +317,14 @@ CK_DLL_CTOR( assemblage_3ctor )
     a_obj->openFile( API->object->str( path ) );
     
     // store the pointer in the ChucK object member
-    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = (t_CKINT)a_obj;
+    OBJ_MEMBER_INT( SELF, collage_data_offset ) = (t_CKINT)a_obj;
 }
 
 // implementation for the default constructor
-CK_DLL_CTOR( assemblage_4ctor )
+CK_DLL_CTOR( collage_4ctor )
 {
     // get the offset where we'll store our internal c++ class pointer
-    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = 0;
+    OBJ_MEMBER_INT( SELF, collage_data_offset ) = 0;
    
     t_CKINT num_grains = GET_NEXT_INT( ARGS );
     if( num_grains <= 0 ) num_grains = 4;
@@ -387,26 +333,26 @@ CK_DLL_CTOR( assemblage_4ctor )
     Assemblage * a_obj = new Assemblage( API->vm->srate(VM), num_grains );
     
     // store the pointer in the ChucK object member
-    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = (t_CKINT)a_obj;
+    OBJ_MEMBER_INT( SELF, collage_data_offset ) = (t_CKINT)a_obj;
 }
 
 
 // implementation for the destructor
-CK_DLL_DTOR( assemblage_dtor )
+CK_DLL_DTOR( collage_dtor )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT( SELF, assemblage_data_offset );
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT( SELF, collage_data_offset );
     // clean up (this macro tests for NULL, deletes, and zeros out the variable)
     CK_SAFE_DELETE( a_obj );
     // set the data field to 0
-    OBJ_MEMBER_INT( SELF, assemblage_data_offset ) = 0;
+    OBJ_MEMBER_INT( SELF, collage_data_offset ) = 0;
 }
 
 // implementation for tick function (relevant only for UGens)
-CK_DLL_TICK( assemblage_tick )
+CK_DLL_TICK( collage_tick )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
  
     // invoke our tick function; store in the magical out variable
     if( a_obj ) *out = a_obj->tick();
@@ -415,50 +361,50 @@ CK_DLL_TICK( assemblage_tick )
     return TRUE;
 }
 
-CK_DLL_MFUN( assemblage_setGrainSize )
+CK_DLL_MFUN( collage_setGrainSize )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     t_CKFLOAT size = GET_NEXT_FLOAT( ARGS );
 
     if( a_obj ) a_obj->setSize( size );
 }
 
-CK_DLL_MFUN( assemblage_set2GrainSize )
+CK_DLL_MFUN( collage_set2GrainSize )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     Chuck_ArrayFloat* sizes = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
     
     if( a_obj ) a_obj->setSize( sizes, API );
 }
 
-CK_DLL_MFUN( assemblage_setPitch )
+CK_DLL_MFUN( collage_setPitch )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     t_CKFLOAT pitch = GET_NEXT_FLOAT( ARGS );
     
     if( a_obj ) a_obj->setPitch( pitch );
 }
 
-CK_DLL_MFUN( assemblage_set2Pitch )
+CK_DLL_MFUN( collage_set2Pitch )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     Chuck_ArrayFloat* pitches = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
     
     if( a_obj ) a_obj->setPitch( pitches, API );
 }
 
-CK_DLL_MFUN( assemblage_set3Pitch )
+CK_DLL_MFUN( collage_set3Pitch )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     t_CKFLOAT pitch = GET_NEXT_FLOAT( ARGS );
     t_CKDUR time_to = GET_NEXT_DUR( ARGS );
@@ -468,10 +414,10 @@ CK_DLL_MFUN( assemblage_set3Pitch )
     if( a_obj ) a_obj->setPitch( pitch, ( time_to ) / srate_khz );
 }
 
-CK_DLL_MFUN( assemblage_set4Pitch )
+CK_DLL_MFUN( collage_set4Pitch )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     Chuck_ArrayFloat* pitches = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
     Chuck_ArrayFloat* times_to = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
@@ -479,30 +425,30 @@ CK_DLL_MFUN( assemblage_set4Pitch )
     if( a_obj ) a_obj->setPitch( pitches, times_to, VM, API );
 }
 
-CK_DLL_MFUN( assemblage_setPosition )
+CK_DLL_MFUN( collage_setPosition )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     t_CKFLOAT pos = GET_NEXT_FLOAT( ARGS );
     
     if( a_obj ) a_obj->setPosition( pos );
 }
 
-CK_DLL_MFUN( assemblage_set2Position )
+CK_DLL_MFUN( collage_set2Position )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     Chuck_ArrayFloat* positions = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
     
     if( a_obj ) a_obj->setPosition( positions, API );
 }
 
-CK_DLL_MFUN( assemblage_set3Position )
+CK_DLL_MFUN( collage_set3Position )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     t_CKFLOAT pos = GET_NEXT_FLOAT( ARGS );
     t_CKDUR time_to = GET_NEXT_DUR( ARGS );
@@ -512,10 +458,10 @@ CK_DLL_MFUN( assemblage_set3Position )
     if( a_obj ) a_obj->setPosition( pos, ( time_to ) / srate_khz );
 }
 
-CK_DLL_MFUN( assemblage_set4Position )
+CK_DLL_MFUN( collage_set4Position )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     Chuck_ArrayFloat* positions = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
     Chuck_ArrayFloat* times_to = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
@@ -523,80 +469,80 @@ CK_DLL_MFUN( assemblage_set4Position )
     if( a_obj ) a_obj->setPosition( positions, times_to, VM, API );
 }
 
-CK_DLL_MFUN( assemblage_setRandomGrainSize ) // need to implement this on the Assemblage side
+CK_DLL_MFUN( collage_setRandomGrainSize ) // need to implement this on the Assemblage side
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     t_CKFLOAT randomSize = GET_NEXT_FLOAT( ARGS );
     
     if( a_obj ) a_obj->setRandomSize( randomSize );
 }
 
-CK_DLL_MFUN( assemblage_set2RandomGrainSize )
+CK_DLL_MFUN( collage_set2RandomGrainSize )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     Chuck_ArrayFloat* randomgrainSizes = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
     
     if( a_obj ) a_obj->setRandomSize( randomgrainSizes, API );
 }
 
-CK_DLL_MFUN( assemblage_setRandomPitch ) // need to implement this on the Assemblage side
+CK_DLL_MFUN( collage_setRandomPitch ) // need to implement this on the Assemblage side
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     t_CKFLOAT randomPitch = GET_NEXT_FLOAT( ARGS );
     
     if( a_obj ) a_obj->setRandomPitch( randomPitch );
 }
 
-CK_DLL_MFUN( assemblage_set2RandomPitch )
+CK_DLL_MFUN( collage_set2RandomPitch )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     Chuck_ArrayFloat* randompitches = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
     
     if( a_obj ) a_obj->setRandomPitch( randompitches, API );
 }
 
-CK_DLL_MFUN( assemblage_setRandomPosition ) // need to implement this on the Assemblage side
+CK_DLL_MFUN( collage_setRandomPosition ) // need to implement this on the Assemblage side
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     t_CKFLOAT randomPitch = GET_NEXT_FLOAT( ARGS );
     
     if( a_obj ) a_obj->setRandomPosition( randomPitch );
 }
 
-CK_DLL_MFUN( assemblage_set2RandomPosition )
+CK_DLL_MFUN( collage_set2RandomPosition )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     Chuck_ArrayFloat* radnompositions = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
     
     if( a_obj ) a_obj->setRandomPosition( radnompositions, API );
 }
 
-CK_DLL_MFUN( assemblage_openFile )
+CK_DLL_MFUN( collage_openFile )
 {
     // get granulator
-    Assemblage* g_obj = (Assemblage* )OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* g_obj = (Assemblage* )OBJ_MEMBER_INT(SELF, collage_data_offset);
     // get file
     Chuck_String* path = GET_NEXT_STRING( ARGS );
 
     if( g_obj ) g_obj->openFile( API->object->str( path ) );
 }
 
-CK_DLL_MFUN( assemblage_openExternalFile )
+CK_DLL_MFUN( collage_openExternalFile )
 {
     // get granulator
-    Assemblage* g_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* g_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, collage_data_offset);
 
     // get file
     SoundFile* myBuffer = (SoundFile*)GET_NEXT_OBJECT( ARGS );
@@ -604,153 +550,153 @@ CK_DLL_MFUN( assemblage_openExternalFile )
     // if( g_obj && myBuffer ) g_obj->linkBuffer( (stk::StkFrames*)myBuffer->buffer() );
 }
 
-CK_DLL_MFUN( assemblage_closeFile )
+CK_DLL_MFUN( collage_closeFile )
 {
     // get granulator
-    Assemblage* g_obj = (Assemblage* )OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* g_obj = (Assemblage* )OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     if( g_obj ) g_obj->closeFile();
 }
 
-CK_DLL_MFUN( assemblage_samples )
+CK_DLL_MFUN( collage_samples )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     if( a_obj ) RETURN->v_int = a_obj->samples();
     else RETURN->v_int = -1;
 }
 
-CK_DLL_MFUN( assemblage_duration )
+CK_DLL_MFUN( collage_duration )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     if( a_obj ) RETURN->v_dur = a_obj->samples();
     else RETURN->v_dur = 0;
 }
 
-CK_DLL_MFUN( assemblage_sync )
+CK_DLL_MFUN( collage_sync )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     if( a_obj ) a_obj->sync();
 }
 
-CK_DLL_MFUN( assemblage_count )
+CK_DLL_MFUN( collage_count )
 {
     // get our c++ class pointer
-    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage * a_obj = (Assemblage *)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     if( a_obj ) RETURN->v_int = a_obj->count();
     else RETURN->v_int = -1;
 }
 
-CK_DLL_MFUN( assemblage_setSpace )
+CK_DLL_MFUN( collage_setSpace )
 {
     // get our c++ class pointer
-    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     t_CKDUR space_time = GET_NEXT_DUR( ARGS );
     if( a_obj ) a_obj->setGap( (unsigned int)space_time );
 }
 
-CK_DLL_MFUN( assemblage_set2Space )
+CK_DLL_MFUN( collage_set2Space )
 {
     // get our c++ class pointer
-    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, collage_data_offset);
  
     Chuck_ArrayFloat* space_time = (Chuck_ArrayFloat*)GET_NEXT_OBJECT( ARGS );
 
     if( a_obj ) a_obj->setGap( space_time, API );
 }
 
-CK_DLL_MFUN( assemblage_getSpace )
+CK_DLL_MFUN( collage_getSpace )
 {
     // get our c++ class pointer
-    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     if( a_obj ) RETURN->v_dur = a_obj->getGap();
 }
 
-CK_DLL_MFUN( assemblage_setRandomSpace )
+CK_DLL_MFUN( collage_setRandomSpace )
 {
     // get our c++ class pointer
-    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     t_CKDUR space_time = GET_NEXT_DUR( ARGS );
     if( a_obj ) a_obj->setRandomGap( (unsigned int)space_time );
 }
 
-CK_DLL_MFUN( assemblage_getRandomSpace )
+CK_DLL_MFUN( collage_getRandomSpace )
 {
     // get our c++ class pointer
-    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     // if( a_obj ) RETURN->v_dur = a_obj->getRandomGap();
 }
 
-CK_DLL_MFUN( assemblage_getGrainSize )
+CK_DLL_MFUN( collage_getGrainSize )
 {
     // get our c++ class pointer
-    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     if( a_obj ) RETURN->v_float = a_obj->getBaseSize();
 }
 
-CK_DLL_MFUN( assemblage_getRandomGrainSize )
+CK_DLL_MFUN( collage_getRandomGrainSize )
 {
     // get our c++ class pointer
-    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     if( a_obj ) RETURN->v_float = a_obj->getBaseRandomSize();
 }
 
-CK_DLL_MFUN( assemblage_getPitch )
+CK_DLL_MFUN( collage_getPitch )
 {
     // get our c++ class pointer
-    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     if( a_obj ) RETURN->v_float = a_obj->getBasePitch();
 }
 
-CK_DLL_MFUN( assemblage_getTargetPitch )
+CK_DLL_MFUN( collage_getTargetPitch )
 {
     // get our c++ class pointer
-    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     if( a_obj ) RETURN->v_float = a_obj->getTargetPitch();
 }
 
-CK_DLL_MFUN( assemblage_getRandomPitch )
+CK_DLL_MFUN( collage_getRandomPitch )
 {
     // get our c++ class pointer
-    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     if( a_obj ) RETURN->v_float = a_obj->getBaseRandomPitch();
 }
 
-CK_DLL_MFUN( assemblage_getPosition )
+CK_DLL_MFUN( collage_getPosition )
 {
     // get our c++ class pointer
-    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     if( a_obj ) RETURN->v_float = a_obj->getBasePosition();
 }
 
-CK_DLL_MFUN( assemblage_getTargetPosition )
+CK_DLL_MFUN( collage_getTargetPosition )
 {
     // get our c++ class pointer
-    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     if( a_obj ) RETURN->v_float = a_obj->getTargetPosition();
 }
 
-CK_DLL_MFUN( assemblage_getRandomPosition )
+CK_DLL_MFUN( collage_getRandomPosition )
 {
     // get our c++ class pointer
-    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, assemblage_data_offset);
+    Assemblage* a_obj = (Assemblage*)OBJ_MEMBER_INT(SELF, collage_data_offset);
     
     if( a_obj ) RETURN->v_float = a_obj->getBaseRandomPosition();
 }

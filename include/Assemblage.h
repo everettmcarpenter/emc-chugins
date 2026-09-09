@@ -181,6 +181,11 @@ public:
 		return collage[0]->getPitch();
 	}
 
+	// return the pitch of the first collage (helpful when not using arrays)
+	float getTargetPitch()
+	{
+		return collage[0]->getTargetPitch();
+	}
 
 	// set all sizes to a single value
 	void setSize( float size )
@@ -216,6 +221,11 @@ public:
 	float getBasePosition()
 	{
 		return collage[0]->getPosition();
+	}
+	// return the position of the first collage (helpful when not using arrays)
+	float getTargetPosition()
+	{
+		return collage[0]->getTargetPosition();
 	}
 
 	void setGap( unsigned int gap_samp )

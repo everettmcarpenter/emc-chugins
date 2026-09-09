@@ -281,7 +281,9 @@ public:
 		// for( unsigned int i = 0; i < num_grains; i++ ) quantum[i]->setPitch( base_pitch + ( random->tick() * random_pitch ) );
 	}
 
-	float getPitch() { return pitch_slew->getTarget(); }
+	float getPitch() { return pitch_slew->getCurrent(); }
+
+	float getTargetPitch() { return pitch_slew->getTarget(); }
 
 	void setPosition( double n_position ) 
 	{
@@ -304,6 +306,8 @@ public:
 	}
 
 	float getPosition() { return position_slew->getCurrent(); }
+	
+	float getTargetPosition() { return position_slew->getTarget(); }
 
 	void setGap( unsigned int gap_samp )
 	{
