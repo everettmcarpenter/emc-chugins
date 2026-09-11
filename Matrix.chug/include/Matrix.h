@@ -1,5 +1,5 @@
 // general matrix class with a signal processing twang
-#include "../../include/Smoother.h"
+#include "../../emc-syntheaders/Smoother.h"
 #include "math.h"
 
 const t_CKFLOAT ZERO_THRESHOLD = 1e-3;

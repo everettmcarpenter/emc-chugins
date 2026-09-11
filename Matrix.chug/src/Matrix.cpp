@@ -36,8 +36,8 @@
 //-----------------------------------------------------------------------------
 
 // include chugin header
-#include "../../include/chugin.h"
-#include "../include/Matrix.h"
+#include "../../emc-syntheaders/chugin.h"
+#include "../emc-syntheaders/Matrix.h"
 
 // general includes
 #include <iostream>

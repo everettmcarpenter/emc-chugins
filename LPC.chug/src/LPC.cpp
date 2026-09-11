@@ -36,7 +36,7 @@
 //-----------------------------------------------------------------------------
 
 // include chugin header
-#include "../../include/chugin.h"
+#include "../../emc-syntheaders/chugin.h"
 
 // general includes
 #include <iostream>

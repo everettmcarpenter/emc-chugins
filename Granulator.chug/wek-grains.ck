@@ -1,7 +1,7 @@
 // instantiate a global Wekinator, so other files can access
 Wekinator wek;
 
-Granulator grains( "../include/randomvaporwave.wav", 16 ) => dac;
+Granulator grains( "../emc-syntheaders/randomvaporwave.wav", 16 ) => dac;
 
 grains.pitch( 1.0 );
 

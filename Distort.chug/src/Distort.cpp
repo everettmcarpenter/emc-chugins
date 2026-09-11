@@ -3,8 +3,8 @@
 //-----------------------------------------------------------------------------
 
 // include chugin header
-#include "../../include/chugin.h"
-#include "../../include/Distort.h"
+#include "../../emc-syntheaders/chugin.h"
+#include "../../emc-syntheaders/Distort.h"
 
 // general includes
 #include <iostream>

@@ -1,6 +1,6 @@
 @import "Rec"
 
-Granulator test( "../include/futureproofamen.wav", 32 )[4] => Gain vol( 1.0 / ( test.size() ) )[4] => DelayA del[4] => Matrix4 mat => dac;
+Granulator test( "../emc-syntheaders/futureproofamen.wav", 32 )[4] => Gain vol( 1.0 / ( test.size() ) )[4] => DelayA del[4] => Matrix4 mat => dac;
 
 mat.identity();
 mat => del;

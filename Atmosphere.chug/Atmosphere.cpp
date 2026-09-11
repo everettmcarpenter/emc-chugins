@@ -8,8 +8,8 @@
 //-----------------------------------------------------------------------------
 
 // include chugin header
-#include "../include/chugin.h"
-#include "../include/Atmosphere.h"
+#include "../emc-syntheaders/chugin.h"
+#include "../emc-syntheaders/Atmosphere.h"
 
 // general includes
 #include <iostream>

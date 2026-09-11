@@ -4,7 +4,7 @@
 Hid hi;
 HidMsg msg;
 GranularSupport helper(1);
-Granulator grains( "../include/compress_practice.wav", 32 )[2] => dac;
+Granulator grains( "../emc-syntheaders/compress_practice.wav", 32 )[2] => dac;
 // identify yourself
 string address;
 int port;

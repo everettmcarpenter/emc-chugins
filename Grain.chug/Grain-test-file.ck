@@ -60,8 +60,8 @@ fun void setPitch( Grain pl[], float pitch )
 
 for( int i; i < N; i++ )
 {
-    testL[i].openFile( "../include/blackpaint.wav" );
-    testR[i].openFile( "../include/blackpaint.wav" );
+    testL[i].openFile( "../emc-syntheaders/blackpaint.wav" );
+    testR[i].openFile( "../emc-syntheaders/blackpaint.wav" );
 }
 
 while( true )

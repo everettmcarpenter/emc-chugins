@@ -1,6 +1,6 @@
 Grain test => Gain vol( 0.5 ) => dac;
 
-test.openFile( "../include/blackpaint.wav" );
+test.openFile( "../emc-syntheaders/blackpaint.wav" );
 
 test.pitch( 1.0 );
 

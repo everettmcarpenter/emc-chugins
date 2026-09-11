@@ -1,6 +1,6 @@
 @import "Rec"
 
-Grain test( "../include/808cymbal.wav" )[36] => Gain vol( 1.0 / ( test.size() / 4.0 ) )[16] => DelayA del[16] => Matrix16 mat => dac;
+Grain test( "../emc-syntheaders/808cymbal.wav" )[36] => Gain vol( 1.0 / ( test.size() / 4.0 ) )[16] => DelayA del[16] => Matrix16 mat => dac;
 
 mat.identity();
 mat => del;

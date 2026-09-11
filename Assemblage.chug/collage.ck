@@ -2,8 +2,8 @@
 
 Rec.auto();
 
-Collage collage( "../include/Noise-Room.wav", 48 ) => NRev leftReverb( 0.125 )=> dac.chan( 0 );
-Collage painting( "../include/Noise-Room.wav", 48 ) => NRev rightReverb( 0.125 ) => dac.chan( 1 );
+Collage collage( "../emc-syntheaders/Noise-Room.wav", 48 ) => NRev leftReverb( 0.125 )=> dac.chan( 0 );
+Collage painting( "../emc-syntheaders/Noise-Room.wav", 48 ) => NRev rightReverb( 0.125 ) => dac.chan( 1 );
 
 leftReverb => DelayA delayLeft( 780::ms ) => Gain feedbackLeft( 0.1 ) => leftReverb;
 rightReverb => DelayA delayRight( 780::ms ) => Gain feedbackRight( 0.1 ) => rightReverb;

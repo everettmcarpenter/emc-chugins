@@ -23,7 +23,7 @@
 // instantiate a Sampler
 Sampler obj => NRev rev( 0.015 ) => Gain vol( 0.8 ) => dac;
 
-obj.file( "../include/blackpaint.WAV" ) $ int => int size;
+obj.file( "../emc-syntheaders/blackpaint.WAV" ) $ int => int size;
 
 obj.pitch( 1.0 );
 obj.position( Math.random2( 0, size ) );

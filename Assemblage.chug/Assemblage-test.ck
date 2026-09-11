@@ -23,7 +23,7 @@
 Rec.auto();
 
 // instantiate a Assemblage
-Collage obj( "../include/Leeds-Bells.wav", 8 ) => Gain vol( 1.25 ) => Pan2 p => dac;
+Collage obj( "../emc-syntheaders/Leeds-Bells.wav", 8 ) => Gain vol( 1.25 ) => Pan2 p => dac;
 obj => NRev rev( 0.1 ) => Gain revVolume( 0.8 ) => dac;
 obj => DelayA del( 386::ms ) => Envelope env( 5::ms, 1.4 ) => PitShift down( 0.25, 1.0 ) => Bitcrusher bc => Distort deldist => PoleZero blocker => del;
 del => Gain feedbackDelayVolume( 0.7 ) => dac;

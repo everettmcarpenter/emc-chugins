@@ -36,9 +36,9 @@
 //-----------------------------------------------------------------------------
 
 // include chugin header
-#include "../../include/chugin.h"
-#include "../../include/Assemblage.h"
-#include "../../include/SoundFile.h"
+#include "../../emc-syntheaders/chugin.h"
+#include "../../emc-syntheaders/Assemblage.h"
+#include "../../emc-syntheaders/SoundFile.h"
 // #include "../../SoundFile.chug/src/SoundFile.cpp"
 
 // general includes

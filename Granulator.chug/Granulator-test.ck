@@ -19,7 +19,7 @@
 //--------------------------------------------------------------------
 
 // instantiate a Granulator
-Granulator obj( "../include/blackpaint.wav", 16 ) => Gain vol(0.5) => dac;
+Granulator obj( "../emc-syntheaders/blackpaint.wav", 16 ) => Gain vol(0.5) => dac;
 
 obj.position( 0.01 ); obj.size( 38.0 ); obj.randomSize( 225.0 );
 

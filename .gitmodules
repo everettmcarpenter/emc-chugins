@@ -1,3 +1,3 @@
-[submodule "include/stk"]
-	path = include/stk
-	url = https://github.com/thestk/stk
+[submodule "emc-syntheaders"]
+	path = emc-syntheaders
+	url = git@github.com:everettmcarpenter/emc-syntheaders.git

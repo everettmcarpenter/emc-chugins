@@ -7,7 +7,7 @@ C_MODULES=
 CXX_MODULES=src/Sampler.cpp
 
 # where to find chugin.h
-CK_SRC_PATH?=../include
+CK_SRC_PATH?=../emc-syntheaders
 
 # where to install chugin
 CHUGIN_PATH?=/usr/local/lib/chuck

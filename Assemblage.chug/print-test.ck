@@ -1,6 +1,6 @@
 @import "Line"
 
-Assemblage grain("../include/resolution.wav") => blackhole;
+Assemblage grain("../emc-syntheaders/resolution.wav") => blackhole;
 Line grainSize(5::second) => blackhole;
 Line grainPitch(5::second) => blackhole;
 Line grainPosition(5::second) => blackhole;

@@ -36,8 +36,8 @@
 //-----------------------------------------------------------------------------
 
 // include chugin header
-#include "../../include/chugin.h"
-#include "../../include/Swarm.h"
+#include "../../emc-syntheaders/chugin.h"
+#include "../../emc-syntheaders/Swarm.h"
 
 // general includes
 #include <iostream>

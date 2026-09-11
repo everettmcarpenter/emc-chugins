@@ -1,3 +1,3 @@
-Collage co( "../include/Leeds-Bells.wav" ) => blackhole;
+Collage co( "../emc-syntheaders/Leeds-Bells.wav" ) => blackhole;
 
 <<< co.spacer() >>>;

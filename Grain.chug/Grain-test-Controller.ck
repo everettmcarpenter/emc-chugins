@@ -26,7 +26,7 @@ GameController controller( 0 );
 Grain testL => Gain volL( 0.8 ) => dac.chan( 0 );
 Grain testR => Gain volR( 0.8 ) => dac.chan( 1 );
 
-"../include/randomvaporwave.WAV" => string filename;
+"../emc-syntheaders/randomvaporwave.WAV" => string filename;
 testL.openFile( filename );
 testR.openFile( filename );
 

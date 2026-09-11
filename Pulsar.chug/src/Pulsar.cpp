@@ -36,8 +36,8 @@
 //-----------------------------------------------------------------------------
 
 // include chugin header
-#include "../../include/chugin.h"
-#include "../include/Pulsar.h"
+#include "../../emc-syntheaders/chugin.h"
+#include "../emc-syntheaders/Pulsar.h"
 
 // general includes
 #include <iostream>

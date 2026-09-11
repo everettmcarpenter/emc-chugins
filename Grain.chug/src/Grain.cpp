@@ -36,8 +36,8 @@
 //-----------------------------------------------------------------------------
 
 // include chugin header
-#include "../../include/chugin.h"
-#include "../../include/FileGrain.h"
+#include "../../emc-syntheaders/chugin.h"
+#include "../../emc-syntheaders/FileGrain.h"
 
 // general includes
 #include <iostream>

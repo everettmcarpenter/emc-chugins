@@ -26,7 +26,7 @@ Sampler obj => Gain vol( 0.8 ) => dac;
 Hid hi;
 HidMsg msg;
 
-obj.file( "../include/randomvaporwave.WAV" ) => float size;
+obj.file( "../emc-syntheaders/randomvaporwave.WAV" ) => float size;
 
 // open joystick 0, exit on fail
 if(!hi.openJoystick(0)) me.exit();

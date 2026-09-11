@@ -1,6 +1,6 @@
 @import "Line"
 
-Assemblage grain("../include/Leeds-Bells.wav", 32) => Gain vol( 2.0 ) => NRev rev( 0.05 ) => dac;
+Assemblage grain("../emc-syntheaders/Leeds-Bells.wav", 32) => Gain vol( 2.0 ) => NRev rev( 0.05 ) => dac;
 
 Line grainSize => blackhole; 
 

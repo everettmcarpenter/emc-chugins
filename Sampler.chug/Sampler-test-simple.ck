@@ -23,7 +23,7 @@
 // instantiate a Sampler
 Sampler obj => NRev rev => Gain vol( 0.8 ) => dac;
 
-obj.file( "../include/randomvaporwave.WAV" ) => float size;
+obj.file( "../emc-syntheaders/randomvaporwave.WAV" ) => float size;
 
 float i;
 100.0 => float runRate;
