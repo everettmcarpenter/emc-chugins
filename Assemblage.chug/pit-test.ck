@@ -1,6 +1,6 @@
 @import "Line"
 
-Assemblage grain("../include/Leeds-Bells.wav", 16) => Gain vol( 1.5 ) => NRev rev( 0.05 ) => dac;
+Assemblage grain("../include/think-break_120bpm.wav", 16) => Gain vol( 1.5 ) => NRev rev( 0.05 ) => dac;
 
 Line grainSize => blackhole; 
 
