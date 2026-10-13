@@ -3,7 +3,7 @@
 // Henon Map noise gen snagged from Neil Thornock's
 // implementation for RTCmix
 //
-// emc.
+// emc. ( who added the soft clipping )
 //	
 // ------------------------------------------------
 
@@ -18,16 +18,16 @@ class HenonMap
 {
 public:
 	// this is an awesome constructor
-	HenonMap::HenonMap( unsigned int fs ) : x( 0 ), y( 0 ), del( 0 ), alpha( 0 ), beta( 0 ) {};
+	HenonMap( unsigned int fs ) : x( 0 ), y( 0 ), del( 0 ), alpha( 0 ), beta( 0 ), x_1( 0 ), y_1( 0 ) {};
 	
 	// give me sample
-	double HenonMap::tick()
+	double tick()
 	{
 		return map();
 	}
 
 	// give me buffer
-	void HenonMap::tick( double* output, unsigned int nframes )
+	void tick( double* output, unsigned int nframes )
 	{
 		// assuming we have a one channel buffer
 		for( unsigned int f = 0; f < nframes; f++ )
@@ -35,7 +35,7 @@ public:
 	}
 	
 	// give me interleaved buffer
-	void HenonMap::tick( double* output, unsigned int nframes, unsigned int channels )
+	void tick( double* output, unsigned int nframes, unsigned int channels )
 	{
 		// assuming we have a one channel buffer
 		for( unsigned int f = 0; f < nframes; f++ )
@@ -54,7 +54,7 @@ public:
 		double out;
 		// map! R^2 -> R^2 weighted feedback + 1.0 - independently weighted feedback squared 
 		// for a variation, maybe try using an input to drive the map ( but how??? ) 
-		x = y + 1.0 - ( alpha * del * del );
+		x = y + 1.0 - ( alpha * x * x );
 		// y is essentially weighted feedback 
 		y = beta * del;
 		// save for later
@@ -62,28 +62,40 @@ public:
 		
 		// edge case ( this was neil's og edge case, but we might try something else ) 
 		if( x > 1.0 || x < -1.0 )
-			out = sin( x ); 
-		else 
-			out = x; 
+		{
+			out = sin( x + y );  
+		}
+		else
+			out = x;
 
-		std::cerr << out << '\n';
 		// send it out
-		return out;
+		return dcBlock( out );
+	}
 
+	double dcBlock( double in )
+	{
+		double out;
+		// explanation for magic constant may be found here https://ccrma.stanford.edu/~jos/filters/DC_Blocker.html
+		out = in - x_1 + 0.9 * y_1;
+		x_1 = in; // woo
+		y_1 = out; // woo
+		return out;
 	}
 
 	// give me set me alpha
-	double HenonMap::a( double newA ) { alpha = newA; return alpha; }
+	double a( double newA ) { alpha = newA; return alpha; }
 	// give me set me beta
-	double HenonMap::b( double newB ) { beta = newB; return beta; }
+	double b( double newB ) { beta = newB; return beta; }
 	
 	// give me alpha
-	double HenonMap::a() { return alpha; }
+	double a() { return alpha; }
 	// give me beta
-	double HenonMap::b() { return beta; }
+	double b() { return beta; }
 
 private:
 	double x, y, del, alpha, beta;
+	double y_1; // this is used for dc blocking
+	double x_1; // this too
 };
 
 #endif /* HENON_H */
